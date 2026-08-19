@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bolsa de Trabajo Municipal</title>
+
+  <!-- Leaflet CSS para el Mapa -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Archivo de Estilos Principal -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Encabezado Principal -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-title">
+        <h1>Bolsa de Trabajo Municipal</h1>
+        <p>Conectando talento con oportunidades</p>
+      </div>
+    </div>
+
+    <div class="header-buttons">
+      <!-- Controles de Accesibilidad -->
+      <div class="text-size-control">
+        <button id="btnTextSmaller" class="btn-access btn-reset" title="Disminuir texto">A-</button>
+        <div class="slider-container">
+          <input type="range" id="textSizeSlider" min="80" max="130" value="100" step="5">
+          <span class="slider-label" id="textSizeLabel">100%</span>
+        </div>
+        <button id="btnTextLarger" class="btn-access btn-reset" title="Aumentar texto">A+</button>
+      </div>
+
+      <button id="btnToggleDarkMode" class="btn-access">🌙 Modo Oscuro</button>
+      <button id="btnEmpleos" class="btn-empleos">GeoPortal de Empleos</button>
+      <button id="btnHelp" class="btn-help" title="Ayuda y Tutorial">?</button>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       VISTA 1: INICIO / LANDING PAGE
+       ========================================== -->
+  <main id="vistaInicio">
+    <!-- Hero Principal -->
+    <section class="hero" id="heroEmpresas">
+      <div class="hero-content">
+        <div class="icon-badge">💼</div>
+        <h2>Portal del Empleador</h2>
+        <p>Publica vacantes y gestiona solicitudes de forma ágil e intuitiva.</p>
+        <button class="btn-accede">Acceder como Empresa</button>
+      </div>
+    </section>
+
+    <!-- Banner Crea tu CV con IA -->
+    <section class="cv-banner-container" id="bannerCV">
+      <div class="cv-banner-card">
+        <div class="cv-banner-image">
+          <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80" alt="Crear Curriculum Vitae">
+        </div>
+        <div class="cv-banner-content">
+          <h2>¿Necesitas ayuda con tu currículum?</h2>
+          <p>Genera un CV profesional adaptado a las vacantes del municipio utilizando nuestro asistente inteligente.</p>
+          <button class="btn-crear-cv">Crear CV con IA</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección Espacio Ciudadano -->
+    <section class="section-container" id="gridCiudadano">
+      <h2 class="section-title">Espacio Ciudadano</h2>
+      <div class="divider">
+        <div class="divider-dots">
+          <span class="dot dot-blue"></span>
+          <span class="dot dot-orange"></span>
+          <span class="dot dot-green"></span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-icon">🔍</div>
+          <h3>Consulta Vacantes</h3>
+          <p>Explora ofertas laborales locales ajustadas a tu perfil e intereses.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📝</div>
+          <h3>Sube tu CV</h3>
+          <p>Permite que las mejores empresas encuentren tu perfil rápidamente.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🚀</div>
+          <h3>Impulsa tu Carrera</h3>
+          <p>Accede a programas de capacitación y jornadas de contratación directas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: Agenda Municipal con Calendario Tipo Rejilla (Click) -->
+    <section id="seccionCalendario" class="section-container calendario-section">
+      <h2 class="section-title">Agenda Municipal de Empleo</h2>
+      <p class="section-subtitle">Haz clic sobre una categoría para desplegar su calendario de eventos</p>
+
+      <div class="sectores-grid">
+        <!-- 1. Día del empleo -->
+        <div class="sector-card" data-sector="diaEmpleo">
+          <div class="sector-header cat-dia-empleo">
+            <span class="sector-icon">☀️</span>
+            <h3>Día del empleo</h3>
+            <span class="badge-count">2 Fechas</span>
+          </div>
+          <p class="sector-desc">Jornadas semanales de vinculación directa entre postulantes y empresas en la cabecera municipal.</p>
+          
+          <!-- Contenedor del Calendario Estilo Rejilla -->
+          <div class="dropdown-calendar">
+            <div class="calendar-widget">
+              <div class="calendar-top">
+                <span class="cal-month">Agosto 2026</span>
+                <div class="cal-nav">
+                  <span>▲</span>
+                  <span>▼</span>
+                </div>
+              </div>
+              <div class="calendar-days-header">
+                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+              </div>
+              <div class="calendar-days-grid">
+                <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
+                <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                <span>16</span><span>17</span><span class="active-today">18</span><span>19</span><span>20</span><span>21</span><span class="event-day" title="Atención en Palacio Municipal (09:00 AM - 02:00 PM)">22</span>
+                <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span>
+                <span>30</span><span>31</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span><span class="muted font-event" title="Módulo Central de Contratación (08:30 AM - 01:30 PM)">4</span><span class="muted">5</span>
+              </div>
+            </div>
+            <div class="event-summary">
+              <strong>📍 Próxima fecha:</strong> 22 de Agosto - Atención en Palacio Municipal (09:00 AM - 02:00 PM)
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Módulo móvil -->
+        <div class="sector-card" data-sector="moduloMovil">
+          <div class="sector-header cat-modulo-movil">
+            <span class="sector-icon">🚐</span>
+            <h3>Módulo móvil</h3>
+            <span class="badge-count">2 Fechas</span>
+          </div>
+          <p class="sector-desc">Unidades itinerantes que acercan la bolsa de trabajo e información directa a tu colonia o comunidad.</p>
+          
+          <div class="dropdown-calendar">
+            <div class="calendar-widget">
+              <div class="calendar-top">
+                <span class="cal-month">Agosto 2026</span>
+                <div class="cal-nav">
+                  <span>▲</span>
+                  <span>▼</span>
+                </div>
+              </div>
+              <div class="calendar-days-header">
+                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+              </div>
+              <div class="calendar-days-grid">
+                <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
+                <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                <span>16</span><span>17</span><span class="active-today">18</span><span>19</span><span>20</span><span>21</span><span>22</span>
+                <span>23</span><span>24</span><span>25</span><span class="event-day" title="Atención Móvil - Sector Norte (09:00 AM - 01:00 PM)">26</span><span>27</span><span>28</span><span>29</span>
+                <span>30</span><span>31</span><span class="muted">1</span><span class="muted font-event" title="Atención Móvil - Sector Poniente (09:30 AM - 02:00 PM)">2</span><span class="muted">3</span><span class="muted">4</span><span class="muted">5</span>
+              </div>
+            </div>
+            <div class="event-summary">
+              <strong>📍 Próxima fecha:</strong> 26 de Agosto - Sector Norte (09:00 AM - 01:00 PM)
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Feria del empleo -->
+        <div class="sector-card" data-sector="feriaEmpleo">
+          <div class="sector-header cat-feria-empleo">
+            <span class="sector-icon">🎪</span>
+            <h3>Feria del empleo</h3>
+            <span class="badge-count">1 Fecha</span>
+          </div>
+          <p class="sector-desc">Eventos masivos de reclutamiento presencial con participación de decenas de empresas líderes.</p>
+          
+          <div class="dropdown-calendar">
+            <div class="calendar-widget">
+              <div class="calendar-top">
+                <span class="cal-month">Septiembre 2026</span>
+                <div class="cal-nav">
+                  <span>▲</span>
+                  <span>▼</span>
+                </div>
+              </div>
+              <div class="calendar-days-header">
+                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+              </div>
+              <div class="calendar-days-grid">
+                <span class="muted">30</span><span class="muted">31</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                <span>6</span><span>7</span><span>8</span><span>9</span><span class="event-day" title="Gran Feria Municipal del Empleo (08:00 AM - 03:00 PM)">10</span><span>11</span><span>12</span>
+                <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
+                <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span>
+                <span>27</span><span>28</span><span>29</span><span>30</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span>
+              </div>
+            </div>
+            <div class="event-summary">
+              <strong>📍 Próxima fecha:</strong> 10 de Septiembre - Gran Feria Municipal (08:00 AM - 03:00 PM)
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Capacitación -->
+        <div class="sector-card" data-sector="capacitacion">
+          <div class="sector-header cat-capacitacion">
+            <span class="sector-icon">🎓</span>
+            <h3>Capacitación</h3>
+            <span class="badge-count">2 Fechas</span>
+          </div>
+          <p class="sector-desc">Talleres y cursos prácticos para mejorar tu currículum, preparar entrevistas y optimizar habilidades.</p>
+          
+          <div class="dropdown-calendar">
+            <div class="calendar-widget">
+              <div class="calendar-top">
+                <span class="cal-month">Agosto 2026</span>
+                <div class="cal-nav">
+                  <span>▲</span>
+                  <span>▼</span>
+                </div>
+              </div>
+              <div class="calendar-days-header">
+                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+              </div>
+              <div class="calendar-days-grid">
+                <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
+                <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                <span>16</span><span>17</span><span class="active-today">18</span><span>19</span><span>20</span><span>21</span><span>22</span>
+                <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span class="event-day" title="Taller: Elaboración de CV impactante (10:00 AM - 12:00 PM)">28</span><span>29</span>
+                <span>30</span><span>31</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span><span class="muted">4</span><span class="muted">5</span>
+              </div>
+            </div>
+            <div class="event-summary">
+              <strong>📍 Próxima fecha:</strong> 28 de Agosto - Taller: Elaboración de CV (10:00 AM - 12:00 PM)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================
+       VISTA 2: GEOPORTAL DE EMPLEOS (MAPA)
+       ========================================== -->
+  <div id="vistaGeoPortal" class="geoportal-container" style="display: none;">
+    <div id="mapa" class="mapa-placeholder"></div>
+
+    <div class="filtro-box" id="filtroBox">
+      <div class="filtro-header" id="btnToggleFiltros">
+        <span>🔍 Filtros de Búsqueda</span>
+        <span class="arrow-down">▼</span>
+      </div>
+      <div class="filtro-body">
+        <div class="field-group">
+          <label>💼</label>
+          <input type="text" id="filtroPalabra" placeholder="Puesto, empresa o palabra clave...">
+        </div>
+        <div class="field-group">
+          <label>📍</label>
+          <select id="filtroZona">
+            <option value="">Todas las zonas</option>
+            <option value="Centro">Centro</option>
+            <option value="Norte">Norte</option>
+            <option value="Sur">Sur</option>
+            <option value="Poniente">Poniente</option>
+            <option value="Oriente">Oriente</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>🏢</label>
+          <select id="filtroCategoria">
+            <option value="">Todas las categorías</option>
+            <option value="Tecnología">Tecnología / Sistemas</option>
+            <option value="Administración">Administración</option>
+            <option value="Ventas">Ventas y Atención a Clientes</option>
+            <option value="Servicios">Servicios Operativos</option>
+          </select>
+        </div>
+        <button id="btnBuscarMapa" class="btn-buscar-mapa">Aplicar Filtros</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menú Flotante Lateral -->
+  <div class="floating-menu">
+    <a href="#" id="btnVolverInicio">🏠 Inicio</a>
+    <a href="#" id="btnIrGeoPortal">🗺️ GeoPortal</a>
+  </div>
+
+  <!-- Capa de Bloqueo para Tutorial -->
+  <div id="tutorialOverlay" class="tutorial-overlay"></div>
+
+  <!-- Asistente Virtual -->
+  <div id="assistantBox" class="assistant-box">
+    <div class="assistant-header">
+      <div class="assistant-info">
+        <span class="assistant-avatar">🤖</span>
+        <strong>Guía Virtual</strong>
+      </div>
+      <button id="btnVoiceRead" class="btn-voice" title="Escuchar explicación">🔊</button>
+    </div>
+    <p id="assistantText">¡Hola! Te orientaré paso a paso en el uso de la plataforma.</p>
+    <div class="assistant-buttons">
+      <button id="btnSkipTutorial" class="btn-skip">Omitir</button>
+      <button id="btnNextStep" class="btn-next">Siguiente</button>
+    </div>
+  </div>
+
+  <!-- Script Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Archivo Lógico Principal -->
+  <script src="script.js"></script>
+</body>
+</html>
