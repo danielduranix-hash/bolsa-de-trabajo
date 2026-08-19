@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Maker con IA - Formulario</title>
+  <link rel="stylesheet" href="formulario-cv.css">
+  <!-- Lucide Icons o SVG inline para los íconos laterales -->
+</head>
+<body>
+
+  <div class="cv-app-container">
+    
+    <!-- Sidebar de navegación lateral -->
+    <aside class="sidebar">
+      <div class="sidebar-toggle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </div>
+
+      <nav class="sidebar-menu">
+        <button class="nav-item active" data-step="1">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span>Datos personales</span>
+        </button>
+
+        <button class="nav-item" data-step="2">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          <span>Experiencia</span>
+        </button>
+
+        <button class="nav-item" data-step="3">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+          <span>Formación</span>
+        </button>
+
+        <button class="nav-item" data-step="4">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span>Competencias</span>
+        </button>
+
+        <button class="nav-item" data-step="5">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <span>Idiomas</span>
+        </button>
+
+        <button class="nav-item" data-step="6">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+          <span>Actividades extracurriculares</span>
+        </button>
+
+        <button class="nav-item" data-step="7">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          <span>Elige el diseño de tu CV</span>
+        </button>
+
+        <hr class="nav-divider">
+
+        <button class="nav-item nav-special">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+          <span>Recomendador de empleos</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+      
+      <!-- Encabezado de la vista -->
+      <header class="content-header">
+        <h1>¡Hola! este es el CV Maker, creador de CV con Inteligencia Artificial</h1>
+        <p class="subtitle">Selecciona en qué idioma quieres el CV y nuestra IA lo traducirá.</p>
+        <p class="privacy-notice">Si quieres saber cómo gestionamos tus datos, <a href="#">pulsa aquí</a></p>
+      </header>
+
+      <!-- Selector de Idioma -->
+      <div class="form-group idioma-group">
+        <label for="idiomaCv">Idioma del CV</label>
+        <div class="select-wrapper">
+          <select id="idiomaCv" class="custom-select">
+            <option value="es" selected>Español</option>
+            <option value="en">Inglés</option>
+            <option value="fr">Francés</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Sección de Formulario -->
+      <section class="form-step-container">
+        <h2 class="step-title">1. Datos personales</h2>
+        <p class="step-subtitle">Por favor completa tus datos personales aquí</p>
+
+        <!-- Barra de Progreso -->
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: 14.28%;"></div>
+        </div>
+        <span class="step-counter">Paso 1 de 7</span>
+
+        <!-- Campos de Datos Personales -->
+        <form id="formDatosPersonales" class="form-body">
+          <div class="form-group full-width">
+            <label for="profesion">Cabecera (escribe tu profesión)</label>
+            <input type="text" id="profesion" class="custom-input" placeholder="Escribe aquí tu profesión">
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="nombre">Nombre</label>
+              <input type="text" id="nombre" class="custom-input" placeholder="Ej. Juan">
+            </div>
+
+            <div class="form-group">
+              <label for="apellidos">Apellidos</label>
+              <input type="text" id="apellidos" class="custom-input" placeholder="Ej. Pérez López">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="correo">Correo electrónico</label>
+              <input type="email" id="correo" class="custom-input" placeholder="ejemplo@correo.com">
+            </div>
+
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input type="tel" id="telefono" class="custom-input" placeholder="999 000 0000">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-next" id="btnSiguienteExperiencia">Siguiente: Experiencia →</button>
+          </div>
+        </form>
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>
