@@ -1,0 +1,107 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: #ffffff;
+  color: #222222;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.cv-header {
+  padding: 20px 0;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: #0b3b60;
+}
+
+/* Hero */
+.hero-section {
+  text-align: center;
+  padding: 60px 20px 40px;
+}
+
+.hero-section h1 {
+  font-size: 2.5rem;
+  color: #0b3b60;
+  margin-bottom: 15px;
+}
+
+.hero-section p {
+  font-size: 1.15rem;
+  color: #555555;
+  max-width: 650px;
+  margin: 0 auto 30px;
+}
+
+/* Grid de Pasos (Basado en la captura) */
+.steps-section {
+  padding: 40px 20px 60px;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  text-align: center;
+}
+
+.step-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.red-icon {
+  color: #d9381e;
+  margin-bottom: 20px;
+}
+
+.step-card h3 {
+  font-size: 1.25rem;
+  color: #111111;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.step-card p {
+  font-size: 0.95rem;
+  color: #555555;
+  line-height: 1.5;
+}
+
+/* Botones */
+.cta-section {
+  text-align: center;
+  padding-bottom: 80px;
+}
+
+.btn-primary-lg {
+  background-color: #d9381e;
+  color: #ffffff;
+  border: none;
+  padding: 16px 36px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary-lg:hover {
+  background-color: #b82b14;
+}
