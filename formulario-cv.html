@@ -3,16 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV con IA - Live Preview & PDF</title>
+  <title>Generador de Currículum Vitae</title>
+  
+  <!-- Estilos CSS del proyecto -->
   <link rel="stylesheet" href="formulario-cv.css">
-  <!-- Librería para exportar a PDF -->
+  
+  <!-- Librería externa para exportación a PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-  <div class="cv-app-container">
-    
-    <!-- 1. BARRA LATERAL DE NAVEGACIÓN -->
+  <!-- BARRA DE PROGRESO SUPERIOR -->
+  <div class="top-progress-container">
+    <div class="progress-bar-wrapper">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-info">
+      <span class="step-counter" id="stepCounter">Paso 1 de 7</span>
+      <h2 class="step-title" id="stepTitle">1. Datos personales</h2>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="main-layout">
+
+    <!-- SIDEBAR DE NAVEGACIÓN -->
     <aside class="sidebar">
       <div class="sidebar-toggle">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -23,55 +38,26 @@
       </div>
 
       <nav class="sidebar-menu">
-        <button class="nav-item active" data-step="1">
-          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          <span>1. Datos personales</span>
-        </button>
-
-        <button class="nav-item" data-step="2">
-          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-          <span>2. Experiencia</span>
-        </button>
-
-        <button class="nav-item" data-step="3">
-          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-          <span>3. Formación</span>
-        </button>
-
-        <button class="nav-item" data-step="4">
-          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-          <span>4. Competencias</span>
-        </button>
-
-        <button class="nav-item" data-step="5">
-          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-          <span>5. Idiomas</span>
-        </button>
-
-        <button class="nav-item" data-step="6">
-          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-          <span>6. Actividades extracurriculares</span>
-        </button>
-
-        <button class="nav-item" data-step="7">
-          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-          <span>7. Elige el diseño de tu CV</span>
-        </button>
+        <button type="button" class="nav-item active" data-step="1"><span>1. Datos personales</span></button>
+        <button type="button" class="nav-item" data-step="2"><span>2. Experiencia</span></button>
+        <button type="button" class="nav-item" data-step="3"><span>3. Formación</span></button>
+        <button type="button" class="nav-item" data-step="4"><span>4. Competencias</span></button>
+        <button type="button" class="nav-item" data-step="5"><span>5. Idiomas</span></button>
+        <button type="button" class="nav-item" data-step="6"><span>6. Actividades extracurriculares</span></button>
+        <button type="button" class="nav-item" data-step="7"><span>7. Elige el diseño de tu CV</span></button>
       </nav>
     </aside>
 
-    <!-- 2. CONTENEDOR SPLIT: FORMULARIO + VISTA PREVIA -->
-    <div class="split-layout">
-      
-      <!-- Panel Izquierdo: Formulario Dinámico Multi-paso -->
-      <main class="main-content">
-        
-        <header class="content-header">
-          <h1>CV con Inteligencia Artificial</h1>
-          <p class="subtitle">Selecciona en qué idioma quieres el CV y nuestra IA lo traducirá.</p>
+    <!-- FORMULARIO SECCIONAL -->
+    <main class="form-container">
+      <form id="cvForm" onsubmit="return false;">
 
-          <div class="form-group idioma-group">
-            <label for="idiomaCv">Idioma global del CV</label>
+        <!-- PASO 1: DATOS PERSONALES -->
+        <section class="step-content active" id="step-1">
+          <h3>Datos personales</h3>
+          
+          <div class="form-group">
+            <label for="idiomaCv">Idioma del CV</label>
             <select id="idiomaCv" class="custom-select">
               <option value="es" selected>Español</option>
               <option value="en">Inglés</option>
@@ -79,284 +65,208 @@
               <option value="de">Alemán</option>
             </select>
           </div>
-        </header>
 
-        <div class="progress-section">
-          <h2 class="step-title" id="stepTitle">1. Datos personales</h2>
-          <p class="step-subtitle" id="stepSubtitle">Por favor completa tus datos personales aquí</p>
-
-          <div class="progress-bar-container">
-            <div class="progress-bar" id="progressBar" style="width: 14.28%;"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nombre">Nombre</label>
+              <input type="text" id="nombre" placeholder="Ej. Juan">
+            </div>
+            <div class="form-group">
+              <label for="apellidos">Apellidos</label>
+              <input type="text" id="apellidos" placeholder="Ej. Pérez Gómez">
+            </div>
           </div>
-          <span class="step-counter" id="stepCounter">Paso 1 de 7</span>
+
+          <div class="form-group">
+            <label for="profesion">Profesión o Título</label>
+            <input type="text" id="profesion" placeholder="Ej. Desarrollador Web Frontend">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="correo">Correo Electrónico</label>
+              <input type="email" id="correo" placeholder="correo@ejemplo.com">
+            </div>
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input type="tel" id="telefono" placeholder="+52 999 000 0000">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="localidad">Ciudad / País</label>
+              <input type="text" id="localidad" placeholder="Ej. Mérida, México">
+            </div>
+            <div class="form-group">
+              <label for="fechaNacimiento">Fecha de Nacimiento</label>
+              <input type="date" id="fechaNacimiento">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Fotografía de Perfil</label>
+            <input type="file" id="fotoInput" accept="image/*">
+            <div class="photo-preview-box" id="photoPreview">
+              <span>Sin imagen</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- PASO 2: EXPERIENCIA (CON DICTADO POR VOZ) -->
+        <section class="step-content" id="step-2">
+          <h3>Experiencia Laboral</h3>
+          <div class="form-group">
+            <label for="experienciaTexto">Describe tus empleos, puestos y logros principales:</label>
+            <div class="voice-input-container">
+              <textarea id="experienciaTexto" rows="8" placeholder="• Desarrollador Frontend en Empresa X (2021 - Presente): Creación de interfaces web..."></textarea>
+              <button type="button" class="btn-voice" data-target="experienciaTexto" title="Dictar por voz">
+                🎤 Hablar
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- PASO 3: FORMACIÓN (CON DICTADO POR VOZ) -->
+        <section class="step-content" id="step-3">
+          <h3>Formación Académica</h3>
+          <div class="form-group">
+            <label for="formacionTexto">Ingresa tus estudios, institución y fechas de egreso:</label>
+            <div class="voice-input-container">
+              <textarea id="formacionTexto" rows="8" placeholder="• Ingeniería en Sistemas Computacionales - Universidad X (2018 - 2022)"></textarea>
+              <button type="button" class="btn-voice" data-target="formacionTexto" title="Dictar por voz">
+                🎤 Hablar
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- PASO 4: COMPETENCIAS (CON DICTADO POR VOZ) -->
+        <section class="step-content" id="step-4">
+          <h3>Competencias / Habilidades</h3>
+          <div class="form-group">
+            <label for="competenciasTexto">Habilidades técnicas y blandas:</label>
+            <div class="voice-input-container">
+              <textarea id="competenciasTexto" rows="8" placeholder="• JavaScript, HTML5, CSS3, React, SQL, Trabajo en equipo, Liderazgo..."></textarea>
+              <button type="button" class="btn-voice" data-target="competenciasTexto" title="Dictar por voz">
+                🎤 Hablar
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- PASO 5: IDIOMAS -->
+        <section class="step-content" id="step-5">
+          <h3>Idiomas</h3>
+          <div id="idiomasLista" class="idiomas-wrapper"></div>
+          <button type="button" id="btnAgregarIdioma" class="btn-secondary">+ Agregar Idioma</button>
+        </section>
+
+        <!-- PASO 6: ACTIVIDADES EXTRACURRICULARES -->
+        <section class="step-content" id="step-6">
+          <h3>Actividades Extracurriculares</h3>
+          <div class="form-group">
+            <label for="actividadesTexto">Voluntariados, cursos, proyectos personales o certificaciones:</label>
+            <textarea id="actividadesTexto" rows="8" placeholder="• Certificación en SQL Relacional (2024)&#10;• Voluntariado en proyectos de desarrollo local..."></textarea>
+          </div>
+        </section>
+
+        <!-- PASO 7: DISEÑO DE CV -->
+        <section class="step-content" id="step-7">
+          <h3>Elige el diseño de tu CV</h3>
+          <div class="templates-grid">
+            <label class="template-card active">
+              <input type="radio" name="disenoCv" value="clasico" checked>
+              <div class="card-content">
+                <h4>Clásico</h4>
+                <p>Estructura limpia, formal y tradicional.</p>
+              </div>
+            </label>
+
+            <label class="template-card">
+              <input type="radio" name="disenoCv" value="moderno">
+              <div class="card-content">
+                <h4>Moderno</h4>
+                <p>Sidebar dinámico con tonos oscuros y elegantes.</p>
+              </div>
+            </label>
+
+            <label class="template-card">
+              <input type="radio" name="disenoCv" value="minimalista">
+              <div class="card-content">
+                <h4>Minimalista</h4>
+                <p>Enfoque claro en la tipografía y jerarquía.</p>
+              </div>
+            </label>
+          </div>
+
+          <div class="download-section">
+            <button type="button" id="btnDescargarPDF" class="btn-primary btn-large">Descargar PDF</button>
+          </div>
+        </section>
+
+        <!-- BOTONES DE NAVEGACIÓN INFERIORES -->
+        <div class="form-navigation">
+          <button type="button" id="btnAnterior" class="btn-secondary">Anterior</button>
+          <button type="button" id="btnSiguiente" class="btn-primary">Siguiente</button>
         </div>
 
-        <form id="cvMasterForm" class="form-body">
+      </form>
+    </main>
+
+    <!-- VISTA PREVIA DEL CV EN TIEMPO REAL -->
+    <aside class="preview-container">
+      <div class="preview-wrapper">
+        <div id="cvPaper" class="cv-paper t-clasico">
           
-          <!-- PASO 1: DATOS PERSONALES -->
-          <div class="step-content active" id="step-1">
-            <div class="photo-upload-container">
-              <div class="photo-preview" id="photoPreview">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+          <header class="cv-header">
+            <div class="cv-photo-container" id="pvPhotoContainer"></div>
+            <div class="cv-header-text">
+              <h1 id="pvNombreCompleto">Tu Nombre Aquí</h1>
+              <h2 id="pvProfesion">Tu Profesión</h2>
+              <div class="cv-contact-info">
+                <span id="pvCorreo">correo@ejemplo.com</span> | 
+                <span id="pvTelefono">+00 0000 0000</span> | 
+                <span id="pvUbicacion">Ciudad, País</span>
               </div>
-              <div class="photo-controls">
-                <label for="fotoInput" class="btn-secondary">Subir Foto de Perfil</label>
-                <input type="file" id="fotoInput" accept="image/*" class="file-input-hidden">
-                <span class="file-help">JPG o PNG (Recomendado fondo neutro)</span>
-              </div>
+              <div class="cv-birthdate" id="pvFechaNac">Fecha de nacimiento: N/A</div>
             </div>
+          </header>
 
-            <div class="form-group full-width">
-              <label for="profesion">Cabecera (escribe tu profesión)</label>
-              <input type="text" id="profesion" class="custom-input" placeholder="Ej. Desarrollador Web / Ingeniero de Sistemas">
-            </div>
+          <main class="cv-body">
+            <section class="cv-section">
+              <h3 id="lblExperiencia">Experiencia Laboral</h3>
+              <p id="pvExperiencia" class="preserve-whitespace">Tu experiencia aparecerá aquí...</p>
+            </section>
 
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label for="nombre">Nombre</label>
-                <input type="text" id="nombre" class="custom-input" placeholder="Ej. Juan">
-              </div>
+            <section class="cv-section">
+              <h3 id="lblFormacion">Formación Académica</h3>
+              <p id="pvFormacion" class="preserve-whitespace">Tu educación aparecerá aquí...</p>
+            </section>
 
-              <div class="form-group">
-                <label for="apellidos">Apellidos</label>
-                <input type="text" id="apellidos" class="custom-input" placeholder="Ej. Pérez López">
-              </div>
-            </div>
+            <section class="cv-section">
+              <h3 id="lblCompetencias">Competencias</h3>
+              <p id="pvCompetencias" class="preserve-whitespace">Tus habilidades destacadas...</p>
+            </section>
 
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label for="correo">Correo electrónico</label>
-                <input type="email" id="correo" class="custom-input" placeholder="ejemplo@correo.com">
-              </div>
+            <section class="cv-section">
+              <h3 id="lblIdiomas">Idiomas</h3>
+              <ul id="pvIdiomas" class="cv-list"></ul>
+            </section>
 
-              <div class="form-group">
-                <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" class="custom-input" placeholder="+52 999 000 0000">
-              </div>
-            </div>
+            <section class="cv-section" id="pvSectionActividades" style="display: none;">
+              <h3 id="lblActividades">Actividades Extracurriculares</h3>
+              <p id="pvActividades" class="preserve-whitespace"></p>
+            </section>
+          </main>
 
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label for="direccion">Dirección</label>
-                <input type="text" id="direccion" class="custom-input" placeholder="Ej. Calle 60 #123 x 45 y 47">
-              </div>
-
-              <div class="form-group">
-                <label for="localidad">Localidad / Ciudad</label>
-                <input type="text" id="localidad" class="custom-input" placeholder="Ej. Mérida, Yucatán">
-              </div>
-            </div>
-
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label for="fechaNacimiento">Fecha de nacimiento</label>
-                <input type="date" id="fechaNacimiento" class="custom-input">
-              </div>
-
-              <div class="form-group">
-                <label for="permisoConducir">Permiso de conducir (Opcional)</label>
-                <select id="permisoConducir" class="custom-select">
-                  <option value="">-- Seleccionar opción --</option>
-                  <option value="No posee">No poseo</option>
-                  <option value="Tipo A">Tipo A (Automovilista)</option>
-                  <option value="Tipo B">Tipo B (Chofer)</option>
-                  <option value="Tipo C">Tipo C (Motociclista)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- PASO 2: EXPERIENCIA -->
-          <div class="step-content" id="step-2">
-            <div class="input-mode-bar">
-              <span>Escribe tu experiencia o dísela por voz a la IA:</span>
-              <button type="button" class="btn-mic" id="btnMicExp">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                <span>Grabar por voz</span>
-              </button>
-            </div>
-            <div class="form-group full-width">
-              <label for="experienciaTexto">Descripción de Experiencia Laboral</label>
-              <textarea id="experienciaTexto" class="custom-textarea" rows="6" placeholder="Escribe o dicta tus puestos anteriores, empresas y principales logros..."></textarea>
-            </div>
-          </div>
-
-          <!-- PASO 3: FORMACIÓN -->
-          <div class="step-content" id="step-3">
-            <div class="input-mode-bar">
-              <span>Escribe tus estudios o díselo por voz:</span>
-              <button type="button" class="btn-mic" id="btnMicForm">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                <span>Grabar por voz</span>
-              </button>
-            </div>
-            <div class="form-group full-width">
-              <label for="formacionTexto">Formación académica y Certificaciones</label>
-              <textarea id="formacionTexto" class="custom-textarea" rows="6" placeholder="Escribe o dicta tus títulos académicos, escuelas, fechas y diplomados..."></textarea>
-            </div>
-          </div>
-
-          <!-- PASO 4: COMPETENCIAS -->
-          <div class="step-content" id="step-4">
-            <div class="input-mode-bar">
-              <span>Tres formas de ingresar tus competencias:</span>
-              <div class="mode-buttons">
-                <button type="button" class="btn-mic" id="btnMicComp">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                  <span>Dictar por voz</span>
-                </button>
-                <button type="button" class="btn-ia" id="btnIAComp">✨ Generar con IA</button>
-              </div>
-            </div>
-            <div class="form-group full-width">
-              <label for="competenciasTexto">Competencias y Habilidades</label>
-              <textarea id="competenciasTexto" class="custom-textarea" rows="6" placeholder="Escribe manual, dicta con voz o usa el botón de IA para redactar tus habilidades..."></textarea>
-            </div>
-          </div>
-
-          <!-- PASO 5: IDIOMAS -->
-          <div class="step-content" id="step-5">
-            <div class="idiomas-header">
-              <p>Agrega los idiomas que dominas y especifica el nivel correspondiente:</p>
-            </div>
-            
-            <div id="idiomasLista">
-              <div class="idioma-row">
-                <select class="custom-select select-idioma-nombre">
-                  <option value="Español" selected>Español</option>
-                  <option value="Inglés">Inglés</option>
-                  <option value="Alemán">Alemán</option>
-                  <option value="Ruso">Ruso</option>
-                  <option value="Francés">Francés</option>
-                  <option value="Italiano">Italiano</option>
-                  <option value="Portugués">Portugués</option>
-                  <option value="Chino Mandarín">Chino Mandarín</option>
-                </select>
-
-                <select class="custom-select select-idioma-nivel">
-                  <option value="Principiante">Principiante</option>
-                  <option value="Intermedio">Intermedio</option>
-                  <option value="Avanzado">Avanzado</option>
-                  <option value="Bilingüe">Bilingüe</option>
-                  <option value="Nativo" selected>Nativo</option>
-                </select>
-
-                <button type="button" class="btn-remove-idioma" title="Eliminar idioma">&times;</button>
-              </div>
-            </div>
-
-            <button type="button" class="btn-secondary" id="btnAgregarIdioma">+ Agregar otro idioma</button>
-          </div>
-
-          <!-- PASO 6: ACTIVIDADES EXTRACURRICULARES -->
-          <div class="step-content" id="step-6">
-            <div class="form-group full-width">
-              <label for="actividadesTexto">Actividades Extracurriculares, Voluntariado y Proyectos</label>
-              <textarea id="actividadesTexto" class="custom-textarea" rows="6" placeholder="Menciona voluntariados, eventos, deportes de rendimiento, proyectos personales u organizaciones a las que perteneces..."></textarea>
-            </div>
-          </div>
-
-          <!-- PASO 7: DISEÑO DE CV -->
-          <div class="step-content" id="step-7">
-            <p class="design-intro">Selecciona la plantilla de diseño que mejor se adapte a tu perfil laboral:</p>
-            
-            <div class="templates-grid">
-              <label class="template-card active">
-                <input type="radio" name="disenoCv" value="moderno" checked class="radio-hidden">
-                <div class="template-preview t-moderno">
-                  <div class="tp-header"></div>
-                  <div class="tp-body"><div class="tp-sidebar"></div><div class="tp-main"></div></div>
-                </div>
-                <span>Estructura Moderna</span>
-              </label>
-
-              <label class="template-card">
-                <input type="radio" name="disenoCv" value="ejecutivo" class="radio-hidden">
-                <div class="template-preview t-ejecutivo">
-                  <div class="tp-topbar"></div>
-                  <div class="tp-body"><div class="tp-main-full"></div></div>
-                </div>
-                <span>Estructura Ejecutiva / Clásica</span>
-              </label>
-
-              <label class="template-card">
-                <input type="radio" name="disenoCv" value="creativo" class="radio-hidden">
-                <div class="template-preview t-creativo">
-                  <div class="tp-body"><div class="tp-sidebar-full"></div><div class="tp-main"></div></div>
-                </div>
-                <span>Estructura Creativa (2 Columnas)</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- CONTROLES Y NAVEGACIÓN -->
-          <div class="form-actions">
-            <button type="button" class="btn-prev" id="btnAnterior" style="display: none;">← Anterior</button>
-            <button type="button" class="btn-next" id="btnSiguiente">Siguiente: Experiencia →</button>
-            <button type="button" class="btn-pdf" id="btnDescargarPDF">📄 Descargar PDF</button>
-          </div>
-
-        </form>
-      </main>
-
-      <!-- Panel Derecho: Live Preview en Tiempo Real -->
-      <section class="preview-panel">
-        <div class="preview-header">
-          <h3>Vista Previa en Tiempo Real</h3>
         </div>
-        
-        <div class="cv-paper" id="cvPaper">
-          <div class="cv-header-block">
-            <div class="cv-photo-box" id="pvPhotoContainer">
-              <span class="photo-placeholder">Sin Foto</span>
-            </div>
-            <div>
-              <h2 id="pvNombreCompleto">Tu Nombre Aquí</h2>
-              <p class="pv-profesion" id="pvProfesion">Tu Profesión</p>
-            </div>
-          </div>
-
-          <div class="cv-contact-row">
-            <span id="pvCorreo">correo@ejemplo.com</span> | 
-            <span id="pvTelefono">+00 0000 0000</span> | 
-            <span id="pvUbicacion">Ciudad, País</span>
-          </div>
-
-          <hr class="cv-divider">
-
-          <div class="cv-section">
-            <h4>Experiencia Laboral</h4>
-            <p id="pvExperiencia" class="pv-text-block">Tu experiencia aparecerá aquí...</p>
-          </div>
-
-          <div class="cv-section">
-            <h4>Formación Académica</h4>
-            <p id="pvFormacion" class="pv-text-block">Tu educación aparecerá aquí...</p>
-          </div>
-
-          <div class="cv-section">
-            <h4>Competencias</h4>
-            <p id="pvCompetencias" class="pv-text-block">Tus habilidades destacadas...</p>
-          </div>
-
-          <div class="cv-section">
-            <h4>Idiomas</h4>
-            <ul id="pvIdiomas" class="pv-list">
-              <li>Español - Nativo</li>
-            </ul>
-          </div>
-
-          <div class="cv-section" id="pvSectionActividades" style="display: none;">
-            <h4>Actividades Extracurriculares</h4>
-            <p id="pvActividades" class="pv-text-block"></p>
-          </div>
-        </div>
-      </section>
-
-    </div>
+      </div>
+    </aside>
 
   </div>
 
+  <!-- Enlace al archivo JavaScript funcional -->
   <script src="script-cv.js"></script>
 </body>
 </html>

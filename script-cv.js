@@ -1,271 +1,512 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================
-  // 0. NAVEGACIÓN DESDE LANDING PAGE (cv-ia.html)
+  // 1. DICCIONARIOS Y CONFIGURACIÓN GLOBAL
   // ==========================================
-  const btnLlenarAhora = document.getElementById('btnLlenarAhora');
-  const btnLlenarDatos = document.getElementById('btnLlenarDatos');
+  const traducciones = {
+    es: { 
+      exp: "Experiencia Laboral", 
+      form: "Formación Académica", 
+      comp: "Competencias", 
+      idio: "Idiomas", 
+      act: "Actividades Extracurriculares", 
+      fecha: "Fecha de nacimiento: " 
+    },
+    en: { 
+      exp: "Work Experience", 
+      form: "Education", 
+      comp: "Skills", 
+      idio: "Languages", 
+      act: "Extracurricular Activities", 
+      fecha: "Date of birth: " 
+    },
+    fr: { 
+      exp: "Expérience Professionnelle", 
+      form: "Formation", 
+      comp: "Compétences", 
+      idio: "Langues", 
+      act: "Activités Extracurriculaires", 
+      fecha: "Date de naissance: " 
+    },
+    de: { 
+      exp: "Berufserfahrung", 
+      form: "Ausbildung", 
+      comp: "Kenntnisse", 
+      idio: "Sprachen", 
+      act: "Außerschulische Aktivitäten", 
+      fecha: "Geburtsdatum: " 
+    }
+  };
 
-  btnLlenarAhora?.addEventListener('click', () => {
-    window.location.href = 'formulario-cv.html';
-  });
-
-  btnLlenarDatos?.addEventListener('click', () => {
-    window.location.href = 'formulario-cv.html';
-  });
-
+  const listaIdiomasBase = [
+    "Español", "Inglés", "Alemán", "Ruso", 
+    "Francés", "Italiano", "Portugués", "Chino Mandarín"
+  ];
 
   // ==========================================
-  // 1. VARIABLES Y CONTROL DEL FORMULARIO MULTI-PASO
+  // 2. SISTEMA DE NAVEGACIÓN Y BOTONES
   // ==========================================
   let pasoActual = 1;
   const totalPasos = 7;
 
-  const titulosPasos = [
-    { title: "1. Datos personales", subtitle: "Por favor completa tus datos personales aquí" },
-    { title: "2. Experiencia", subtitle: "Añade tus puestos anteriores y logros más importantes" },
-    { title: "3. Formación", subtitle: "Escribe tus títulos académicos y certificaciones" },
-    { title: "4. Competencias", subtitle: "Indica tus habilidades técnicas y blandas principales" },
-    { title: "5. Idiomas", subtitle: "Selecciona los idiomas que dominas y tu nivel" },
-    { title: "6. Actividades extracurriculares", subtitle: "Agrega voluntariados, proyectos o logros personales" },
-    { title: "7. Elige el diseño de tu CV", subtitle: "Selecciona la estructura visual para exportar" }
-  ];
-
-  // ELEMENTOS DE NAVEGACIÓN
   const btnAnterior = document.getElementById('btnAnterior');
   const btnSiguiente = document.getElementById('btnSiguiente');
-  const stepTitle = document.getElementById('stepTitle');
-  const stepSubtitle = document.getElementById('stepSubtitle');
   const progressBar = document.getElementById('progressBar');
   const stepCounter = document.getElementById('stepCounter');
-  const navItems = document.querySelectorAll('.nav-item');
+  const stepTitle = document.getElementById('stepTitle');
 
-  function actualizarNavegacion(paso) {
-    pasoActual = paso;
-
-    // Actualizar secciones activas en el formulario
-    document.querySelectorAll('.step-content').forEach((sec, idx) => {
-      sec.classList.toggle('active', (idx + 1) === pasoActual);
-    });
-
-    // Actualizar sidebar
-    navItems.forEach((item) => {
-      const stepItem = parseInt(item.getAttribute('data-step'));
-      item.classList.toggle('active', stepItem === pasoActual);
-    });
-
-    // Actualizar encabezados y progreso
-    if (stepTitle) stepTitle.textContent = titulosPasos[pasoActual - 1].title;
-    if (stepSubtitle) stepSubtitle.textContent = titulosPasos[pasoActual - 1].subtitle;
-    if (progressBar) progressBar.style.width = `${(pasoActual / totalPasos) * 100}%`;
-    if (stepCounter) stepCounter.textContent = `Paso ${pasoActual} de ${totalPasos}`;
-
-    // Visibilidad de botones
-    if (btnAnterior) btnAnterior.style.display = pasoActual === 1 ? 'none' : 'inline-block';
-    
-    if (btnSiguiente) {
-      if (pasoActual === totalPasos) {
-        btnSiguiente.style.display = 'none';
-      } else {
-        btnSiguiente.style.display = 'inline-block';
-        const siguientePasoNombre = titulosPasos[pasoActual].title.split('.')[1];
-        btnSiguiente.textContent = `Siguiente: ${siguientePasoNombre} →`;
-      }
-    }
-  }
-
-  btnSiguiente?.addEventListener('click', () => {
-    if (pasoActual < totalPasos) actualizarNavegacion(pasoActual + 1);
-  });
-
-  btnAnterior?.addEventListener('click', () => {
-    if (pasoActual > 1) actualizarNavegacion(pasoActual - 1);
-  });
-
-  navItems.forEach((item) => {
-    item.addEventListener('click', () => {
-      const paso = parseInt(item.getAttribute('data-step'));
-      actualizarNavegacion(paso);
-    });
-  });
-
-
-  // ==========================================
-  // 2. EVENTOS DE ESCRITURA EN TIEMPO REAL (LIVE PREVIEW)
-  // ==========================================
-  const inputsDirectos = [
-    { inputId: 'profesion', pvId: 'pvProfesion', defecto: 'Tu Profesión' },
-    { inputId: 'correo', pvId: 'pvCorreo', defecto: 'correo@ejemplo.com' },
-    { inputId: 'telefono', pvId: 'pvTelefono', defecto: '+00 0000 0000' },
-    { inputId: 'experienciaTexto', pvId: 'pvExperiencia', defecto: 'Tu experiencia aparecerá aquí...' },
-    { inputId: 'formacionTexto', pvId: 'pvFormacion', defecto: 'Tu educación aparecerá aquí...' },
-    { inputId: 'competenciasTexto', pvId: 'pvCompetencias', defecto: 'Tus habilidades destacadas...' }
+  const titulosPasos = [
+    "1. Datos personales",
+    "2. Experiencia",
+    "3. Formación",
+    "4. Competencias",
+    "5. Idiomas",
+    "6. Actividades extracurriculares",
+    "7. Elige el diseño de tu CV"
   ];
 
-  inputsDirectos.forEach(item => {
-    const input = document.getElementById(item.inputId);
-    const pv = document.getElementById(item.pvId);
+  function cambiarPaso(nuevoPaso) {
+    if (nuevoPaso < 1 || nuevoPaso > totalPasos) return;
+    pasoActual = nuevoPaso;
 
-    if (input && pv) {
-      input.addEventListener('input', () => {
-        pv.textContent = input.value.trim() !== '' ? input.value : item.defecto;
-      });
+    // Mostrar sección activa
+    document.querySelectorAll('.step-content').forEach(el => {
+      el.classList.remove('active');
+    });
+    
+    const seccionTarget = document.getElementById(`step-${pasoActual}`);
+    if (seccionTarget) {
+      seccionTarget.classList.add('active');
     }
-  });
 
-  // Nombre Completo
-  const inputNombre = document.getElementById('nombre');
-  const inputApellidos = document.getElementById('apellidos');
-  const pvNombreCompleto = document.getElementById('pvNombreCompleto');
+    // Activar pestaña en sidebar
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      const stepNum = parseInt(btn.getAttribute('data-step'), 10);
+      btn.classList.toggle('active', stepNum === pasoActual);
+    });
 
-  function actualizarNombre() {
-    if (!pvNombreCompleto) return;
-    const nom = inputNombre ? inputNombre.value.trim() : '';
-    const ape = inputApellidos ? inputApellidos.value.trim() : '';
-    pvNombreCompleto.textContent = (nom || ape) ? `${nom} ${ape}` : 'Tu Nombre Aquí';
+    // Actualizar barra e indicadores
+    if (progressBar) {
+      progressBar.style.width = `${(pasoActual / totalPasos) * 100}%`;
+    }
+    if (stepCounter) {
+      stepCounter.textContent = `Paso ${pasoActual} de ${totalPasos}`;
+    }
+    if (stepTitle) {
+      stepTitle.textContent = titulosPasos[pasoActual - 1];
+    }
+
+    // Mostrar/Ocultar botones
+    if (btnAnterior) {
+      btnAnterior.style.display = (pasoActual === 1) ? 'none' : 'inline-block';
+    }
+    if (btnSiguiente) {
+      btnSiguiente.style.display = (pasoActual === totalPasos) ? 'none' : 'inline-block';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  inputNombre?.addEventListener('input', actualizarNombre);
-  inputApellidos?.addEventListener('input', actualizarNombre);
-
-  // Localidad / Ubicación
-  const inputLocalidad = document.getElementById('localidad');
-  const pvUbicacion = document.getElementById('pvUbicacion');
-
-  if (inputLocalidad && pvUbicacion) {
-    inputLocalidad.addEventListener('input', () => {
-      pvUbicacion.textContent = inputLocalidad.value.trim() !== '' ? inputLocalidad.value : 'Ciudad, País';
+  if (btnSiguiente) {
+    btnSiguiente.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      cambiarPaso(pasoActual + 1);
+      guardarProgreso();
     });
   }
 
-  // Actividades Extracurriculares
-  const inputActividades = document.getElementById('actividadesTexto');
-  const pvActividades = document.getElementById('pvActividades');
-  const pvSectionActividades = document.getElementById('pvSectionActividades');
+  if (btnAnterior) {
+    btnAnterior.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      cambiarPaso(pasoActual - 1);
+      guardarProgreso();
+    });
+  }
 
-  if (inputActividades && pvActividades && pvSectionActividades) {
-    inputActividades.addEventListener('input', () => {
-      const val = inputActividades.value.trim();
-      if (val !== '') {
-        pvSectionActividades.style.display = 'block';
-        pvActividades.textContent = val;
-      } else {
-        pvSectionActividades.style.display = 'none';
+  document.querySelectorAll('.nav-item').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const step = parseInt(button.getAttribute('data-step'), 10);
+      if (step) {
+        cambiarPaso(step);
+        guardarProgreso();
+      }
+    });
+  });
+
+  cambiarPaso(1);
+
+  // ==========================================
+  // 3. ACTUALIZACIÓN EN VIVO (PREVISUALIZACIÓN)
+  // ==========================================
+  const idiomaCvSelect = document.getElementById('idiomaCv');
+  const inputFechaNac = document.getElementById('fechaNacimiento');
+  const pvFechaNac = document.getElementById('pvFechaNac');
+
+  function actualizarFechaNacimiento() {
+    if (!pvFechaNac) return;
+    const lang = idiomaCvSelect ? idiomaCvSelect.value : 'es';
+    const prefix = traducciones[lang]?.fecha || traducciones.es.fecha;
+    pvFechaNac.textContent = (inputFechaNac && inputFechaNac.value) 
+      ? `${prefix}${inputFechaNac.value}` 
+      : `${prefix}N/A`;
+  }
+
+  if (inputFechaNac) {
+    inputFechaNac.addEventListener('change', actualizarFechaNacimiento);
+  }
+
+  function vincularInput(inputId, pvId, valorPorDefecto) {
+    const inp = document.getElementById(inputId);
+    const pv = document.getElementById(pvId);
+    if (!inp || !pv) return;
+
+    const actualizar = () => {
+      pv.textContent = inp.value.trim() !== '' ? inp.value : valorPorDefecto;
+    };
+
+    inp.addEventListener('input', actualizar);
+  }
+
+  vincularInput('profesion', 'pvProfesion', 'Tu Profesión');
+  vincularInput('correo', 'pvCorreo', 'correo@ejemplo.com');
+  vincularInput('telefono', 'pvTelefono', '+00 0000 0000');
+  vincularInput('localidad', 'pvUbicacion', 'Ciudad, País');
+  vincularInput('experienciaTexto', 'pvExperiencia', 'Tu experiencia aparecerá aquí...');
+  vincularInput('formacionTexto', 'pvFormacion', 'Tu educación aparecerá aquí...');
+  vincularInput('competenciasTexto', 'pvCompetencias', 'Tus habilidades destacadas...');
+
+  const inputNombre = document.getElementById('nombre');
+  const inputApellidos = document.getElementById('apellidos');
+  const pvNombre = document.getElementById('pvNombreCompleto');
+
+  function actualizarNombreCompleto() {
+    if (!pvNombre) return;
+    const n = inputNombre?.value.trim() || '';
+    const a = inputApellidos?.value.trim() || '';
+    pvNombre.textContent = (n || a) ? `${n} ${a}` : 'Tu Nombre Aquí';
+  }
+
+  if (inputNombre) inputNombre.addEventListener('input', actualizarNombreCompleto);
+  if (inputApellidos) inputApellidos.addEventListener('input', actualizarNombreCompleto);
+
+  const inputAct = document.getElementById('actividadesTexto');
+  const pvAct = document.getElementById('pvActividades');
+  const pvSecAct = document.getElementById('pvSectionActividades');
+
+  if (inputAct) {
+    inputAct.addEventListener('input', () => {
+      const val = inputAct.value.trim();
+      if (pvSecAct) pvSecAct.style.display = val !== '' ? 'block' : 'none';
+      if (pvAct) pvAct.textContent = val;
+    });
+  }
+
+  const fotoInput = document.getElementById('fotoInput');
+  if (fotoInput) {
+    fotoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const imgHTML = `<img src="${evt.target.result}" alt="Foto CV" style="width:100%; height:100%; object-fit:cover;">`;
+          const prev = document.getElementById('photoPreview');
+          const pvCont = document.getElementById('pvPhotoContainer');
+          if (prev) prev.innerHTML = imgHTML;
+          if (pvCont) pvCont.innerHTML = imgHTML;
+        };
+        reader.readAsDataURL(file);
       }
     });
   }
 
+  if (idiomaCvSelect) {
+    idiomaCvSelect.addEventListener('change', (e) => {
+      const lang = e.target.value;
+      const t = traducciones[lang] || traducciones.es;
+
+      const lblExp = document.getElementById('lblExperiencia');
+      const lblForm = document.getElementById('lblFormacion');
+      const lblComp = document.getElementById('lblCompetencias');
+      const lblIdio = document.getElementById('lblIdiomas');
+      const lblAct = document.getElementById('lblActividades');
+
+      if (lblExp) lblExp.textContent = t.exp;
+      if (lblForm) lblForm.textContent = t.form;
+      if (lblComp) lblComp.textContent = t.comp;
+      if (lblIdio) lblIdio.textContent = t.idio;
+      if (lblAct) lblAct.textContent = t.act;
+
+      actualizarFechaNacimiento();
+    });
+  }
 
   // ==========================================
-  // 3. FOTO DE PERFIL EN VISTA PREVIA
-  // ==========================================
-  const fotoInput = document.getElementById('fotoInput');
-  const photoPreview = document.getElementById('photoPreview');
-  const pvPhotoContainer = document.getElementById('pvPhotoContainer');
-
-  fotoInput?.addEventListener('change', (e) => {
-    const archivo = e.target.files[0];
-    if (archivo) {
-      const reader = new FileReader();
-      reader.onload = (evento) => {
-        const imgHTML = `<img src="${evento.target.result}" alt="Foto CV">`;
-        if (photoPreview) photoPreview.innerHTML = imgHTML;
-        if (pvPhotoContainer) pvPhotoContainer.innerHTML = imgHTML;
-      };
-      reader.readAsDataURL(archivo);
-    }
-  });
-
-
-  // ==========================================
-  // 4. IDIOMAS DINÁMICOS EN VISTA PREVIA
+  // 4. LISTA DINÁMICA DE IDIOMAS
   // ==========================================
   const idiomasLista = document.getElementById('idiomasLista');
   const btnAgregarIdioma = document.getElementById('btnAgregarIdioma');
   const pvIdiomas = document.getElementById('pvIdiomas');
 
-  function renderizarIdiomasPreview() {
+  function renderizarIdiomas() {
     if (!pvIdiomas) return;
     pvIdiomas.innerHTML = '';
-
-    const filas = document.querySelectorAll('.idioma-row');
-    filas.forEach(fila => {
-      const selectNombre = fila.querySelector('.select-idioma-nombre');
-      const selectNivel = fila.querySelector('.select-idioma-nivel');
-
-      if (selectNombre && selectNivel) {
+    document.querySelectorAll('.idioma-row').forEach(row => {
+      const nom = row.querySelector('.select-idioma-nombre')?.value;
+      const niv = row.querySelector('.select-idioma-nivel')?.value;
+      if (nom && niv) {
         const li = document.createElement('li');
-        li.textContent = `${selectNombre.value} - ${selectNivel.value}`;
+        li.textContent = `${nom} - ${niv}`;
         pvIdiomas.appendChild(li);
       }
     });
   }
 
-  function vincularEventosFilaIdioma(fila) {
-    const selects = fila.querySelectorAll('select');
-    selects.forEach(s => s.addEventListener('change', renderizarIdiomasPreview));
+  function agregarFilaIdioma() {
+    if (!idiomasLista) return;
 
-    const btnRemove = fila.querySelector('.btn-remove-idioma');
-    btnRemove?.addEventListener('click', () => {
+    const fila = document.createElement('div');
+    fila.className = 'idioma-row';
+
+    let opciones = listaIdiomasBase.map(i => `<option value="${i}">${i}</option>`).join('');
+
+    fila.innerHTML = `
+      <select class="custom-select select-idioma-nombre">${opciones}</select>
+      <select class="custom-select select-idioma-nivel">
+        <option value="Principiante">Principiante</option>
+        <option value="Intermedio">Intermedio</option>
+        <option value="Avanzado">Avanzado</option>
+        <option value="Nativo" selected>Nativo</option>
+      </select>
+      <button type="button" class="btn-remove-idioma" style="background:none;border:none;color:red;cursor:pointer;font-size:1.2rem;">&times;</button>
+    `;
+
+    idiomasLista.appendChild(fila);
+
+    fila.querySelectorAll('select').forEach(s => s.addEventListener('change', () => {
+      renderizarIdiomas();
+      guardarProgreso();
+    }));
+
+    fila.querySelector('.btn-remove-idioma')?.addEventListener('click', () => {
       if (document.querySelectorAll('.idioma-row').length > 1) {
         fila.remove();
-        renderizarIdiomasPreview();
+        renderizarIdiomas();
+        guardarProgreso();
       }
+    });
+
+    renderizarIdiomas();
+  }
+
+  if (idiomasLista) agregarFilaIdioma();
+
+  if (btnAgregarIdioma) {
+    btnAgregarIdioma.addEventListener('click', (e) => {
+      e.preventDefault();
+      agregarFilaIdioma();
     });
   }
 
-  document.querySelectorAll('.idioma-row').forEach(vincularEventosFilaIdioma);
-
-  btnAgregarIdioma?.addEventListener('click', () => {
-    if (!idiomasLista) return;
-    const nuevaFila = document.createElement('div');
-    nuevaFila.className = 'idioma-row';
-    nuevaFila.innerHTML = `
-      <select class="custom-select select-idioma-nombre">
-        <option value="Español">Español</option>
-        <option value="Inglés" selected>Inglés</option>
-        <option value="Alemán">Alemán</option>
-        <option value="Ruso">Ruso</option>
-        <option value="Francés">Francés</option>
-        <option value="Italiano">Italiano</option>
-        <option value="Portugués">Portugués</option>
-        <option value="Chino Mandarín">Chino Mandarín</option>
-      </select>
-
-      <select class="custom-select select-idioma-nivel">
-        <option value="Principiante">Principiante</option>
-        <option value="Intermedio" selected>Intermedio</option>
-        <option value="Avanzado">Avanzado</option>
-        <option value="Bilingüe">Bilingüe</option>
-        <option value="Nativo">Nativo</option>
-      </select>
-
-      <button type="button" class="btn-remove-idioma" title="Eliminar idioma">&times;</button>
-    `;
-    idiomasLista.appendChild(nuevaFila);
-    vincularEventosFilaIdioma(nuevaFila);
-    renderizarIdiomasPreview();
+  // ==========================================
+  // 5. PLANTILLAS DE DISEÑO Y DESCARGA PDF
+  // ==========================================
+  const cvPaper = document.getElementById('cvPaper');
+  
+  document.querySelectorAll('input[name="disenoCv"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      if (cvPaper) {
+        cvPaper.className = `cv-paper t-${e.target.value}`;
+      }
+      document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
+      e.target.closest('.template-card')?.classList.add('active');
+    });
   });
 
+  const btnPDF = document.getElementById('btnDescargarPDF');
+  if (btnPDF) {
+    btnPDF.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!cvPaper) return;
+      if (typeof html2pdf === 'undefined') {
+        alert("La librería PDF aún se está cargando. Intenta de nuevo en unos momentos.");
+        return;
+      }
+      
+      const clon = cvPaper.cloneNode(true);
+      clon.style.transform = "none";
+      clon.style.margin = "0";
+      clon.style.width = "210mm";
+      document.body.appendChild(clon);
+
+      html2pdf().set({
+        margin: 0,
+        filename: 'Curriculum_Vitae.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(clon).save().then(() => document.body.removeChild(clon));
+    });
+  }
 
   // ==========================================
-  // 5. DESCARGAR PDF CON HTML2PDF
+  // 6. RECONOCIMIENTO DE VOZ (WEB SPEECH API)
   // ==========================================
-  const btnDescargarPDF = document.getElementById('btnDescargarPDF');
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  btnDescargarPDF?.addEventListener('click', () => {
-    const elementoCV = document.getElementById('cvPaper');
-    if (!elementoCV) return;
+  if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
 
-    const opciones = {
-      margin:       8,
-      filename:     'Curriculum_Vitae.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    let targetTextarea = null;
+    let activeButton = null;
+
+    function obtenerIdiomaReconocimiento() {
+      const lang = document.getElementById('idiomaCv')?.value || 'es';
+      const mapaIdiomas = {
+        es: 'es-ES',
+        en: 'en-US',
+        fr: 'fr-FR',
+        de: 'de-DE'
+      };
+      return mapaIdiomas[lang] || 'es-ES';
+    }
+
+    document.querySelectorAll('.btn-voice').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = button.getAttribute('data-target');
+        const textarea = document.getElementById(targetId);
+
+        if (!textarea) return;
+
+        if (activeButton === button) {
+          recognition.stop();
+          return;
+        }
+
+        if (activeButton) {
+          recognition.stop();
+        }
+
+        targetTextarea = textarea;
+        activeButton = button;
+
+        recognition.lang = obtenerIdiomaReconocimiento();
+        recognition.start();
+
+        button.classList.add('listening');
+        button.textContent = '🛑 Escuchando...';
+      });
+    });
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map(result => result[0].transcript)
+        .join('');
+
+      if (targetTextarea) {
+        const textoPrevio = targetTextarea.value.trim();
+        targetTextarea.value = textoPrevio ? `${textoPrevio} ${transcript}` : transcript;
+
+        targetTextarea.dispatchEvent(new Event('input'));
+        targetTextarea.dispatchEvent(new Event('change'));
+      }
     };
 
-    html2pdf().set(opciones).from(elementoCV).save();
-  });
+    recognition.onerror = (event) => {
+      console.error('Error en reconocimiento de voz:', event.error);
+      detenerReconocimiento();
+    };
 
+    recognition.onend = () => {
+      detenerReconocimiento();
+    };
+
+    function detenerReconocimiento() {
+      if (activeButton) {
+        activeButton.classList.remove('listening');
+        activeButton.textContent = '🎤 Hablar';
+        activeButton = null;
+        targetTextarea = null;
+      }
+    }
+
+  } else {
+    document.querySelectorAll('.btn-voice').forEach(button => {
+      button.disabled = true;
+      button.title = "Tu navegador no soporta el reconocimiento por voz.";
+      button.style.opacity = "0.5";
+      button.style.cursor = "not-allowed";
+    });
+  }
+
+  // ==========================================
+  // 7. PERSISTENCIA DE DATOS (LOCALSTORAGE)
+  // ==========================================
+  const STORAGE_KEY = 'cv_builder_draft';
+
+  function guardarProgreso() {
+    const datos = {
+      idiomaCv: document.getElementById('idiomaCv')?.value || 'es',
+      nombre: document.getElementById('nombre')?.value || '',
+      apellidos: document.getElementById('apellidos')?.value || '',
+      profesion: document.getElementById('profesion')?.value || '',
+      correo: document.getElementById('correo')?.value || '',
+      telefono: document.getElementById('telefono')?.value || '',
+      localidad: document.getElementById('localidad')?.value || '',
+      fechaNacimiento: document.getElementById('fechaNacimiento')?.value || '',
+      experienciaTexto: document.getElementById('experienciaTexto')?.value || '',
+      formacionTexto: document.getElementById('formacionTexto')?.value || '',
+      competenciasTexto: document.getElementById('competenciasTexto')?.value || '',
+      actividadesTexto: document.getElementById('actividadesTexto')?.value || '',
+      pasoActual: pasoActual,
+      disenoCv: document.querySelector('input[name="disenoCv"]:checked')?.value || 'clasico'
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
+  }
+
+  function cargarProgresoGuardado() {
+    const guardado = localStorage.getItem(STORAGE_KEY);
+    if (!guardado) return;
+
+    try {
+      const datos = JSON.parse(guardado);
+
+      Object.keys(datos).forEach(key => {
+        if (key === 'pasoActual' || key === 'disenoCv') return;
+        const el = document.getElementById(key);
+        if (el) {
+          el.value = datos[key];
+          el.dispatchEvent(new Event(el.tagName === 'SELECT' ? 'change' : 'input'));
+        }
+      });
+
+      if (datos.disenoCv) {
+        const radio = document.querySelector(`input[name="disenoCv"][value="${datos.disenoCv}"]`);
+        if (radio) {
+          radio.checked = true;
+          radio.dispatchEvent(new Event('change'));
+        }
+      }
+
+      if (datos.pasoActual) {
+        cambiarPaso(datos.pasoActual);
+      }
+    } catch (e) {
+      console.error("Error al restaurar los datos guardados", e);
+    }
+  }
+
+  const formCV = document.getElementById('cvForm');
+  if (formCV) {
+    formCV.addEventListener('input', guardarProgreso);
+    formCV.addEventListener('change', guardarProgreso);
+  }
+
+  cargarProgresoGuardado();
 });
