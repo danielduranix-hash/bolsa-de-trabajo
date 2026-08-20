@@ -17,6 +17,8 @@
   --text-muted: #6b7280;
   --border-color: #e5e7eb;
   --danger-color: #dc2626;
+  --ai-color: #8b5cf6;
+  --ai-hover: #7c3aed;
   --radius: 8px;
 }
 
@@ -221,7 +223,7 @@ textarea {
 }
 
 /* ==========================================
-   6. BOTÓN DE ENTRADA POR VOZ
+   6. BOTONES DE ACCIÓN (VOZ E INTELIGENCIA ARTIFICIAL)
    ========================================== */
 .voice-input-container {
   position: relative;
@@ -230,11 +232,15 @@ textarea {
   gap: 8px;
 }
 
-.btn-voice {
-  align-self: flex-end;
-  background-color: var(--primary-color);
-  color: #ffffff;
-  border: none;
+.button-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.btn-voice,
+.btn-ai {
   padding: 6px 14px;
   border-radius: 6px;
   cursor: pointer;
@@ -243,7 +249,14 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  border: none;
   transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+/* Estilos de Botón Voz */
+.btn-voice {
+  background-color: var(--primary-color);
+  color: #ffffff;
 }
 
 .btn-voice:hover {
@@ -253,6 +266,21 @@ textarea {
 .btn-voice.listening {
   background-color: var(--danger-color);
   animation: pulse-voice 1.5s infinite;
+}
+
+/* Estilos de Botón IA */
+.btn-ai {
+  background-color: var(--ai-color);
+  color: #ffffff;
+}
+
+.btn-ai:hover {
+  background-color: var(--ai-hover);
+}
+
+.btn-ai:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @keyframes pulse-voice {
