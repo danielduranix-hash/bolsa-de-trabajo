@@ -1,124 +1,271 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 1. Redirección desde la landing de bienvenida (si los botones existen)
-  const btnEmpezarCV = document.getElementById('btnEmpezarCV');
-  const btnIrAFormulario = document.getElementById('btnIrAFormulario');
+  // ==========================================
+  // 0. NAVEGACIÓN DESDE LANDING PAGE (cv-ia.html)
+  // ==========================================
+  const btnLlenarAhora = document.getElementById('btnLlenarAhora');
+  const btnLlenarDatos = document.getElementById('btnLlenarDatos');
 
-  function irAlFormulario() {
+  btnLlenarAhora?.addEventListener('click', () => {
     window.location.href = 'formulario-cv.html';
-  }
+  });
 
-  if (btnEmpezarCV) btnEmpezarCV.addEventListener('click', irAlFormulario);
-  if (btnIrAFormulario) btnIrAFormulario.addEventListener('click', irAlFormulario);
+  btnLlenarDatos?.addEventListener('click', () => {
+    window.location.href = 'formulario-cv.html';
+  });
 
 
-  // 2. Control de la interfaz interactiva del Formulario
-  const navItems = document.querySelectorAll('.sidebar-menu .nav-item[data-step]');
-  const stepTitle = document.querySelector('.step-title');
-  const stepSubtitle = document.querySelector('.step-subtitle');
-  const progressBar = document.querySelector('.progress-bar');
-  const stepCounter = document.querySelector('.step-counter');
-  const btnSiguiente = document.getElementById('btnSiguienteExperiencia');
-
-  // Mapeo de información y textos por cada paso
-  const pasosInfo = {
-    1: {
-      titulo: '1. Datos personales',
-      subtitulo: 'Por favor completa tus datos personales aquí',
-      siguienteTexto: 'Siguiente: Experiencia →'
-    },
-    2: {
-      titulo: '2. Experiencia laboral',
-      subtitulo: 'Añade tus empleos previos y funciones más destacadas',
-      siguienteTexto: 'Siguiente: Formación →'
-    },
-    3: {
-      titulo: '3. Formación académica',
-      subtitulo: 'Ingresa tus estudios, grados y certificaciones',
-      siguienteTexto: 'Siguiente: Competencias →'
-    },
-    4: {
-      titulo: '4. Competencias y habilidades',
-      subtitulo: 'Indica tus fortalezas técnicas y habilidades blandas',
-      siguienteTexto: 'Siguiente: Idiomas →'
-    },
-    5: {
-      titulo: '5. Idiomas',
-      subtitulo: 'Añade los idiomas que dominas y tu nivel de fluidez',
-      siguienteTexto: 'Siguiente: Actividades extracurriculares →'
-    },
-    6: {
-      titulo: '6. Actividades extracurriculares',
-      subtitulo: 'Menciona proyectos, voluntariados o logros adicionales',
-      siguienteTexto: 'Siguiente: Elige el diseño de tu CV →'
-    },
-    7: {
-      titulo: '7. Elige el diseño de tu CV',
-      subtitulo: 'Selecciona la plantilla visual para exportar tu currículum',
-      siguienteTexto: '✨ Generar y optimizar con IA'
-    }
-  };
-
+  // ==========================================
+  // 1. VARIABLES Y CONTROL DEL FORMULARIO MULTI-PASO
+  // ==========================================
   let pasoActual = 1;
+  const totalPasos = 7;
 
-  // Función para cambiar de paso
-  function cambiarPaso(numeroPaso) {
-    const paso = parseInt(numeroPaso, 10);
-    if (!pasosInfo[paso]) return;
+  const titulosPasos = [
+    { title: "1. Datos personales", subtitle: "Por favor completa tus datos personales aquí" },
+    { title: "2. Experiencia", subtitle: "Añade tus puestos anteriores y logros más importantes" },
+    { title: "3. Formación", subtitle: "Escribe tus títulos académicos y certificaciones" },
+    { title: "4. Competencias", subtitle: "Indica tus habilidades técnicas y blandas principales" },
+    { title: "5. Idiomas", subtitle: "Selecciona los idiomas que dominas y tu nivel" },
+    { title: "6. Actividades extracurriculares", subtitle: "Agrega voluntariados, proyectos o logros personales" },
+    { title: "7. Elige el diseño de tu CV", subtitle: "Selecciona la estructura visual para exportar" }
+  ];
 
+  // ELEMENTOS DE NAVEGACIÓN
+  const btnAnterior = document.getElementById('btnAnterior');
+  const btnSiguiente = document.getElementById('btnSiguiente');
+  const stepTitle = document.getElementById('stepTitle');
+  const stepSubtitle = document.getElementById('stepSubtitle');
+  const progressBar = document.getElementById('progressBar');
+  const stepCounter = document.getElementById('stepCounter');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  function actualizarNavegacion(paso) {
     pasoActual = paso;
 
-    // Actualizar clase activa en la sidebar
-    navItems.forEach(item => {
-      if (parseInt(item.getAttribute('data-step'), 10) === pasoActual) {
-        item.classList.add('active');
-      } else {
-        item.classList.remove('active');
-      }
+    // Actualizar secciones activas en el formulario
+    document.querySelectorAll('.step-content').forEach((sec, idx) => {
+      sec.classList.toggle('active', (idx + 1) === pasoActual);
     });
 
-    // Actualizar encabezados
-    if (stepTitle) stepTitle.textContent = pasosInfo[pasoActual].titulo;
-    if (stepSubtitle) stepSubtitle.textContent = pasosInfo[pasoActual].subtitulo;
+    // Actualizar sidebar
+    navItems.forEach((item) => {
+      const stepItem = parseInt(item.getAttribute('data-step'));
+      item.classList.toggle('active', stepItem === pasoActual);
+    });
 
-    // Actualizar barra de progreso (1/7 = 14.28%, 7/7 = 100%)
-    const porcentaje = Math.round((pasoActual / 7) * 100);
-    if (progressBar) progressBar.style.width = `${porcentaje}%`;
-    if (stepCounter) stepCounter.textContent = `Paso ${pasoActual} de 7`;
+    // Actualizar encabezados y progreso
+    if (stepTitle) stepTitle.textContent = titulosPasos[pasoActual - 1].title;
+    if (stepSubtitle) stepSubtitle.textContent = titulosPasos[pasoActual - 1].subtitle;
+    if (progressBar) progressBar.style.width = `${(pasoActual / totalPasos) * 100}%`;
+    if (stepCounter) stepCounter.textContent = `Paso ${pasoActual} de ${totalPasos}`;
 
-    // Actualizar texto del botón Siguiente
+    // Visibilidad de botones
+    if (btnAnterior) btnAnterior.style.display = pasoActual === 1 ? 'none' : 'inline-block';
+    
     if (btnSiguiente) {
-      btnSiguiente.textContent = pasosInfo[pasoActual].siguienteTexto;
+      if (pasoActual === totalPasos) {
+        btnSiguiente.style.display = 'none';
+      } else {
+        btnSiguiente.style.display = 'inline-block';
+        const siguientePasoNombre = titulosPasos[pasoActual].title.split('.')[1];
+        btnSiguiente.textContent = `Siguiente: ${siguientePasoNombre} →`;
+      }
     }
   }
 
-  // Click en las opciones de la barra lateral
-  navItems.forEach(item => {
+  btnSiguiente?.addEventListener('click', () => {
+    if (pasoActual < totalPasos) actualizarNavegacion(pasoActual + 1);
+  });
+
+  btnAnterior?.addEventListener('click', () => {
+    if (pasoActual > 1) actualizarNavegacion(pasoActual - 1);
+  });
+
+  navItems.forEach((item) => {
     item.addEventListener('click', () => {
-      const step = item.getAttribute('data-step');
-      if (step) cambiarPaso(step);
+      const paso = parseInt(item.getAttribute('data-step'));
+      actualizarNavegacion(paso);
     });
   });
 
-  // Click en el botón principal "Siguiente"
-  if (btnSiguiente) {
-    btnSiguiente.addEventListener('click', () => {
-      if (pasoActual < 7) {
-        cambiarPaso(pasoActual + 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // ==========================================
+  // 2. EVENTOS DE ESCRITURA EN TIEMPO REAL (LIVE PREVIEW)
+  // ==========================================
+  const inputsDirectos = [
+    { inputId: 'profesion', pvId: 'pvProfesion', defecto: 'Tu Profesión' },
+    { inputId: 'correo', pvId: 'pvCorreo', defecto: 'correo@ejemplo.com' },
+    { inputId: 'telefono', pvId: 'pvTelefono', defecto: '+00 0000 0000' },
+    { inputId: 'experienciaTexto', pvId: 'pvExperiencia', defecto: 'Tu experiencia aparecerá aquí...' },
+    { inputId: 'formacionTexto', pvId: 'pvFormacion', defecto: 'Tu educación aparecerá aquí...' },
+    { inputId: 'competenciasTexto', pvId: 'pvCompetencias', defecto: 'Tus habilidades destacadas...' }
+  ];
+
+  inputsDirectos.forEach(item => {
+    const input = document.getElementById(item.inputId);
+    const pv = document.getElementById(item.pvId);
+
+    if (input && pv) {
+      input.addEventListener('input', () => {
+        pv.textContent = input.value.trim() !== '' ? input.value : item.defecto;
+      });
+    }
+  });
+
+  // Nombre Completo
+  const inputNombre = document.getElementById('nombre');
+  const inputApellidos = document.getElementById('apellidos');
+  const pvNombreCompleto = document.getElementById('pvNombreCompleto');
+
+  function actualizarNombre() {
+    if (!pvNombreCompleto) return;
+    const nom = inputNombre ? inputNombre.value.trim() : '';
+    const ape = inputApellidos ? inputApellidos.value.trim() : '';
+    pvNombreCompleto.textContent = (nom || ape) ? `${nom} ${ape}` : 'Tu Nombre Aquí';
+  }
+
+  inputNombre?.addEventListener('input', actualizarNombre);
+  inputApellidos?.addEventListener('input', actualizarNombre);
+
+  // Localidad / Ubicación
+  const inputLocalidad = document.getElementById('localidad');
+  const pvUbicacion = document.getElementById('pvUbicacion');
+
+  if (inputLocalidad && pvUbicacion) {
+    inputLocalidad.addEventListener('input', () => {
+      pvUbicacion.textContent = inputLocalidad.value.trim() !== '' ? inputLocalidad.value : 'Ciudad, País';
+    });
+  }
+
+  // Actividades Extracurriculares
+  const inputActividades = document.getElementById('actividadesTexto');
+  const pvActividades = document.getElementById('pvActividades');
+  const pvSectionActividades = document.getElementById('pvSectionActividades');
+
+  if (inputActividades && pvActividades && pvSectionActividades) {
+    inputActividades.addEventListener('input', () => {
+      const val = inputActividades.value.trim();
+      if (val !== '') {
+        pvSectionActividades.style.display = 'block';
+        pvActividades.textContent = val;
       } else {
-        alert('¡Formulario completado! En el siguiente paso procesaremos la optimización de tu CV con Inteligencia Artificial.');
+        pvSectionActividades.style.display = 'none';
       }
     });
   }
 
-  // Listener para el selector de Idioma
-  const idiomaSelect = document.getElementById('idiomaCv');
-  if (idiomaSelect) {
-    idiomaSelect.addEventListener('change', (e) => {
-      const idioma = e.target.value;
-      console.log(`Idioma del CV cambiado a: ${idioma}`);
+
+  // ==========================================
+  // 3. FOTO DE PERFIL EN VISTA PREVIA
+  // ==========================================
+  const fotoInput = document.getElementById('fotoInput');
+  const photoPreview = document.getElementById('photoPreview');
+  const pvPhotoContainer = document.getElementById('pvPhotoContainer');
+
+  fotoInput?.addEventListener('change', (e) => {
+    const archivo = e.target.files[0];
+    if (archivo) {
+      const reader = new FileReader();
+      reader.onload = (evento) => {
+        const imgHTML = `<img src="${evento.target.result}" alt="Foto CV">`;
+        if (photoPreview) photoPreview.innerHTML = imgHTML;
+        if (pvPhotoContainer) pvPhotoContainer.innerHTML = imgHTML;
+      };
+      reader.readAsDataURL(archivo);
+    }
+  });
+
+
+  // ==========================================
+  // 4. IDIOMAS DINÁMICOS EN VISTA PREVIA
+  // ==========================================
+  const idiomasLista = document.getElementById('idiomasLista');
+  const btnAgregarIdioma = document.getElementById('btnAgregarIdioma');
+  const pvIdiomas = document.getElementById('pvIdiomas');
+
+  function renderizarIdiomasPreview() {
+    if (!pvIdiomas) return;
+    pvIdiomas.innerHTML = '';
+
+    const filas = document.querySelectorAll('.idioma-row');
+    filas.forEach(fila => {
+      const selectNombre = fila.querySelector('.select-idioma-nombre');
+      const selectNivel = fila.querySelector('.select-idioma-nivel');
+
+      if (selectNombre && selectNivel) {
+        const li = document.createElement('li');
+        li.textContent = `${selectNombre.value} - ${selectNivel.value}`;
+        pvIdiomas.appendChild(li);
+      }
     });
   }
+
+  function vincularEventosFilaIdioma(fila) {
+    const selects = fila.querySelectorAll('select');
+    selects.forEach(s => s.addEventListener('change', renderizarIdiomasPreview));
+
+    const btnRemove = fila.querySelector('.btn-remove-idioma');
+    btnRemove?.addEventListener('click', () => {
+      if (document.querySelectorAll('.idioma-row').length > 1) {
+        fila.remove();
+        renderizarIdiomasPreview();
+      }
+    });
+  }
+
+  document.querySelectorAll('.idioma-row').forEach(vincularEventosFilaIdioma);
+
+  btnAgregarIdioma?.addEventListener('click', () => {
+    if (!idiomasLista) return;
+    const nuevaFila = document.createElement('div');
+    nuevaFila.className = 'idioma-row';
+    nuevaFila.innerHTML = `
+      <select class="custom-select select-idioma-nombre">
+        <option value="Español">Español</option>
+        <option value="Inglés" selected>Inglés</option>
+        <option value="Alemán">Alemán</option>
+        <option value="Ruso">Ruso</option>
+        <option value="Francés">Francés</option>
+        <option value="Italiano">Italiano</option>
+        <option value="Portugués">Portugués</option>
+        <option value="Chino Mandarín">Chino Mandarín</option>
+      </select>
+
+      <select class="custom-select select-idioma-nivel">
+        <option value="Principiante">Principiante</option>
+        <option value="Intermedio" selected>Intermedio</option>
+        <option value="Avanzado">Avanzado</option>
+        <option value="Bilingüe">Bilingüe</option>
+        <option value="Nativo">Nativo</option>
+      </select>
+
+      <button type="button" class="btn-remove-idioma" title="Eliminar idioma">&times;</button>
+    `;
+    idiomasLista.appendChild(nuevaFila);
+    vincularEventosFilaIdioma(nuevaFila);
+    renderizarIdiomasPreview();
+  });
+
+
+  // ==========================================
+  // 5. DESCARGAR PDF CON HTML2PDF
+  // ==========================================
+  const btnDescargarPDF = document.getElementById('btnDescargarPDF');
+
+  btnDescargarPDF?.addEventListener('click', () => {
+    const elementoCV = document.getElementById('cvPaper');
+    if (!elementoCV) return;
+
+    const opciones = {
+      margin:       8,
+      filename:     'Curriculum_Vitae.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opciones).from(elementoCV).save();
+  });
 
 });
