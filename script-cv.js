@@ -43,8 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
     "Francés", "Italiano", "Portugués", "Chino Mandarín"
   ];
 
+  const STORAGE_KEY = 'cv_builder_draft';
+
   // ==========================================
-  // 2. SISTEMA DE NAVEGACIÓN Y BOTONES
+  // 2. SISTEMA DE NAVEGACIÓN Y PASOS
   // ==========================================
   let pasoActual = 1;
   const totalPasos = 7;
@@ -69,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nuevoPaso < 1 || nuevoPaso > totalPasos) return;
     pasoActual = nuevoPaso;
 
-    // Mostrar sección activa
+    // Activar sección actual
     document.querySelectorAll('.step-content').forEach(el => {
       el.classList.remove('active');
     });
@@ -79,13 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
       seccionTarget.classList.add('active');
     }
 
-    // Activar pestaña en sidebar
+    // Activar botón en Sidebar
     document.querySelectorAll('.nav-item').forEach(btn => {
       const stepNum = parseInt(btn.getAttribute('data-step'), 10);
       btn.classList.toggle('active', stepNum === pasoActual);
     });
 
-    // Actualizar barra e indicadores
+    // Actualizar barra de progreso e indicadores
     if (progressBar) {
       progressBar.style.width = `${(pasoActual / totalPasos) * 100}%`;
     }
@@ -96,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stepTitle.textContent = titulosPasos[pasoActual - 1];
     }
 
-    // Mostrar/Ocultar botones
+    // Visibilidad de botones de navegación inferior
     if (btnAnterior) {
       btnAnterior.style.display = (pasoActual === 1) ? 'none' : 'inline-block';
     }
@@ -110,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnSiguiente) {
     btnSiguiente.addEventListener('click', (e) => {
       e.preventDefault();
-      e.stopPropagation();
       cambiarPaso(pasoActual + 1);
       guardarProgreso();
     });
@@ -119,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnAnterior) {
     btnAnterior.addEventListener('click', (e) => {
       e.preventDefault();
-      e.stopPropagation();
       cambiarPaso(pasoActual - 1);
       guardarProgreso();
     });
@@ -136,10 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  cambiarPaso(1);
-
   // ==========================================
-  // 3. ACTUALIZACIÓN EN VIVO (PREVISUALIZACIÓN)
+  // 3. ACTUALIZACIÓN EN VIVO (VISTA PREVIA)
   // ==========================================
   const idiomaCvSelect = document.getElementById('idiomaCv');
   const inputFechaNac = document.getElementById('fechaNacimiento');
@@ -244,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 4. LISTA DINÁMICA DE IDIOMAS
+  // 4. GESTIÓN DE IDIOMAS DINÁMICOS
   // ==========================================
   const idiomasLista = document.getElementById('idiomasLista');
   const btnAgregarIdioma = document.getElementById('btnAgregarIdioma');
@@ -264,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function agregarFilaIdioma() {
+  function agregarFilaIdioma(nombrePredeterminado = null, nivelPredeterminado = null) {
     if (!idiomasLista) return;
 
     const fila = document.createElement('div');
@@ -278,12 +276,18 @@ document.addEventListener('DOMContentLoaded', () => {
         <option value="Principiante">Principiante</option>
         <option value="Intermedio">Intermedio</option>
         <option value="Avanzado">Avanzado</option>
-        <option value="Nativo" selected>Nativo</option>
+        <option value="Nativo">Nativo</option>
       </select>
-      <button type="button" class="btn-remove-idioma" style="background:none;border:none;color:red;cursor:pointer;font-size:1.2rem;">&times;</button>
+      <button type="button" class="btn-remove-idioma" style="background:none;border:none;color:var(--danger-color);cursor:pointer;font-size:1.2rem;">&times;</button>
     `;
 
     idiomasLista.appendChild(fila);
+
+    const selectNom = fila.querySelector('.select-idioma-nombre');
+    const selectNiv = fila.querySelector('.select-idioma-nivel');
+
+    if (nombrePredeterminado) selectNom.value = nombrePredeterminado;
+    if (nivelPredeterminado) selectNiv.value = nivelPredeterminado;
 
     fila.querySelectorAll('select').forEach(s => s.addEventListener('change', () => {
       renderizarIdiomas();
@@ -301,17 +305,72 @@ document.addEventListener('DOMContentLoaded', () => {
     renderizarIdiomas();
   }
 
-  if (idiomasLista) agregarFilaIdioma();
-
   if (btnAgregarIdioma) {
     btnAgregarIdioma.addEventListener('click', (e) => {
       e.preventDefault();
       agregarFilaIdioma();
+      guardarProgreso();
     });
   }
 
   // ==========================================
-  // 5. PLANTILLAS DE DISEÑO Y DESCARGA PDF
+  // 5. INTEGRACIÓN CON BACKEND IA (FASTAPI / GROQ)
+  // ==========================================
+  document.querySelectorAll('.btn-ai, .btn-ia, [data-ai="true"]').forEach(button => {
+    button.addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      const targetId = button.getAttribute('data-target') || 'experienciaTexto';
+      const seccion = button.getAttribute('data-seccion') || 'experiencia';
+      const targetTextarea = document.getElementById(targetId);
+
+      if (!targetTextarea) return;
+
+      const textoOriginal = targetTextarea.value.trim();
+      if (!textoOriginal) {
+        alert("Escribe algo en la casilla antes de optimizar con IA.");
+        return;
+      }
+
+      const textoBotonOriginal = button.innerText;
+      button.disabled = true;
+      button.innerText = "✨ Optimizando...";
+
+      try {
+        const lang = document.getElementById('idiomaCv')?.value || 'es';
+        const response = await fetch("http://127.0.0.1:8000/api/mejorar-cv", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            texto: textoOriginal,
+            seccion: seccion,
+            idioma: lang
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          targetTextarea.value = data.resultado;
+          // Actualizar vista previa y guardar
+          targetTextarea.dispatchEvent(new Event('input'));
+          targetTextarea.dispatchEvent(new Event('change'));
+          guardarProgreso();
+        } else {
+          alert("Error de Servidor: " + (data.detail || "No se pudo optimizar el texto."));
+        }
+      } catch (err) {
+        console.error("Error al conectar con la API:", err);
+        alert("No se pudo conectar con el servidor local (http://127.0.0.1:8000). Asegúrate de que FastAPI esté activo.");
+      } finally {
+        button.disabled = false;
+        button.innerText = textoBotonOriginal;
+      }
+    });
+  });
+
+  // ==========================================
+  // 6. PLANTILLAS Y DESCARGA EN PDF
   // ==========================================
   const cvPaper = document.getElementById('cvPaper');
   
@@ -322,6 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
       e.target.closest('.template-card')?.classList.add('active');
+      guardarProgreso();
     });
   });
 
@@ -330,8 +390,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPDF.addEventListener('click', (e) => {
       e.preventDefault();
       if (!cvPaper) return;
+
       if (typeof html2pdf === 'undefined') {
-        alert("La librería PDF aún se está cargando. Intenta de nuevo en unos momentos.");
+        alert("La librería HTML2PDF aún no ha cargado. Intenta de nuevo en unos momentos.");
         return;
       }
       
@@ -352,7 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 6. RECONOCIMIENTO DE VOZ (WEB SPEECH API)
+  // 7. RECONOCIMIENTO DE VOZ (SPEECH RECOGNITION)
   // ==========================================
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -399,7 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recognition.start();
 
         button.classList.add('listening');
-        button.textContent = '🛑 Escuchando...';
+        button.textContent = '🛑 Detener';
       });
     });
 
@@ -414,6 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         targetTextarea.dispatchEvent(new Event('input'));
         targetTextarea.dispatchEvent(new Event('change'));
+        guardarProgreso();
       }
     };
 
@@ -438,18 +500,23 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     document.querySelectorAll('.btn-voice').forEach(button => {
       button.disabled = true;
-      button.title = "Tu navegador no soporta el reconocimiento por voz.";
+      button.title = "Navegador sin soporte de voz.";
       button.style.opacity = "0.5";
       button.style.cursor = "not-allowed";
     });
   }
 
   // ==========================================
-  // 7. PERSISTENCIA DE DATOS (LOCALSTORAGE)
+  // 8. PERSISTENCIA DE DATOS (LOCALSTORAGE)
   // ==========================================
-  const STORAGE_KEY = 'cv_builder_draft';
-
   function guardarProgreso() {
+    const arregloIdiomas = [];
+    document.querySelectorAll('.idioma-row').forEach(row => {
+      const nom = row.querySelector('.select-idioma-nombre')?.value;
+      const niv = row.querySelector('.select-idioma-nivel')?.value;
+      if (nom && niv) arregloIdiomas.push({ nombre: nom, nivel: niv });
+    });
+
     const datos = {
       idiomaCv: document.getElementById('idiomaCv')?.value || 'es',
       nombre: document.getElementById('nombre')?.value || '',
@@ -463,6 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
       formacionTexto: document.getElementById('formacionTexto')?.value || '',
       competenciasTexto: document.getElementById('competenciasTexto')?.value || '',
       actividadesTexto: document.getElementById('actividadesTexto')?.value || '',
+      idiomas: arregloIdiomas,
       pasoActual: pasoActual,
       disenoCv: document.querySelector('input[name="disenoCv"]:checked')?.value || 'clasico'
     };
@@ -472,19 +540,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function cargarProgresoGuardado() {
     const guardado = localStorage.getItem(STORAGE_KEY);
-    if (!guardado) return;
+    if (!guardado) {
+      agregarFilaIdioma("Español", "Nativo");
+      cambiarPaso(1);
+      return;
+    }
 
     try {
       const datos = JSON.parse(guardado);
 
       Object.keys(datos).forEach(key => {
-        if (key === 'pasoActual' || key === 'disenoCv') return;
+        if (key === 'pasoActual' || key === 'disenoCv' || key === 'idiomas') return;
         const el = document.getElementById(key);
         if (el) {
           el.value = datos[key];
           el.dispatchEvent(new Event(el.tagName === 'SELECT' ? 'change' : 'input'));
         }
       });
+
+      if (datos.idiomas && Array.isArray(datos.idiomas) && datos.idiomas.length > 0) {
+        if (idiomasLista) idiomasLista.innerHTML = '';
+        datos.idiomas.forEach(i => agregarFilaIdioma(i.nombre, i.nivel));
+      } else {
+        agregarFilaIdioma("Español", "Nativo");
+      }
 
       if (datos.disenoCv) {
         const radio = document.querySelector(`input[name="disenoCv"][value="${datos.disenoCv}"]`);
@@ -498,7 +577,8 @@ document.addEventListener('DOMContentLoaded', () => {
         cambiarPaso(datos.pasoActual);
       }
     } catch (e) {
-      console.error("Error al restaurar los datos guardados", e);
+      console.error("Error al restaurar los datos del borrador:", e);
+      agregarFilaIdioma("Español", "Nativo");
     }
   }
 
@@ -508,5 +588,6 @@ document.addEventListener('DOMContentLoaded', () => {
     formCV.addEventListener('change', guardarProgreso);
   }
 
+  // Inicialización de la app
   cargarProgresoGuardado();
 });

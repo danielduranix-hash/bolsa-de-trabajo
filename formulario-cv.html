@@ -113,44 +113,59 @@
           </div>
         </section>
 
-        <!-- PASO 2: EXPERIENCIA (CON DICTADO POR VOZ) -->
+        <!-- PASO 2: EXPERIENCIA (CON DICTADO Y BOTÓN IA) -->
         <section class="step-content" id="step-2">
           <h3>Experiencia Laboral</h3>
           <div class="form-group">
             <label for="experienciaTexto">Describe tus empleos, puestos y logros principales:</label>
             <div class="voice-input-container">
               <textarea id="experienciaTexto" rows="8" placeholder="• Desarrollador Frontend en Empresa X (2021 - Presente): Creación de interfaces web..."></textarea>
-              <button type="button" class="btn-voice" data-target="experienciaTexto" title="Dictar por voz">
-                🎤 Hablar
-              </button>
+              <div class="button-actions" style="margin-top: 8px; display: flex; gap: 8px;">
+                <button type="button" class="btn-voice" data-target="experienciaTexto" title="Dictar por voz">
+                  🎤 Hablar
+                </button>
+                <button type="button" class="btn-ai" data-target="experienciaTexto" data-seccion="experiencia" title="Optimizar con IA">
+                  ✨ Mejorar con IA
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- PASO 3: FORMACIÓN (CON DICTADO POR VOZ) -->
+        <!-- PASO 3: FORMACIÓN (CON DICTADO Y BOTÓN IA) -->
         <section class="step-content" id="step-3">
           <h3>Formación Académica</h3>
           <div class="form-group">
             <label for="formacionTexto">Ingresa tus estudios, institución y fechas de egreso:</label>
             <div class="voice-input-container">
               <textarea id="formacionTexto" rows="8" placeholder="• Ingeniería en Sistemas Computacionales - Universidad X (2018 - 2022)"></textarea>
-              <button type="button" class="btn-voice" data-target="formacionTexto" title="Dictar por voz">
-                🎤 Hablar
-              </button>
+              <div class="button-actions" style="margin-top: 8px; display: flex; gap: 8px;">
+                <button type="button" class="btn-voice" data-target="formacionTexto" title="Dictar por voz">
+                  🎤 Hablar
+                </button>
+                <button type="button" class="btn-ai" data-target="formacionTexto" data-seccion="formacion" title="Optimizar con IA">
+                  ✨ Mejorar con IA
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- PASO 4: COMPETENCIAS (CON DICTADO POR VOZ) -->
+        <!-- PASO 4: COMPETENCIAS (CON DICTADO Y BOTÓN IA) -->
         <section class="step-content" id="step-4">
           <h3>Competencias / Habilidades</h3>
           <div class="form-group">
             <label for="competenciasTexto">Habilidades técnicas y blandas:</label>
             <div class="voice-input-container">
               <textarea id="competenciasTexto" rows="8" placeholder="• JavaScript, HTML5, CSS3, React, SQL, Trabajo en equipo, Liderazgo..."></textarea>
-              <button type="button" class="btn-voice" data-target="competenciasTexto" title="Dictar por voz">
-                🎤 Hablar
-              </button>
+              <div class="button-actions" style="margin-top: 8px; display: flex; gap: 8px;">
+                <button type="button" class="btn-voice" data-target="competenciasTexto" title="Dictar por voz">
+                  🎤 Hablar
+                </button>
+                <button type="button" class="btn-ai" data-target="competenciasTexto" data-seccion="competencias" title="Optimizar con IA">
+                  ✨ Mejorar con IA
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -162,12 +177,17 @@
           <button type="button" id="btnAgregarIdioma" class="btn-secondary">+ Agregar Idioma</button>
         </section>
 
-        <!-- PASO 6: ACTIVIDADES EXTRACURRICULARES -->
+        <!-- PASO 6: ACTIVIDADES EXTRACURRICULARES (CON BOTÓN IA) -->
         <section class="step-content" id="step-6">
           <h3>Actividades Extracurriculares</h3>
           <div class="form-group">
             <label for="actividadesTexto">Voluntariados, cursos, proyectos personales o certificaciones:</label>
             <textarea id="actividadesTexto" rows="8" placeholder="• Certificación en SQL Relacional (2024)&#10;• Voluntariado en proyectos de desarrollo local..."></textarea>
+            <div class="button-actions" style="margin-top: 8px;">
+              <button type="button" class="btn-ai" data-target="actividadesTexto" data-seccion="actividades" title="Optimizar con IA">
+                ✨ Mejorar con IA
+              </button>
+            </div>
           </div>
         </section>
 
