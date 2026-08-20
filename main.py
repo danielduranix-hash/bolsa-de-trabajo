@@ -68,7 +68,7 @@ async def mejorar_cv(datos: PeticionMejorar):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",
+                    "model": "openai/gpt-oss-120b",
                     "messages": [
                         {"role": "system", "content": f"{system_prompt} Responde en idioma: {datos.idioma}."},
                         {"role": "user", "content": datos.texto}
