@@ -20,25 +20,29 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   function mostrarInicio() {
-    vistaInicio.style.display = 'block';
-    vistaGeoPortal.style.display = 'none';
-    window.scrollTo(0, 0);
-  }
-
-  function mostrarGeoPortal() {
-    vistaInicio.style.display = 'none';
-    vistaGeoPortal.style.display = 'block';
-
-    if (!mapa) {
-      inicializarMapa();
-    } else {
-      setTimeout(() => mapa.invalidateSize(), 200);
+    if (vistaInicio && vistaGeoPortal) {
+      vistaInicio.style.display = 'block';
+      vistaGeoPortal.style.display = 'none';
+      window.scrollTo(0, 0);
     }
   }
 
-  btnEmpleos.addEventListener('click', mostrarGeoPortal);
-  btnIrGeoPortal.addEventListener('click', (e) => { e.preventDefault(); mostrarGeoPortal(); });
-  btnVolverInicio.addEventListener('click', (e) => { e.preventDefault(); mostrarInicio(); });
+  function mostrarGeoPortal() {
+    if (vistaInicio && vistaGeoPortal) {
+      vistaInicio.style.display = 'none';
+      vistaGeoPortal.style.display = 'block';
+
+      if (!mapa) {
+        inicializarMapa();
+      } else {
+        setTimeout(() => mapa.invalidateSize(), 200);
+      }
+    }
+  }
+
+  if (btnEmpleos) btnEmpleos.addEventListener('click', mostrarGeoPortal);
+  if (btnIrGeoPortal) btnIrGeoPortal.addEventListener('click', (e) => { e.preventDefault(); mostrarGeoPortal(); });
+  if (btnVolverInicio) btnVolverInicio.addEventListener('click', (e) => { e.preventDefault(); mostrarInicio(); });
 
   /* ==========================================
      2. Inicialización del Mapa e Interacción
@@ -77,24 +81,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const filtroBox = document.getElementById('filtroBox');
   const btnBuscarMapa = document.getElementById('btnBuscarMapa');
 
-  btnToggleFiltros.addEventListener('click', () => {
-    filtroBox.classList.toggle('colapsado');
-  });
-
-  btnBuscarMapa.addEventListener('click', () => {
-    const texto = document.getElementById('filtroPalabra').value.toLowerCase();
-    const zona = document.getElementById('filtroZona').value;
-    const cat = document.getElementById('filtroCategoria').value;
-
-    const filtrados = empleos.filter(e => {
-      const matchTexto = e.titulo.toLowerCase().includes(texto) || e.empresa.toLowerCase().includes(texto);
-      const matchZona = zona === '' || e.zona === zona;
-      const matchCat = cat === '' || e.categoria === cat;
-      return matchTexto && matchZona && matchCat;
+  if (btnToggleFiltros && filtroBox) {
+    btnToggleFiltros.addEventListener('click', () => {
+      filtroBox.classList.toggle('colapsado');
     });
+  }
 
-    renderizarMarcadores(filtrados);
-  });
+  if (btnBuscarMapa) {
+    btnBuscarMapa.addEventListener('click', () => {
+      const texto = document.getElementById('filtroPalabra').value.toLowerCase();
+      const zona = document.getElementById('filtroZona').value;
+      const cat = document.getElementById('filtroCategoria').value;
+
+      const filtrados = empleos.filter(e => {
+        const matchTexto = e.titulo.toLowerCase().includes(texto) || e.empresa.toLowerCase().includes(texto);
+        const matchZona = zona === '' || e.zona === zona;
+        const matchCat = cat === '' || e.categoria === cat;
+        return matchTexto && matchZona && matchCat;
+      });
+
+      renderizarMarcadores(filtrados);
+    });
+  }
 
   /* ==========================================
      3. Controles de Accesibilidad
@@ -109,30 +117,40 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('modo-oscuro', 'dark-mode');
   }
 
-  btnToggleDarkMode.addEventListener('click', () => {
-    document.body.classList.toggle('modo-oscuro');
-    document.body.classList.toggle('dark-mode');
+  if (btnToggleDarkMode) {
+    btnToggleDarkMode.addEventListener('click', () => {
+      document.body.classList.toggle('modo-oscuro');
+      document.body.classList.toggle('dark-mode');
 
-    const isDark = document.body.classList.contains('modo-oscuro');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  });
-
-  function updateTextSize(val) {
-    textSizeSlider.value = val;
-    textSizeLabel.textContent = `${val}%`;
-    document.body.style.fontSize = `${val}%`;
-    localStorage.setItem('textSize', val);
+      const isDark = document.body.classList.contains('modo-oscuro');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
   }
 
-  textSizeSlider.addEventListener('input', (e) => updateTextSize(e.target.value));
-  btnTextSmaller.addEventListener('click', () => {
-    let current = parseInt(textSizeSlider.value, 10);
-    if (current > 80) updateTextSize(current - 5);
-  });
-  btnTextLarger.addEventListener('click', () => {
-    let current = parseInt(textSizeSlider.value, 10);
-    if (current < 130) updateTextSize(current + 5);
-  });
+  function updateTextSize(val) {
+    if (textSizeSlider && textSizeLabel) {
+      textSizeSlider.value = val;
+      textSizeLabel.textContent = `${val}%`;
+      document.body.style.fontSize = `${val}%`;
+      localStorage.setItem('textSize', val);
+    }
+  }
+
+  if (textSizeSlider) {
+    textSizeSlider.addEventListener('input', (e) => updateTextSize(e.target.value));
+  }
+  if (btnTextSmaller) {
+    btnTextSmaller.addEventListener('click', () => {
+      let current = parseInt(textSizeSlider.value, 10);
+      if (current > 80) updateTextSize(current - 5);
+    });
+  }
+  if (btnTextLarger) {
+    btnTextLarger.addEventListener('click', () => {
+      let current = parseInt(textSizeSlider.value, 10);
+      if (current < 130) updateTextSize(current + 5);
+    });
+  }
 
   const savedSize = localStorage.getItem('textSize');
   if (savedSize) updateTextSize(savedSize);
@@ -147,23 +165,203 @@ document.addEventListener('DOMContentLoaded', () => {
       e.stopPropagation();
       const estaActivo = card.classList.contains('activo');
       
-      // Cierra todos los demás paneles
       sectorCards.forEach(c => c.classList.remove('activo'));
 
-      // Alterna únicamente el seleccionado
       if (!estaActivo) {
         card.classList.add('activo');
       }
     });
   });
 
-  // Cerrar desplegable si el usuario hace clic fuera de las tarjetas
   document.addEventListener('click', () => {
     sectorCards.forEach(c => c.classList.remove('activo'));
   });
 
   /* ==========================================
-     5. Asistente Virtual y Tour Interactivo
+     5. Modales y Lógica de Registro con PostgreSQL
+     ========================================== */
+  const btnUserAuth = document.getElementById('btnUserAuth');
+  const btnCerrarLogin = document.getElementById('btnCerrarLogin');
+  const btnCerrarRegistro = document.getElementById('btnCerrarRegistro');
+  const btnIrARegistro = document.getElementById('btnIrARegistro');
+
+  const modalLogin = document.getElementById('modalLogin');
+  const modalRegistro = document.getElementById('modalRegistro');
+
+  const formLogin = document.getElementById('formLogin');
+  const formRegistro = document.getElementById('formRegistro');
+
+  // Abrir modal Login
+  if (btnUserAuth && modalLogin) {
+    btnUserAuth.addEventListener('click', () => {
+      modalLogin.style.display = 'flex';
+    });
+  }
+
+  // Cerrar modales con sus botones 'X'
+  if (btnCerrarLogin && modalLogin) {
+    btnCerrarLogin.addEventListener('click', () => {
+      modalLogin.style.display = 'none';
+    });
+  }
+
+  if (btnCerrarRegistro && modalRegistro) {
+    btnCerrarRegistro.addEventListener('click', () => {
+      modalRegistro.style.display = 'none';
+    });
+  }
+
+  // Cambiar de Login a Registro
+  if (btnIrARegistro && modalLogin && modalRegistro) {
+    btnIrARegistro.addEventListener('click', () => {
+      modalLogin.style.display = 'none';
+      modalRegistro.style.display = 'flex';
+    });
+  }
+
+  // Cerrar modales al hacer clic en el fondo oscuro
+  window.addEventListener('click', (e) => {
+    if (e.target === modalLogin) modalLogin.style.display = 'none';
+    if (e.target === modalRegistro) modalRegistro.style.display = 'none';
+  });
+
+  // --- LÓGICA DE CAMPOS CONDICIONALES (GRUPO VULNERABLE Y DISCAPACIDAD) ---
+  const vulnerableSi = document.getElementById('vulnerableSi');
+  const vulnerableNo = document.getElementById('vulnerableNo');
+  const boxTipoVulnerable = document.getElementById('boxTipoVulnerable');
+  const selectTipoVulnerable = document.getElementById('selectTipoVulnerable');
+  const boxCatalogoDiscapacidad = document.getElementById('boxCatalogoDiscapacidad');
+
+  function toggleVulnerable() {
+    if (vulnerableSi && vulnerableSi.checked) {
+      boxTipoVulnerable.classList.remove('oculto');
+      selectTipoVulnerable.setAttribute('required', 'true');
+    } else if (boxTipoVulnerable) {
+      boxTipoVulnerable.classList.add('oculto');
+      selectTipoVulnerable.removeAttribute('required');
+      selectTipoVulnerable.value = '';
+      
+      if (boxCatalogoDiscapacidad) boxCatalogoDiscapacidad.classList.add('oculto');
+      limpiarCheckboxesDiscapacidad();
+    }
+  }
+
+  if (vulnerableSi && vulnerableNo) {
+    vulnerableSi.addEventListener('change', toggleVulnerable);
+    vulnerableNo.addEventListener('change', toggleVulnerable);
+  }
+
+  if (selectTipoVulnerable) {
+    selectTipoVulnerable.addEventListener('change', (e) => {
+      if (e.target.value === 'discapacidad') {
+        boxCatalogoDiscapacidad.classList.remove('oculto');
+      } else {
+        boxCatalogoDiscapacidad.classList.add('oculto');
+        limpiarCheckboxesDiscapacidad();
+      }
+    });
+  }
+
+  function limpiarCheckboxesDiscapacidad() {
+    const checkboxes = document.querySelectorAll('input[name="tipoDiscapacidad"]');
+    checkboxes.forEach(cb => cb.checked = false);
+  }
+
+  // Envío Formulario Login
+  if (formLogin) {
+    formLogin.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const correo = document.getElementById('loginCorreo').value;
+      alert(`Sesión iniciada correctamente como: ${correo}`);
+      formLogin.reset();
+      modalLogin.style.display = 'none';
+    });
+  }
+
+  // Envío Formulario Registro con PostgreSQL y Validaciones
+  if (formRegistro) {
+    formRegistro.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const pass = document.getElementById('password')?.value;
+      const confirmPass = document.getElementById('confirmPassword')?.value;
+
+      if (pass !== confirmPass) {
+        alert("Las contraseñas no coinciden. Por favor, verifica nuevamente.");
+        return;
+      }
+
+      // Validar reglas de la contraseña: Alfanumérica, sin comas, acentos ni 'ñ'
+      const regexPassword = /^[a-zA-Z0-9]+$/;
+      if (!regexPassword.test(pass)) {
+        alert("La contraseña no cumple con el formato: no debe contener comas, acentos, la letra 'ñ' ni caracteres especiales.");
+        return;
+      }
+
+      // Validar selección de discapacidad si aplica
+      if (selectTipoVulnerable && selectTipoVulnerable.value === 'discapacidad') {
+        const seleccionados = document.querySelectorAll('input[name="tipoDiscapacidad"]:checked');
+        if (seleccionados.length === 0) {
+          alert("Por favor, selecciona al menos una opción del catálogo de discapacidades.");
+          return;
+        }
+      }
+
+      // Recopilar selecciones múltiples de discapacidad
+      const discapacidadesElegidas = Array.from(
+        document.querySelectorAll('input[name="tipoDiscapacidad"]:checked')
+      ).map(cb => cb.value);
+
+      // Mapeo de datos para enviar al Backend en PostgreSQL
+      const datosUsuario = {
+        curp: document.getElementById('curp')?.value,
+        correo: document.getElementById('correo')?.value,
+        password: pass,
+        nombre: document.getElementById('nombre')?.value,
+        primer_apellido: document.getElementById('apellidoPaterno')?.value,
+        segundo_apellido: document.getElementById('apellidoMaterno')?.value,
+        fecha_nacimiento: document.getElementById('fechaNacimiento')?.value,
+        sexo: document.querySelector('input[name="sexo"]:checked')?.value,
+        pertenece_grupo_vulnerable: vulnerableSi ? vulnerableSi.checked : false,
+        grupos_vulnerables: selectTipoVulnerable?.value ? [selectTipoVulnerable.value] : [],
+        tiene_discapacidad: selectTipoVulnerable?.value === 'discapacidad',
+        tipos_discapacidad: discapacidadesElegidas
+      };
+
+      try {
+        // Petición al Backend en Node.js / PostgreSQL
+        const respuesta = await fetch('http://localhost:3000/api/registro', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(datosUsuario)
+        });
+
+        const resultado = await respuesta.json();
+
+        if (respuesta.ok && resultado.exito) {
+          alert("¡Tu cuenta ha sido creada exitosamente en la base de datos!");
+          formRegistro.reset();
+          toggleVulnerable();
+          modalRegistro.style.display = 'none';
+        } else {
+          // Si la CURP ya existe o el correo está duplicado
+          if (resultado.codigo === 'CURP_DUPLICADA') {
+            alert(`Atención: ${resultado.mensaje}`);
+          } else {
+            alert(`Error en el registro: ${resultado.mensaje}`);
+          }
+        }
+      } catch (error) {
+        console.error("Error de red o conexión:", error);
+        alert("No se pudo conectar con el servidor de la base de datos. Verifica que el servidor (Node.js) esté encendido.");
+      }
+    });
+  }
+
+  /* ==========================================
+     6. Asistente Virtual y Tour Interactivo
      ========================================== */
   const btnHelp = document.getElementById('btnHelp');
   const assistantBox = document.getElementById('assistantBox');
@@ -212,16 +410,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function iniciarTutorial() {
     pasoActual = 0;
-    assistantBox.style.display = 'block';
-    tutorialOverlay.style.display = 'block';
+    if (assistantBox) assistantBox.style.display = 'block';
+    if (tutorialOverlay) tutorialOverlay.style.display = 'block';
     mostrarPaso();
   }
 
   function finalizarTutorial() {
-    assistantBox.style.display = 'none';
-    tutorialOverlay.style.display = 'none';
+    if (assistantBox) assistantBox.style.display = 'none';
+    if (tutorialOverlay) tutorialOverlay.style.display = 'none';
     quitarResaltados();
-    window.speechSynthesis.cancel();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   }
 
   function quitarResaltados() {
@@ -230,9 +428,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function mostrarPaso() {
     quitarResaltados();
-    window.speechSynthesis.cancel();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 
-    const esGeoPortal = vistaGeoPortal.style.display !== 'none';
+    const esGeoPortal = vistaGeoPortal && vistaGeoPortal.style.display !== 'none';
     const pasarela = esGeoPortal ? tutorialesPorSeccion.geoportal : tutorialesPorSeccion.inicio;
 
     if (pasoActual >= pasarela.length) {
@@ -241,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const paso = pasarela[pasoActual];
-    assistantText.textContent = paso.text;
+    if (assistantText) assistantText.textContent = paso.text;
 
     const elTarget = document.getElementById(paso.elementId);
     if (elTarget) {
@@ -250,20 +448,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  btnHelp.addEventListener('click', iniciarTutorial);
-  btnNextStep.addEventListener('click', () => {
-    pasoActual++;
-    mostrarPaso();
-  });
-  btnSkipTutorial.addEventListener('click', finalizarTutorial);
+  if (btnHelp) btnHelp.addEventListener('click', iniciarTutorial);
+  if (btnNextStep) {
+    btnNextStep.addEventListener('click', () => {
+      pasoActual++;
+      mostrarPaso();
+    });
+  }
+  if (btnSkipTutorial) btnSkipTutorial.addEventListener('click', finalizarTutorial);
 
-  btnVoiceRead.addEventListener('click', () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const locucion = new SpeechSynthesisUtterance(assistantText.textContent);
-      locucion.lang = 'es-ES';
-      window.speechSynthesis.speak(locucion);
-    }
-  });
+  if (btnVoiceRead) {
+    btnVoiceRead.addEventListener('click', () => {
+      if ('speechSynthesis' in window && assistantText) {
+        window.speechSynthesis.cancel();
+        const locucion = new SpeechSynthesisUtterance(assistantText.textContent);
+        locucion.lang = 'es-ES';
+        window.speechSynthesis.speak(locucion);
+      }
+    });
+  }
 
 });
