@@ -314,59 +314,113 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
+
   // 5. INTEGRACIÓN CON BACKEND IA (FASTAPI / GROQ)
+
   // ==========================================
+
   document.querySelectorAll('.btn-ai, .btn-ia, [data-ai="true"]').forEach(button => {
+
     button.addEventListener('click', async (e) => {
+
       e.preventDefault();
 
+
+
       const targetId = button.getAttribute('data-target') || 'experienciaTexto';
+
       const seccion = button.getAttribute('data-seccion') || 'experiencia';
+
       const targetTextarea = document.getElementById(targetId);
+
+
 
       if (!targetTextarea) return;
 
+
+
       const textoOriginal = targetTextarea.value.trim();
+
       if (!textoOriginal) {
+
         alert("Escribe algo en la casilla antes de optimizar con IA.");
+
         return;
+
       }
 
+
+
       const textoBotonOriginal = button.innerText;
+
       button.disabled = true;
+
       button.innerText = "✨ Optimizando...";
 
+
+
       try {
+
         const lang = document.getElementById('idiomaCv')?.value || 'es';
+
         const response = await fetch("http://127.0.0.1:8000/api/mejorar-cv", {
+
           method: "POST",
+
           headers: { "Content-Type": "application/json" },
+
           body: JSON.stringify({
+
             texto: textoOriginal,
+
             seccion: seccion,
+
             idioma: lang
+
           })
+
         });
+
+
 
         const data = await response.json();
 
+
+
         if (response.ok) {
+
           targetTextarea.value = data.resultado;
+
           // Actualizar vista previa y guardar
+
           targetTextarea.dispatchEvent(new Event('input'));
+
           targetTextarea.dispatchEvent(new Event('change'));
+
           guardarProgreso();
+
         } else {
+
           alert("Error de Servidor: " + (data.detail || "No se pudo optimizar el texto."));
+
         }
+
       } catch (err) {
+
         console.error("Error al conectar con la API:", err);
+
         alert("No se pudo conectar con el servidor local (http://127.0.0.1:8000). Asegúrate de que FastAPI esté activo.");
+
       } finally {
+
         button.disabled = false;
+
         button.innerText = textoBotonOriginal;
+
       }
+
     });
+
   });
 
   // ==========================================
