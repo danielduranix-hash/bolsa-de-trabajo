@@ -13,40 +13,53 @@
 <body>
 
   <!-- Encabezado Principal -->
-  <header>
-    <div class="logo-container">
-      <div class="logo-title">
-        <h1>Bolsa de Trabajo Municipal</h1>
-        <p>Conectando talento con oportunidades</p>
+<header>
+  <div class="logo-container">
+    <div class="logo-title">
+      <h1>Bolsa de Trabajo Municipal</h1>
+      <p>Conectando talento con oportunidades</p>
+    </div>
+  </div>
+
+  <div class="header-buttons">
+    <!-- Controles de Accesibilidad -->
+    <div class="text-size-control">
+      <button id="btnTextSmaller" class="btn-access btn-reset" title="Disminuir texto">A-</button>
+      <div class="slider-container">
+        <input type="range" id="textSizeSlider" min="80" max="130" value="100" step="5">
+        <span class="slider-label" id="textSizeLabel">100%</span>
       </div>
+      <button id="btnTextLarger" class="btn-access btn-reset" title="Aumentar texto">A+</button>
     </div>
 
-    <div class="header-buttons">
-      <!-- Controles de Accesibilidad -->
-      <div class="text-size-control">
-        <button id="btnTextSmaller" class="btn-access btn-reset" title="Disminuir texto">A-</button>
-        <div class="slider-container">
-          <input type="range" id="textSizeSlider" min="80" max="130" value="100" step="5">
-          <span class="slider-label" id="textSizeLabel">100%</span>
-        </div>
-        <button id="btnTextLarger" class="btn-access btn-reset" title="Aumentar texto">A+</button>
-      </div>
+    <button id="btnToggleDarkMode" class="btn-access">🌙 Modo Oscuro</button>
+    <button id="btnEmpleos" class="btn-empleos">GeoPortal de Empleos</button>
+    
+    <!-- Botón para cuando NO hay sesión (Login / Registro) -->
+    <button id="btnUserAuth" class="btn-user-auth" title="Mi Cuenta / Acceso">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span>Ingresar</span>
+    </button>
 
-      <button id="btnToggleDarkMode" class="btn-access">🌙 Modo Oscuro</button>
-      <button id="btnEmpleos" class="btn-empleos">GeoPortal de Empleos</button>
-      
-      <!-- Icono/Botón de Usuario (Registro/Login) -->
-      <button id="btnUserAuth" class="btn-user-auth" title="Mi Cuenta / Acceso">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span>Ingresar</span>
-      </button>
+    <!-- Botones para cuando SÍ hay sesión iniciada (Ocultos por defecto) -->
+    <button id="btnMiPerfil" class="btn-user-auth" style="display: none;" title="Configurar Perfil">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span id="txtNombreUsuario">Mi Perfil</span>
+    </button>
 
-      <button id="btnHelp" class="btn-help" title="Ayuda y Tutorial">?</button>
-    </div>
-  </header>
+    <button id="btnCerrarSesion" class="btn-access" style="display: none;" title="Cerrar Sesión">
+      🚪 Salir
+    </button>
+
+    <button id="btnHelp" class="btn-help" title="Ayuda y Tutorial">?</button>
+  </div>
+</header>
 
   <!-- ==========================================
         VISTA 1: INICIO / LANDING PAGE
@@ -340,134 +353,142 @@
         <button type="button" id="btnCerrarRegistro" class="btn-close">&times;</button>
       </div>
 
-      <form id="formRegistro" class="form-registro">
-        <div class="registro-grid">
-          
-          <!-- Columna Izquierda -->
-          <div class="columna">
-            <div class="form-group">
-              <label for="curp">CURP *</label>
-              <input type="text" id="curp" name="curp" class="input-curp" placeholder="Ingresa tu CURP" maxlength="18" required>
-            </div>
+<form id="formRegistro" class="form-registro">
+  <div class="registro-grid">
+    
+    <!-- Columna Izquierda -->
+    <div class="columna">
+      <div class="form-group">
+        <label for="curp">CURP *</label>
+        <!-- SE ACTUALIZÓ ESTE INPUT: Se agregó placeholder explicativo y validación de 18 caracteres -->
+        <input 
+          type="text" 
+          id="curp" 
+          name="curp" 
+          class="input-curp" 
+          placeholder="AAAA000000HHHHHH00" 
+          maxlength="18" 
+          required>
+      </div>
 
-            <div class="form-group">
-              <label for="correo">Correo electrónico *</label>
-              <input type="email" id="correo" name="correo" placeholder="Escriba su correo electrónico" required>
-            </div>
+      <div class="form-group">
+        <label for="correo">Correo electrónico *</label>
+        <input type="email" id="correo" name="correo" placeholder="Escriba su correo electrónico" required>
+      </div>
 
-            <div class="form-group">
-              <label for="password">Contraseña *</label>
-              <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres" minlength="8" required>
-            </div>
+      <div class="form-group">
+        <label for="password">Contraseña *</label>
+        <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres" minlength="8" required>
+      </div>
 
-            <div class="form-group">
-              <label for="confirmPassword">Confirmar contraseña *</label>
-              <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmar contraseña" minlength="8" required>
-            </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar contraseña *</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmar contraseña" minlength="8" required>
+      </div>
 
-            <p class="texto-ayuda">
-              La contraseña debe tener mínimo 8 caracteres. Evitar el uso de comas. No debe contener coma(,), letras con acentos, ñ o caracteres especiales.
-            </p>
-          </div>
+      <p class="texto-ayuda">
+        La contraseña debe tener mínimo 8 caracteres. Evitar el uso de comas. No debe contener coma(,), letras con acentos, ñ o caracteres especiales.
+      </p>
+    </div>
 
-          <!-- Columna Derecha -->
-          <div class="columna">
-            <div class="form-group">
-              <label for="nombre">Nombre *</label>
-              <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
-            </div>
+    <!-- Columna Derecha -->
+    <div class="columna">
+      <div class="form-group">
+        <label for="nombre">Nombre *</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
+      </div>
 
-            <div class="form-group">
-              <label for="apellidoPaterno">Apellido Paterno *</label>
-              <input type="text" id="apellidoPaterno" name="apellidoPaterno" placeholder="Apellido Paterno" required>
-            </div>
+      <div class="form-group">
+        <label for="apellidoPaterno">Apellido Paterno *</label>
+        <input type="text" id="apellidoPaterno" name="apellidoPaterno" placeholder="Apellido Paterno" required>
+      </div>
 
-            <div class="form-group">
-              <label for="apellidoMaterno">Apellido Materno *</label>
-              <input type="text" id="apellidoMaterno" name="apellidoMaterno" placeholder="Apellido Materno" required>
-            </div>
-          </div>
+      <div class="form-group">
+        <label for="apellidoMaterno">Apellido Materno *</label>
+        <input type="text" id="apellidoMaterno" name="apellidoMaterno" placeholder="Apellido Materno" required>
+      </div>
+    </div>
 
-        </div>
+  </div>
 
-        <!-- Sección Inferior -->
-        <div class="registro-inferior">
-          <div class="form-group group-fecha">
-            <label for="fechaNacimiento">Fecha de nacimiento *</label>
-            <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
-          </div>
+  <!-- Sección Inferior -->
+  <div class="registro-inferior">
+    <div class="form-group group-fecha">
+      <label for="fechaNacimiento">Fecha de nacimiento *</label>
+      <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+    </div>
 
-          <div class="form-group group-sexo">
-            <label>Sexo *</label>
-            <div class="opciones-radio">
-              <label class="radio-label">
-                <input type="radio" name="sexo" value="mujer" required> Mujer
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="sexo" value="hombre"> Hombre
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="sexo" value="otra"> Otra (respuesta)
-              </label>
-            </div>
-          </div>
-        </div>
+    <div class="form-group group-sexo">
+      <label>Sexo *</label>
+      <div class="opciones-radio">
+        <label class="radio-label">
+          <input type="radio" name="sexo" value="mujer" required> Mujer
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="sexo" value="hombre"> Hombre
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="sexo" value="otra"> Otra (respuesta)
+        </label>
+      </div>
+    </div>
+  </div>
 
-        <!-- Sección Condicional: Grupo Vulnerable y Credenciales -->
-        <div class="seccion-vulnerable-box">
-          <div class="form-group">
-            <label>* ¿Considera que pertenece a un grupo vulnerable?</label>
-            <div class="opciones-radio">
-              <label class="radio-label">
-                <input type="radio" name="vulnerable" value="SI" id="vulnerableSi" required> SI
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="vulnerable" value="NO" id="vulnerableNo" required> NO
-              </label>
-            </div>
-          </div>
+  <!-- Sección Condicional: Grupo Vulnerable y Credenciales -->
+  <div class="seccion-vulnerable-box">
+    <div class="form-group">
+      <label>* ¿Considera que pertenece a un grupo vulnerable?</label>
+      <div class="opciones-radio">
+        <label class="radio-label">
+          <input type="radio" name="vulnerable" value="SI" id="vulnerableSi" required> SI
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="vulnerable" value="NO" id="vulnerableNo" required> NO
+        </label>
+      </div>
+    </div>
 
-          <!-- Select Tipo de Vulnerabilidad -->
-          <div id="boxTipoVulnerable" class="form-group oculto" style="margin-top: 12px;">
-            <label for="selectTipoVulnerable">* ¿A cuál?</label>
-            <select id="selectTipoVulnerable">
-              <option value="">-- Seleccione una opción --</option>
-              <option value="discapacidad">Persona con discapacidad</option>
-              <option value="adulto_mayor">Persona adulto mayor</option>
-              <option value="rehabilitada">Persona rehabilitada</option>
-              <option value="violencia">Persona víctima de violencia intrafamiliar</option>
-            </select>
-          </div>
+    <!-- Select Tipo de Vulnerabilidad -->
+    <div id="boxTipoVulnerable" class="form-group oculto" style="margin-top: 12px;">
+      <label for="selectTipoVulnerable">* ¿A cuál?</label>
+      <select id="selectTipoVulnerable">
+        <option value="">-- Seleccione una opción --</option>
+        <option value="discapacidad">Persona con discapacidad</option>
+        <option value="adulto_mayor">Persona adulto mayor</option>
+        <option value="rehabilitada">Persona rehabilitada</option>
+        <option value="violencia">Persona víctima de violencia intrafamiliar</option>
+      </select>
+    </div>
 
-          <!-- Selección Múltiple: Tipo de Discapacidad -->
-          <div id="boxCatalogoDiscapacidad" class="form-group oculto" style="margin-top: 12px;">
-            <label>* Seleccione tipo(s) de discapacidad (Selección múltiple):</label>
-            <div class="catalogo-discapacidades">
-              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Motriz"> Motriz</label>
-              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Visual"> Visual</label>
-              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Auditiva"> Auditiva</label>
-              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Intelectual"> Intelectual</label>
-              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Psicosocial"> Psicosocial</label>
-              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Multiple"> Múltiple</label>
-            </div>
-          </div>
+    <!-- Selección Múltiple: Tipo de Discapacidad -->
+    <div id="boxCatalogoDiscapacidad" class="form-group oculto" style="margin-top: 12px;">
+      <label>* Seleccione tipo(s) de discapacidad (Selección múltiple):</label>
+      <div class="catalogo-discapacidades">
+        <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Motriz"> Motriz</label>
+        <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Visual"> Visual</label>
+        <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Auditiva"> Auditiva</label>
+        <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Intelectual"> Intelectual</label>
+        <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Psicosocial"> Psicosocial</label>
+        <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Multiple"> Múltiple</label>
+      </div>
+    </div>
 
-          <!-- Select Credencial -->
-          <div class="form-group" style="margin-top: 12px;">
-            <label for="selectCredencial">* Cuentas con credencial:</label>
-            <select id="selectCredencial" name="credencial" required>
-              <option value="">-- Seleccione una opción --</option>
-              <option value="Discapacidad">Discapacidad</option>
-              <option value="INAPAM">INAPAM</option>
-              <option value="Ninguna">Ninguna</option>
-            </select>
-          </div>
-        </div>
+    <!-- Select Credencial -->
+    <div class="form-group" style="margin-top: 12px;">
+      <label for="selectCredencial">* Cuentas con credencial:</label>
+      <select id="selectCredencial" name="credencial" required>
+        <option value="">-- Seleccione una opción --</option>
+        <option value="Discapacidad">Discapacidad</option>
+        <option value="INAPAM">INAPAM</option>
+        <option value="Ninguna">Ninguna</option>
+      </select>
+    </div>
+  </div>
 
-        <div class="registro-actions">
-          <button type="submit" class="btn-submit-registro">Registrarse</button>
-        </div>
-      </form>
+  <div class="registro-actions">
+    <button type="submit" class="btn-submit-registro">Registrarse</button>
+  </div>
+</form>
 
     </div>
   </div>
