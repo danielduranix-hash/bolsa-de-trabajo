@@ -491,5 +491,263 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+  
+    /* ==========================================
+     7. PANEL DE ACCESIBILIDAD (GLOBAL)
+     ========================================== */
 
+  // Elementos del panel
+  const btnAccesibilidad = document.getElementById('btnAccesibilidad');
+  const panelAccesibilidad = document.getElementById('panelAccesibilidad');
+  const btnCerrarAccesibilidad = document.getElementById('btnCerrarAccesibilidad');
+  const tabs = document.querySelectorAll('.tab-accesibilidad');
+  const tabContents = document.querySelectorAll('.tab-content-accesibilidad');
+
+  // Abrir/Cerrar panel
+  if (btnAccesibilidad && panelAccesibilidad) {
+    btnAccesibilidad.addEventListener('click', () => {
+      const isOpen = panelAccesibilidad.style.display === 'block';
+      panelAccesibilidad.style.display = isOpen ? 'none' : 'block';
+    });
+  }
+
+  if (btnCerrarAccesibilidad && panelAccesibilidad) {
+    btnCerrarAccesibilidad.addEventListener('click', () => {
+      panelAccesibilidad.style.display = 'none';
+    });
+  }
+
+  // Cambio de pestañas
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const target = tab.dataset.tab;
+      tabContents.forEach(content => {
+        content.classList.remove('active');
+        if (content.id === 'tab' + target.charAt(0).toUpperCase() + target.slice(1)) {
+          content.classList.add('active');
+        }
+      });
+    });
+  });
+
+  // ==========================================
+  // FUNCIONES GLOBALES DE ACCESIBILIDAD
+  // ==========================================
+
+  // Tamaño de fuente (global)
+  function cambiarFuente(accion) {
+    let current = parseInt(localStorage.getItem('textSize') || '100', 10);
+    let nuevo = accion === 'aumentar' ? Math.min(current + 10, 150) : Math.max(current - 10, 70);
+    document.body.style.fontSize = nuevo + '%';
+    localStorage.setItem('textSize', nuevo);
+    const label = document.getElementById('tamanoTextoLabel');
+    if (label) label.textContent = nuevo + '%';
+    // Sincronizar con el slider existente
+    const slider = document.getElementById('textSizeSlider');
+    if (slider) slider.value = nuevo;
+  }
+
+  // Toggle de clases
+  function toggleClase(className, key) {
+    document.body.classList.toggle(className);
+    const isActive = document.body.classList.contains(className);
+    localStorage.setItem(key, isActive ? 'true' : 'false');
+
+    // Actualizar estado visual del botón
+    document.querySelectorAll(`[data-accion="${key}"]`).forEach(btn => {
+      btn.classList.toggle('active', isActive);
+    });
+  }
+
+  // Funciones específicas para cada acción
+  window.toggleAltoContraste = () => toggleClase('alto-contraste', 'altoContraste');
+  
+  window.toggleModoOscuro = () => {
+    document.body.classList.toggle('modo-oscuro');
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('modo-oscuro');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
+      btn.classList.toggle('active', isDark);
+    });
+    // Sincronizar con el botón existente
+    const btnExistente = document.getElementById('btnToggleDarkMode');
+    if (btnExistente) btnExistente.textContent = isDark ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+  };
+  
+  window.toggleSubrayar = () => toggleClase('subrayar-enlaces', 'subrayarEnlaces');
+  window.toggleEspaciado = () => toggleClase('espaciado-legible', 'espaciado');
+  window.toggleFuenteLegible = () => toggleClase('fuente-legible', 'fuenteLegible');
+  window.toggleBotonesGrandes = () => toggleClase('botones-grandes', 'botonesGrandes');
+  window.toggleNavegacionTeclado = () => toggleClase('navegacion-teclado', 'navegacionTeclado');
+  window.toggleModoLectura = () => toggleClase('modo-lectura', 'modoLectura');
+  window.toggleResaltarTitulos = () => toggleClase('resaltar-titulos', 'resaltarTitulos');
+
+  // Saltar al contenido
+  window.saltarContenido = () => {
+    const main = document.querySelector('main');
+    if (main) {
+      main.setAttribute('tabindex', '-1');
+      main.focus();
+      main.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // ==========================================
+  // LECTOR DE PANTALLA (Web Speech API)
+  // ==========================================
+  let synth = window.speechSynthesis;
+  let utterance = null;
+  let isPaused = false;
+
+  function leerTexto(texto) {
+    if (!synth) return;
+    synth.cancel();
+    utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang = 'es-ES';
+    const velocidad = document.getElementById('velocidadVoz');
+    utterance.rate = velocidad ? parseFloat(velocidad.value) : 1;
+    utterance.onend = () => { isPaused = false; };
+    synth.speak(utterance);
+  }
+
+  window.leerTodo = () => {
+    const bodyText = document.body.innerText;
+    leerTexto(bodyText);
+  };
+
+  window.leerSeleccion = () => {
+    const seleccion = window.getSelection().toString();
+    if (seleccion) {
+      leerTexto(seleccion);
+    } else {
+      alert('Selecciona un texto con el mouse o el teclado para leerlo en voz alta.');
+    }
+  };
+
+  window.pausarVoz = () => {
+    if (synth.speaking) {
+      if (isPaused) {
+        synth.resume();
+        isPaused = false;
+      } else {
+        synth.pause();
+        isPaused = true;
+      }
+    }
+  };
+
+  window.detenerVoz = () => {
+    synth.cancel();
+    isPaused = false;
+  };
+
+  // Velocidad de voz
+  const velocidadInput = document.getElementById('velocidadVoz');
+  const velocidadLabel = document.getElementById('velocidadLabel');
+  if (velocidadInput && velocidadLabel) {
+    velocidadInput.addEventListener('input', () => {
+      velocidadLabel.textContent = parseFloat(velocidadInput.value).toFixed(1) + 'x';
+    });
+  }
+
+  // ==========================================
+  // ASIGNAR EVENTOS A LOS BOTONES DEL PANEL
+  // ==========================================
+
+  // Botones de fuente
+  document.querySelectorAll('.btn-fuente').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const accion = btn.dataset.accion;
+      if (accion === 'aumentar' || accion === 'disminuir') {
+        cambiarFuente(accion);
+        const slider = document.getElementById('textSizeSlider');
+        if (slider) slider.value = document.body.style.fontSize.replace('%', '') || 100;
+      }
+    });
+  });
+
+  // Botones toggle
+  document.querySelectorAll('.btn-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const accion = btn.dataset.accion;
+      const funciones = {
+        'altoContraste': window.toggleAltoContraste,
+        'modoOscuro': window.toggleModoOscuro,
+        'subrayarEnlaces': window.toggleSubrayar,
+        'espaciado': window.toggleEspaciado,
+        'fuenteLegible': window.toggleFuenteLegible,
+        'botonesGrandes': window.toggleBotonesGrandes,
+        'navegacionTeclado': window.toggleNavegacionTeclado,
+        'modoLectura': window.toggleModoLectura,
+        'resaltarTitulos': window.toggleResaltarTitulos,
+        'saltarContenido': window.saltarContenido
+      };
+      if (funciones[accion]) funciones[accion]();
+    });
+  });
+
+  // Botones de lectura
+  document.querySelectorAll('.btn-lectura').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const accion = btn.dataset.accion;
+      const funciones = {
+        'leerTodo': window.leerTodo,
+        'leerSeleccion': window.leerSeleccion,
+        'pausarVoz': window.pausarVoz,
+        'detenerVoz': window.detenerVoz
+      };
+      if (funciones[accion]) funciones[accion]();
+    });
+  });
+
+  // ==========================================
+  // RESTAURAR PREFERENCIAS GUARDADAS
+  // ==========================================
+  function restaurarAccesibilidad() {
+    const preferencias = {
+      'altoContraste': 'alto-contraste',
+      'subrayarEnlaces': 'subrayar-enlaces',
+      'espaciado': 'espaciado-legible',
+      'fuenteLegible': 'fuente-legible',
+      'botonesGrandes': 'botones-grandes',
+      'navegacionTeclado': 'navegacion-teclado',
+      'modoLectura': 'modo-lectura',
+      'resaltarTitulos': 'resaltar-titulos'
+    };
+
+    Object.entries(preferencias).forEach(([key, className]) => {
+      if (localStorage.getItem(key) === 'true') {
+        document.body.classList.add(className);
+        document.querySelectorAll(`[data-accion="${key}"]`).forEach(btn => {
+          btn.classList.add('active');
+        });
+      }
+    });
+
+    // Modo oscuro
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('modo-oscuro', 'dark-mode');
+      document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
+        btn.classList.add('active');
+      });
+    }
+
+    // Tamaño de texto
+    const savedSize = localStorage.getItem('textSize');
+    if (savedSize) {
+      document.body.style.fontSize = savedSize + '%';
+      const label = document.getElementById('tamanoTextoLabel');
+      if (label) label.textContent = savedSize + '%';
+      const slider = document.getElementById('textSizeSlider');
+      if (slider) slider.value = savedSize;
+    }
+  }
+
+  // Ejecutar al cargar
+  restaurarAccesibilidad();
+  
 });

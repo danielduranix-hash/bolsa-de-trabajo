@@ -693,6 +693,80 @@
     </div>
   </div>
 
+  <!-- ==========================================
+        PANEL DE ACCESIBILIDAD (Flotante)
+        ========================================== -->
+        
+  <!-- Botón para abrir/cerrar el panel -->
+  <button id="btnAccesibilidad" class="btn-accesibilidad-flotante" aria-label="Abrir panel de accesibilidad">
+    ♿
+  </button>
+
+  <!-- Panel de accesibilidad -->
+  <div id="panelAccesibilidad" class="panel-accesibilidad" role="dialog" aria-label="Panel de accesibilidad" style="display: none;">
+    <div class="panel-header">
+      <h3>♿ Accesibilidad</h3>
+      <button id="btnCerrarAccesibilidad" class="btn-cerrar-panel">&times;</button>
+    </div>
+
+    <!-- Pestañas -->
+    <div class="tabs-accesibilidad">
+      <button class="tab-accesibilidad active" data-tab="vista">👁️ Vista</button>
+      <button class="tab-accesibilidad" data-tab="audio">🎧 Audio</button>
+      <button class="tab-accesibilidad" data-tab="motriz">🖱️ Motriz</button>
+      <button class="tab-accesibilidad" data-tab="cognitiva">🧠 Cognitiva</button>
+    </div>
+
+    <!-- Contenido de las pestañas -->
+    <div class="tab-content-accesibilidad active" id="tabVista">
+      <div class="control-group">
+        <label>Tamaño de texto:</label>
+        <div class="control-buttons">
+          <button class="btn-fuente" data-accion="disminuir">A-</button>
+          <span id="tamanoTextoLabel">100%</span>
+          <button class="btn-fuente" data-accion="aumentar">A+</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <button class="btn-toggle" data-accion="altoContraste">🔲 Alto contraste</button>
+        <button class="btn-toggle" data-accion="modoOscuro">🌙 Modo oscuro</button>
+        <button class="btn-toggle" data-accion="subrayarEnlaces">🔗 Subrayar enlaces</button>
+        <button class="btn-toggle" data-accion="espaciado">📏 Espaciado legible</button>
+        <button class="btn-toggle" data-accion="fuenteLegible">🔤 Fuente legible</button>
+      </div>
+    </div>
+
+    <div class="tab-content-accesibilidad" id="tabAudio">
+      <div class="control-group">
+        <button class="btn-lectura" data-accion="leerTodo">🔊 Leer todo</button>
+        <button class="btn-lectura" data-accion="leerSeleccion">📖 Leer selección</button>
+        <button class="btn-lectura" data-accion="pausarVoz">⏸️ Pausar</button>
+        <button class="btn-lectura" data-accion="detenerVoz">⏹️ Detener</button>
+      </div>
+      <div class="control-group">
+        <label for="velocidadVoz">Velocidad de voz:</label>
+        <input type="range" id="velocidadVoz" min="0.5" max="2" step="0.1" value="1">
+        <span id="velocidadLabel">1x</span>
+      </div>
+    </div>
+
+    <div class="tab-content-accesibilidad" id="tabMotriz">
+      <div class="control-group">
+        <button class="btn-toggle" data-accion="saltarContenido">⬇️ Saltar al contenido</button>
+        <button class="btn-toggle" data-accion="botonesGrandes">🔲 Botones grandes</button>
+        <button class="btn-toggle" data-accion="navegacionTeclado">⌨️ Navegación por teclado</button>
+      </div>
+    </div>
+
+    <div class="tab-content-accesibilidad" id="tabCognitiva">
+      <div class="control-group">
+        <button class="btn-toggle" data-accion="modoLectura">📖 Modo lectura</button>
+        <button class="btn-toggle" data-accion="resaltarTitulos">🔦 Resaltar títulos</button>
+        <button class="btn-toggle" data-accion="guiasPaso">🧭 Guía paso a paso</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Script Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- Archivo Lógico Principal -->
