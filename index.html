@@ -471,6 +471,202 @@
 
     </div>
   </div>
+  
+<!-- MODAL 3: PERFIL DE USUARIO -->
+<div id="modalPerfil" class="modal-overlay" style="display: none;">
+  <div class="modal-registro-container" style="max-width: 800px;">
+    
+    <div class="modal-header">
+      <h2>Mi Perfil</h2>
+      <button type="button" id="btnCerrarPerfil" class="btn-close">&times;</button>
+    </div>
+
+    <form id="formPerfil" class="form-registro">
+      
+      <!-- FOTO Y CURP -->
+      <div class="columna" style="text-align: center; margin-bottom: 20px;">
+        
+        <!--  AQUÍ VA LA LÍNEA REEMPLAZADA  -->
+        <div class="profile-avatar-container">👤</div>
+
+        <div class="form-group">
+          <label>CURP:</label>
+          <input type="text" id="perfilCurp" readonly style="text-align: center;">
+        </div>
+      </div>
+
+        <!-- INFORMACIÓN GENERAL -->
+        <div class="registro-grid">
+          <div class="columna">
+            <div class="form-group">
+              <label for="perfilNombre">Nombre *</label>
+              <input type="text" id="perfilNombre" required>
+            </div>
+            <div class="form-group">
+              <label for="perfilPrimerApellido">Primer Apellido *</label>
+              <input type="text" id="perfilPrimerApellido" required>
+            </div>
+            <div class="form-group">
+              <label for="perfilSegundoApellido">Segundo Apellido</label>
+              <input type="text" id="perfilSegundoApellido">
+            </div>
+          </div>
+
+          <div class="columna">
+            <div class="form-group">
+              <label for="perfilCorreo">Correo electrónico *</label>
+              <input type="email" id="perfilCorreo" required>
+            </div>
+            <div class="form-group">
+              <label for="perfilFechaNac">Fecha de nacimiento *</label>
+              <input type="date" id="perfilFechaNac" required>
+            </div>
+            <div class="form-group">
+              <label for="perfilSexo">Sexo *</label>
+              <select id="perfilSexo">
+                <option value="H">Hombre</option>
+                <option value="M">Mujer</option>
+                <option value="O">Otra (respuesta)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIRECCIÓN SIMPLIFICADA -->
+        <div style="border-top: 1px solid #ccc; padding-top: 15px; margin-top: 15px;">
+          <h4>Dirección</h4>
+          <div class="registro-grid">
+            <div class="columna">
+              <div class="form-group">
+                <label for="perfilCalle">Calle *</label>
+                <input type="text" id="perfilCalle">
+              </div>
+              <div class="form-group">
+                <label for="perfilLetraCalle">Letra Calle</label>
+                <input type="text" id="perfilLetraCalle">
+              </div>
+              <div class="form-group">
+                <label for="perfilNumero">Número *</label>
+                <input type="text" id="perfilNumero">
+              </div>
+              <div class="form-group">
+                <label for="perfilLetraNumero">Letra Número</label>
+                <input type="text" id="perfilLetraNumero">
+              </div>
+            </div>
+
+            <div class="columna">
+              <div class="form-group">
+                <label for="perfilPoblacion">Población *</label>
+                <select id="perfilPoblacion">
+                  <option value="MÉRIDA" selected>MÉRIDA</option>
+                  <option value="IZAMAL">IZAMAL</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="perfilColonia">Colonia / Fraccionamiento *</label>
+                <input type="text" id="perfilColonia">
+              </div>
+              <div class="form-group">
+                <label for="perfilCP">Código Postal</label>
+                <input type="text" id="perfilCP" maxlength="5">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTACTO Y DISCAPACIDAD -->
+        <div class="registro-grid" style="margin-top: 15px;">
+          <div class="columna">
+            <div class="form-group">
+              <label for="perfilTelFijo">Teléfono Fijo</label>
+              <input type="text" id="perfilTelFijo">
+            </div>
+            <div class="form-group">
+              <label for="perfilCelular">Celular</label>
+              <input type="text" id="perfilCelular">
+            </div>
+          </div>
+          <div class="columna">
+            <div class="form-group">
+              <label for="perfilDiscapacidad">Discapacidad</label>
+              <select id="perfilDiscapacidad" onchange="evaluarNuevoComienzo()">
+                <option value="NINGUNA">NINGUNA</option>
+                <option value="MOTRIZ">MOTRIZ</option>
+                <option value="VISUAL">VISUAL</option>
+                <option value="AUDITIVA">AUDITIVA</option>
+                <option value="OTRA">OTRA</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN CONDICIONAL: PROGRAMA NUEVO COMIENZO -->
+        <div id="seccionNuevoComienzo" style="display: none; border: 1px solid #007bff; padding: 15px; border-radius: 8px; margin-top: 15px; background-color: #f8f9fa;">
+          <h4 style="color: #007bff; margin-top: 0;">Información - Programa Nuevo Comienzo</h4>
+          
+          <div class="form-group">
+            <label for="perfilTipoApoyo">Tipo de apoyo que utiliza:</label>
+            <input type="text" id="perfilTipoApoyo" placeholder="Ej. Bastón, Silla de ruedas, Sordera parcial">
+          </div>
+
+          <div class="registro-grid">
+            <div class="columna">
+              <div class="form-group">
+                <label for="perfilContactoNombre">Nombre del Contacto de Emergencia:</label>
+                <input type="text" id="perfilContactoNombre">
+              </div>
+            </div>
+            <div class="columna">
+              <div class="form-group">
+                <label for="perfilContactoParentesco">Parentesco:</label>
+                <input type="text" id="perfilContactoParentesco">
+              </div>
+            </div>
+          </div>
+
+          <div style="border: 1px dashed #17a2b8; padding: 10px; border-radius: 5px; margin-top: 10px;">
+            <strong style="color: #17a2b8;">Credencial de Discapacidad</strong>
+            <div class="registro-grid" style="margin-top: 8px;">
+              <div class="columna">
+                <div class="form-group">
+                  <label for="perfilCredencialFolio">Núm. de Folio:</label>
+                  <input type="text" id="perfilCredencialFolio">
+                </div>
+              </div>
+              <div class="columna">
+                <div class="form-group">
+                  <label for="perfilCredencialVencimiento">Fecha de vencimiento:</label>
+                  <input type="date" id="perfilCredencialVencimiento">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DATOS DEL SISTEMA -->
+        <div class="registro-grid" style="margin-top: 15px;">
+          <div class="columna">
+            <div class="form-group">
+              <label>Lugar de Registro:</label>
+              <input type="text" id="perfilLugarRegistro" value="INTERNET" readonly style="background-color: #e0e0e0;">
+            </div>
+          </div>
+          <div class="columna">
+            <div class="form-group">
+              <label>Fecha de Registro:</label>
+              <input type="text" id="perfilFechaRegistro" readonly style="background-color: #e0e0e0;">
+            </div>
+          </div>
+        </div>
+
+        <div class="registro-actions" style="margin-top: 20px;">
+          <button type="button" id="btnGuardarPerfil" class="btn-submit-registro">Guardar Cambios</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
 
   <!-- Menú Flotante Lateral -->
   <div class="floating-menu">
