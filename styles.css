@@ -1160,3 +1160,226 @@ body.modo-oscuro .checkbox-label {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================
+   PANEL DE ACCESIBILIDAD (Flotante)
+   ========================================== */
+.btn-accesibilidad-flotante {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: #0d3c75;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 2rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  z-index: 9999;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-accesibilidad-flotante:hover {
+  transform: scale(1.1);
+  background: #1a5c9e;
+}
+
+.panel-accesibilidad {
+  position: fixed;
+  bottom: 150px;
+  right: 20px;
+  width: 340px;
+  max-height: 500px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  z-index: 9998;
+  padding: 20px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #0d3c75;
+}
+
+.btn-cerrar-panel {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+/* Pestañas */
+.tabs-accesibilidad {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.tab-accesibilidad {
+  background: #f0f0f0;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.3s;
+}
+
+.tab-accesibilidad.active {
+  background: #0d3c75;
+  color: white;
+}
+
+.tab-content-accesibilidad {
+  display: none;
+}
+
+.tab-content-accesibilidad.active {
+  display: block;
+}
+
+/* Controles del panel */
+.control-group {
+  margin-bottom: 15px;
+}
+
+.control-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.control-buttons button {
+  background: #e0e0e0;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-toggle, .btn-lectura {
+  display: inline-block;
+  background: #e0e0e0;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin: 4px 4px 4px 0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.3s;
+}
+
+.btn-toggle.active, .btn-lectura.active {
+  background: #0d3c75;
+  color: white;
+}
+
+.btn-toggle:hover, .btn-lectura:hover {
+  background: #ccc;
+}
+
+/* ==========================================
+   CLASES DE ACCESIBILIDAD (GLOBALES)
+   ========================================== */
+
+/* Alto contraste */
+.alto-contraste {
+  background: #000 !important;
+  color: #ff0 !important;
+}
+.alto-contraste * {
+  background: #000 !important;
+  color: #ff0 !important;
+  border-color: #ff0 !important;
+}
+.alto-contraste a {
+  color: #0ff !important;
+}
+
+/* Subrayar enlaces */
+.subrayar-enlaces a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+/* Espaciado legible */
+.espaciado-legible {
+  line-height: 1.8 !important;
+  letter-spacing: 0.5px !important;
+}
+.espaciado-legible p,
+.espaciado-legible li {
+  margin-bottom: 1.2em !important;
+}
+
+/* Fuente legible */
+.fuente-legible {
+  font-family: 'Segoe UI', 'Open Sans', Arial, sans-serif !important;
+}
+
+/* Botones grandes */
+.botones-grandes button,
+.botones-grandes .btn-access,
+.botones-grandes .btn-empleos,
+.botones-grandes .btn-submit-login,
+.botones-grandes .btn-submit-registro {
+  font-size: 1.2rem !important;
+  padding: 12px 24px !important;
+  min-height: 48px !important;
+}
+
+/* Modo lectura */
+.modo-lectura .card,
+.modo-lectura .sector-card,
+.modo-lectura .cv-banner-card {
+  background: white !important;
+  box-shadow: none !important;
+  border: 1px solid #ccc !important;
+}
+.modo-lectura img,
+.modo-lectura .card-icon,
+.modo-lectura .sector-icon {
+  display: none !important;
+}
+.modo-lectura .hero {
+  background: #f9f9f9 !important;
+}
+
+/* Resaltar títulos */
+.resaltar-titulos h1,
+.resaltar-titulos h2,
+.resaltar-titulos h3,
+.resaltar-titulos .section-title {
+  background: #ffeb3b !important;
+  display: inline-block !important;
+  padding: 0 8px !important;
+}
+
+/* Navegación por teclado */
+.navegacion-teclado *:focus {
+  outline: 3px solid #ff0 !important;
+  outline-offset: 2px !important;
+}

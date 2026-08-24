@@ -12,7 +12,8 @@ const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
   database: process.env.DB_NAME || 'bolsa_trabajo',
-  password: process.env.DB_PASSWORD || 'gamer358', // Reemplaza por tu contraseña real
+  password: process.env.DB_PASSWORD || 'Moises#510', // Reemplaza por tu contraseña real  
+  //password: process.env.DB_PASSWORD || 'gamer358', // Reemplaza por tu contraseña real
   port: process.env.DB_PORT || 5432,
 });
 
