@@ -1160,3 +1160,96 @@ body.modo-oscuro .checkbox-label {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================
+   12. Estilos para Modal 3 (Perfil de Usuario)
+   ========================================== */
+
+/* Contenedor del avatar de usuario */
+.profile-avatar-container {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  border: 2px solid #0d3c75;
+}
+
+body.modo-oscuro .profile-avatar-container,
+body.dark-mode .profile-avatar-container {
+  background: #2a2a2a;
+  border-color: #8bb4f6;
+}
+
+/* Campos de lectura (read-only) */
+input[readonly] {
+  background-color: #f1f3f5 !important;
+  color: #495057;
+  cursor: not-allowed;
+  font-weight: 600;
+}
+
+body.modo-oscuro input[readonly],
+body.dark-mode input[readonly] {
+  background-color: #252525 !important;
+  color: #aaaaaa !important;
+}
+
+/* Secciones internas (Dirección y Datos del Sistema) */
+.profile-section-divider {
+  border-top: 1px dashed #dcdcdc;
+  padding-top: 18px;
+  margin-top: 18px;
+}
+
+body.modo-oscuro .profile-section-divider,
+body.dark-mode .profile-section-divider {
+  border-top-color: #444444;
+}
+
+.profile-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0b2545;
+  margin-bottom: 12px;
+}
+
+body.modo-oscuro .profile-section-title,
+body.dark-mode .profile-section-title {
+  color: #8bb4f6;
+}
+
+/* Caja condicional: Programa Nuevo Comienzo */
+#seccionNuevoComienzo {
+  border: 1px solid #17a2b8;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 18px;
+  background-color: #f0f8ff;
+  transition: all 0.3s ease;
+}
+
+body.modo-oscuro #seccionNuevoComienzo,
+body.dark-mode #seccionNuevoComienzo {
+  background-color: #1a2634;
+  border-color: #2b7082;
+}
+
+/* Sub-tarjeta de Credencial */
+.credencial-box {
+  border: 1px dashed #17a2b8;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  background-color: #ffffff;
+}
+
+body.modo-oscuro .credencial-box,
+body.dark-mode .credencial-box {
+  background-color: #222d3a;
+  border-color: #2b7082;
+}
