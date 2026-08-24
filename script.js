@@ -267,17 +267,41 @@ document.addEventListener('DOMContentLoaded', () => {
     checkboxes.forEach(cb => cb.checked = false);
   }
 
-  // Envío Formulario Login
+// Envío Formulario Login con autenticación real
   if (formLogin) {
-    formLogin.addEventListener('submit', (e) => {
+    formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
       const correo = document.getElementById('loginCorreo').value;
-      alert(`Sesión iniciada correctamente como: ${correo}`);
-      formLogin.reset();
-      modalLogin.style.display = 'none';
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const respuesta = await fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ correo, password })
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok && datos.exito) {
+          // Guardar el usuario activo en la memoria local del navegador
+          localStorage.setItem('usuarioActivo', JSON.stringify(datos.usuario));
+          
+          alert(`¡Bienvenido/a, ${datos.usuario.nombre}!`);
+          formLogin.reset();
+          modalLogin.style.display = 'none';
+          
+          // Opcional: Recargar o actualizar la UI con el nombre del usuario
+          location.reload(); 
+        } else {
+          alert(datos.mensaje || 'Error al iniciar sesión.');
+        }
+      } catch (error) {
+        console.error('Error de conexión:', error);
+        alert('No se pudo conectar con el servidor.');
+      }
     });
   }
-
   // Envío Formulario Registro con PostgreSQL y Validaciones
   if (formRegistro) {
     formRegistro.addEventListener('submit', async (e) => {
