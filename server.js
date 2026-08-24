@@ -45,9 +45,20 @@ app.post('/api/registro', async (req, res) => {
   const curpLimpia = curp.trim().toUpperCase();
   const correoLimpio = correo.trim().toLowerCase();
 
+  const regexCurp = /^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[A-Z0-9]{2}$/;
+  if (!regexCurp.test(curpLimpia)) {
+    return res.status(400).json({
+      exito: false,
+      mensaje: 'La CURP ingresada es inválida. Debe tener el formato oficial de 18 caracteres.'
+    });
+  }
+
   let sexoFormateado = 'O';
   if (sexo && typeof sexo === 'string') {
-    sexoFormateado = sexo.trim().charAt(0).toUpperCase();
+    const char = sexo.trim().toUpperCase().charAt(0);
+    if (['H', 'M', 'O'].includes(char)) {
+      sexoFormateado = char;
+    }
   }
 
   try {
@@ -110,7 +121,7 @@ app.post('/api/registro', async (req, res) => {
 });
 
 // ============================================================================
-// ENDPOINT DE LOGIN
+// 2. ENDPOINT DE LOGIN
 // ============================================================================
 app.post('/api/login', async (req, res) => {
   const { correo, password } = req.body;
@@ -133,7 +144,6 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ exito: false, mensaje: 'Contraseña incorrecta.' });
     }
 
-    // Ocultar el hash por seguridad antes de devolver el objeto
     delete usuario.password_hash;
 
     res.json({ exito: true, usuario });
@@ -144,7 +154,30 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ============================================================================
-// 3. ENDPOINT PARA ACTUALIZAR EL PERFIL (PUT)
+// 3. ENDPOINT PARA CONSULTAR EL PERFIL (GET)
+// ============================================================================
+app.get('/api/perfil/:curp', async (req, res) => {
+  const { curp } = req.params;
+
+  try {
+    const result = await pool.query('SELECT * FROM usuarios WHERE curp = $1', [curp.toUpperCase()]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado.' });
+    }
+
+    const usuario = result.rows[0];
+    delete usuario.password_hash;
+
+    res.json({ exito: true, usuario });
+  } catch (error) {
+    console.error('Error al obtener perfil:', error);
+    res.status(500).json({ exito: false, mensaje: 'Error al consultar datos del usuario.' });
+  }
+});
+
+// ============================================================================
+// 4. ENDPOINT PARA ACTUALIZAR EL PERFIL (PUT)
 // ============================================================================
 app.put('/api/perfil/:curp', async (req, res) => {
   const { curp } = req.params;
@@ -176,7 +209,10 @@ app.put('/api/perfil/:curp', async (req, res) => {
 
   let sexoFormateado = 'O';
   if (sexo && typeof sexo === 'string') {
-    sexoFormateado = sexo.trim().charAt(0).toUpperCase();
+    const char = sexo.trim().toUpperCase().charAt(0);
+    if (['H', 'M', 'O'].includes(char)) {
+      sexoFormateado = char;
+    }
   }
 
   try {
