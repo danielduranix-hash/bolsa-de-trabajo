@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <!-- Archivo de Estilos Principal -->
   <link rel="stylesheet" href="styles.css">
+  <!-- FontAwesome para íconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 <body>
 
@@ -21,15 +24,20 @@
     </div>
   </div>
 
-  <div class="header-buttons">
-    <!-- Controles de Accesibilidad -->
-    <div class="text-size-control">
-      <button id="btnTextSmaller" class="btn-access btn-reset" title="Disminuir texto">A-</button>
-      <div class="slider-container">
-        <input type="range" id="textSizeSlider" min="80" max="130" value="100" step="5">
-        <span class="slider-label" id="textSizeLabel">100%</span>
-      </div>
-      <button id="btnTextLarger" class="btn-access btn-reset" title="Aumentar texto">A+</button>
+    <div class="header-buttons">
+
+      <button id="btnEmpleos" class="btn-empleos">GeoPortal de Empleos</button>
+      
+      <!-- Icono/Botón de Usuario (Registro/Login) -->
+      <button id="btnUserAuth" class="btn-user-auth" title="Mi Cuenta / Acceso">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Ingresar</span>
+      </button>
+
+      <button id="btnHelp" class="btn-help" title="Ayuda y Tutorial">?</button>
     </div>
 
     <button id="btnToggleDarkMode" class="btn-access">🌙 Modo Oscuro</button>
@@ -720,7 +728,7 @@
         
   <!-- Botón para abrir/cerrar el panel -->
   <button id="btnAccesibilidad" class="btn-accesibilidad-flotante" aria-label="Abrir panel de accesibilidad">
-    ♿
+    <i class="fas fa-universal-access"></i>
   </button>
 
   <!-- Panel de accesibilidad -->
