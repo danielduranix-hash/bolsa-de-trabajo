@@ -203,55 +203,12 @@ if (formReg) {
   }
 
   /* ==========================================
-     3. Controles de Accesibilidad
+     3. Controles de Accesibilidad (Sincronizados)
      ========================================== */
-  const btnToggleDarkMode = document.getElementById('btnToggleDarkMode');
-  const textSizeSlider = document.getElementById('textSizeSlider');
-  const textSizeLabel = document.getElementById('textSizeLabel');
-  const btnTextSmaller = document.getElementById('btnTextSmaller');
-  const btnTextLarger = document.getElementById('btnTextLarger');
 
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('modo-oscuro', 'dark-mode');
   }
-
-  if (btnToggleDarkMode) {
-    btnToggleDarkMode.addEventListener('click', () => {
-      document.body.classList.toggle('modo-oscuro');
-      document.body.classList.toggle('dark-mode');
-
-      const isDark = document.body.classList.contains('modo-oscuro');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-  }
-
-  function updateTextSize(val) {
-    if (textSizeSlider && textSizeLabel) {
-      textSizeSlider.value = val;
-      textSizeLabel.textContent = `${val}%`;
-      document.body.style.fontSize = `${val}%`;
-      localStorage.setItem('textSize', val);
-    }
-  }
-
-  if (textSizeSlider) {
-    textSizeSlider.addEventListener('input', (e) => updateTextSize(e.target.value));
-  }
-  if (btnTextSmaller) {
-    btnTextSmaller.addEventListener('click', () => {
-      let current = parseInt(textSizeSlider.value, 10);
-      if (current > 80) updateTextSize(current - 5);
-    });
-  }
-  if (btnTextLarger) {
-    btnTextLarger.addEventListener('click', () => {
-      let current = parseInt(textSizeSlider.value, 10);
-      if (current < 130) updateTextSize(current + 5);
-    });
-  }
-
-  const savedSize = localStorage.getItem('textSize');
-  if (savedSize) updateTextSize(savedSize);
 
   /* ==========================================
      4. Despliegue de Calendario Exclusivamente por Clic
@@ -657,14 +614,11 @@ if (formPerfil) {
   // Tamaño de fuente (global)
   function cambiarFuente(accion) {
     let current = parseInt(localStorage.getItem('textSize') || '100', 10);
-    let nuevo = accion === 'aumentar' ? Math.min(current + 10, 150) : Math.max(current - 10, 70);
+    let nuevo = accion === 'aumentar' ? Math.min(current + 10, 160) : Math.max(current - 10, 100);
     document.body.style.fontSize = nuevo + '%';
     localStorage.setItem('textSize', nuevo);
     const label = document.getElementById('tamanoTextoLabel');
     if (label) label.textContent = nuevo + '%';
-    // Sincronizar con el slider existente
-    const slider = document.getElementById('textSizeSlider');
-    if (slider) slider.value = nuevo;
   }
 
   // Toggle de clases
@@ -690,9 +644,6 @@ if (formPerfil) {
     document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
       btn.classList.toggle('active', isDark);
     });
-    // Sincronizar con el botón existente
-    const btnExistente = document.getElementById('btnToggleDarkMode');
-    if (btnExistente) btnExistente.textContent = isDark ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
   };
   
   window.toggleSubrayar = () => toggleClase('subrayar-enlaces', 'subrayarEnlaces');
@@ -781,8 +732,6 @@ if (formPerfil) {
       const accion = btn.dataset.accion;
       if (accion === 'aumentar' || accion === 'disminuir') {
         cambiarFuente(accion);
-        const slider = document.getElementById('textSizeSlider');
-        if (slider) slider.value = document.body.style.fontSize.replace('%', '') || 100;
       }
     });
   });
@@ -851,16 +800,6 @@ if (formPerfil) {
       document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
         btn.classList.add('active');
       });
-    }
-
-    // Tamaño de texto
-    const savedSize = localStorage.getItem('textSize');
-    if (savedSize) {
-      document.body.style.fontSize = savedSize + '%';
-      const label = document.getElementById('tamanoTextoLabel');
-      if (label) label.textContent = savedSize + '%';
-      const slider = document.getElementById('textSizeSlider');
-      if (slider) slider.value = savedSize;
     }
   }
 

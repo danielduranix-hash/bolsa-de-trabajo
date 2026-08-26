@@ -1,19 +1,39 @@
 /* ==========================================
    1. Reset & Estilos Base
    ========================================== */
+
+/* Importación externa de Google Fonts (Ponla al inicio de tu CSS) */
+@import url('https://googleapis.com');
+
+:root {
+  /* Fuente base predeterminada del sitio */
+  --fuente-sitio: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Cuando JavaScript agregue la clase "fuente-accesible" al body, la variable cambiará automáticamente */
+body.fuente-accesible {
+  --fuente-sitio: 'Atkinson Hyperlegible', sans-serif !important;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Aplicar la variable al cuerpo */
 body {
+  font-family: var(--fuente-sitio);
   color: #333333;
   background-color: #f8f9fa;
   overflow-x: hidden;
   font-size: 100%;
+}
+
+/* Forzar herencia absoluta en todos los elementos nativos de interacción */
+input, select, textarea, button, h1, h2, h3, p, a {
+  font-family: var(--fuente-sitio) !important;
 }
 
 /* ==========================================
@@ -250,7 +270,7 @@ body.modo-oscuro .btn-secundario {
 .hero {
   position: relative;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-              url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+    url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
   height: 380px;
   display: flex;
   flex-direction: column;
@@ -1336,8 +1356,8 @@ body.modo-oscuro .checkbox-label {
 }
 
 /* Fuente legible */
-.fuente-legible {
-  font-family: 'Segoe UI', 'Open Sans', Arial, sans-serif !important;
+.fuente-legible * {
+  font-family:'Paytone One', sans-serif !important;
 }
 
 /* Botones grandes */
@@ -1382,4 +1402,15 @@ body.modo-oscuro .checkbox-label {
 .navegacion-teclado *:focus {
   outline: 3px solid #ff0 !important;
   outline-offset: 2px !important;
+}
+
+/* ==========================================
+   Solución específica para el Botón de Accesibilidad
+   ========================================== */
+
+/* Fuerza a que FontAwesome mantenga su fuente tipográfica original de iconos */
+.btn-accesibilidad-flotante i,
+.fas, .fa-universal-access {
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-weight: 900 !important; /* Es crucial para que el icono 'Solid' cargue correctamente */
 }
