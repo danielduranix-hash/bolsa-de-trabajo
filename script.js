@@ -1,3 +1,19 @@
+/* ==========================================
+   Función Global para el evento inline onchange
+   ========================================== */
+function evaluarNuevoComienzo() {
+  const selectDiscapacidad = document.getElementById('perfilDiscapacidad');
+  const seccionNC = document.getElementById('seccionNuevoComienzo');
+  
+  if (selectDiscapacidad && seccionNC) {
+    if (selectDiscapacidad.value !== 'NINGUNA' && selectDiscapacidad.value !== '') {
+      seccionNC.style.display = 'block';
+    } else {
+      seccionNC.style.display = 'none';
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
 /* ==========================================
@@ -23,6 +39,64 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+  /* ==========================================
+   0.1 Validación del Formulario de Registro (Apellidos)
+   ========================================== */
+const formReg = document.getElementById('formRegistro');
+
+if (formReg) {
+  formReg.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const paterno = document.getElementById('apellidoPaterno')?.value.trim();
+    const materno = document.getElementById('apellidoMaterno')?.value.trim();
+
+    if (!paterno && !materno) {
+      alert('Por favor, ingrese al menos un apellido.');
+      return;
+    }
+
+    // Mapeo exacto con los nombres de variables que espera server.js
+    const datosRegistro = {
+      curp: document.getElementById('curp')?.value,
+      nombre: document.getElementById('nombre')?.value,
+      primer_apellido: paterno,
+      segundo_apellido: materno,
+      correo: document.getElementById('correo')?.value,
+      password: document.getElementById('password')?.value,
+      fecha_nacimiento: document.getElementById('fechaNacimiento')?.value,
+      sexo: document.getElementById('sexo')?.value,
+      
+      // Ajuste de valores booleanos y arrays esperados por el Backend
+      pertenece_grupo_vulnerable: document.getElementById('vulnerable')?.value !== 'NINGUNO',
+      grupos_vulnerables: [document.getElementById('vulnerable')?.value].filter(Boolean),
+      tiene_discapacidad: false,
+      tipos_discapacidad: []
+    };
+
+    try {
+      const respuesta = await fetch('http://localhost:3000/api/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datosRegistro)
+      });
+
+      const resultado = await respuesta.json();
+
+      if (respuesta.ok && resultado.exito) {
+        alert('¡Registro completado con éxito!');
+        formReg.reset();
+        document.getElementById('modalRegistro').style.display = 'none';
+        document.getElementById('modalLogin').style.display = 'flex';
+      } else {
+        alert(`Error al guardar: ${resultado.mensaje}`);
+      }
+    } catch (error) {
+      console.error('Error al conectar con la API:', error);
+      alert('Error de conexión con el servidor backend.');
+    }
+  });
+}
 
   /* ==========================================
      1. Navegación entre Vistas (Inicio y GeoPortal)
@@ -375,11 +449,11 @@ if (formPerfil) {
     const datosActualizados = {
       curp: document.getElementById('perfilCurp')?.value,
       nombre: document.getElementById('perfilNombre')?.value,
-      primer_apellido: document.getElementById('perfilApellidoPaterno')?.value,
-      segundo_apellido: document.getElementById('perfilApellidoMaterno')?.value,
+      primer_apellido: document.getElementById('perfilPrimerApellido')?.value,
+      segundo_apellido: document.getElementById('perfilSegundoApellido')?.value,
       correo: document.getElementById('perfilCorreo')?.value,
-      fecha_nacimiento: document.getElementById('perfilFechaNacimiento')?.value,
-      sexo: document.querySelector('input[name="perfilSexo"]:checked')?.value
+      fecha_nacimiento: document.getElementById('perfilFechaNac')?.value,
+      sexo: document.getElementById('perfilSexo')?.value
     };
 
     try {
@@ -418,14 +492,16 @@ if (formPerfil) {
 }
 
 // Cerrar Sesión
-if (btnCerrarSesion) {
-  btnCerrarSesion.addEventListener('click', () => {
-    localStorage.removeItem('usuarioActivo');
-    usuarioActivo = null;
-    actualizarUIAutenticacion(); // Ocultar botones e inicializar vista
-    alert('Sesión cerrada.');
-  });
-}  /* ==========================================
+  if (btnCerrarSesion) {
+    btnCerrarSesion.addEventListener('click', () => {
+      localStorage.removeItem('usuarioActivo');
+      usuarioActivo = null;
+      actualizarUIAutenticacion();
+      alert('Sesión cerrada.');
+    });
+  }
+
+ /* ==========================================
      6. Asistente Virtual y Tour Interactivo
      ========================================== */
   const btnHelp = document.getElementById('btnHelp');
