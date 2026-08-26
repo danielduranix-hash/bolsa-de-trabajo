@@ -398,23 +398,51 @@ if (formLogin) {
   });
 }
 
-// Guardar Cambios de Perfil (PUT)
-if (formPerfil) {
-  formPerfil.addEventListener('submit', async (e) => {
-    e.preventDefault();
+/* ==========================================
+   GUARDAR CAMBIOS DE PERFIL (PUT)
+   ========================================== */
+const formPer= document.getElementById('formPerfil');
 
+if (formPer) {
+  formPer.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Evita la recarga de página
+
+    const curp = document.getElementById('perfilCurp')?.value;
+
+    if (!curp) {
+      alert('Error: No se encontró la CURP del usuario.');
+      return;
+    }
+
+    // Mapeo EXACTO de los IDs de tu HTML al backend server.js
     const datosActualizados = {
-      curp: document.getElementById('perfilCurp')?.value,
       nombre: document.getElementById('perfilNombre')?.value,
       primer_apellido: document.getElementById('perfilPrimerApellido')?.value,
-      segundo_apellido: document.getElementById('perfilSegundoApellido')?.value,
+      segundo_apellido: document.getElementById('perfilSegundoApellido')?.value || null,
       correo: document.getElementById('perfilCorreo')?.value,
-      fecha_nacimiento: document.getElementById('perfilFechaNac')?.value,
-      sexo: document.getElementById('perfilSexo')?.value
+      fecha_nacimiento: document.getElementById('perfilFechaNac')?.value || null,
+      sexo: document.getElementById('perfilSexo')?.value,
+      estado_civil: null,
+      discapacidad: document.getElementById('perfilDiscapacidad')?.value || 'NINGUNA',
+      calle: document.getElementById('perfilCalle')?.value || null,
+      letra_calle: document.getElementById('perfilLetraCalle')?.value || null,
+      numero: document.getElementById('perfilNumero')?.value || null,
+      letra_numero: document.getElementById('perfilLetraNumero')?.value || null,
+      poblacion: document.getElementById('perfilPoblacion')?.value || 'MÉRIDA',
+      colonia: document.getElementById('perfilColonia')?.value || null,
+      codigo_postal: document.getElementById('perfilCP')?.value || null,
+      telefono_fijo: document.getElementById('perfilTelFijo')?.value || null,
+      celular: document.getElementById('perfilCelular')?.value || null,
+      es_nuevo_comienzo: document.getElementById('perfilDiscapacidad')?.value !== 'NINGUNA',
+      tipo_apoyo: document.getElementById('perfilTipoApoyo')?.value || null,
+      contacto_nombre: document.getElementById('perfilContactoNombre')?.value || null,
+      contacto_parentesco: document.getElementById('perfilContactoParentesco')?.value || null,
+      credencial_folio: document.getElementById('perfilCredencialFolio')?.value || null,
+      credencial_vencimiento: document.getElementById('perfilCredencialVencimiento')?.value || null
     };
 
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/perfil/${datosActualizados.curp}`, {
+      const respuesta = await fetch(`http://localhost:3000/api/perfil/${curp}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datosActualizados)
@@ -423,26 +451,18 @@ if (formPerfil) {
       const resultado = await respuesta.json();
 
       if (respuesta.ok && resultado.exito) {
-        alert('¡Perfil actualizado con éxito!');
-
-        // Actualización segura de la variable y el localStorage
-        const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
-        const usuarioActualizado = {
-          ...usuarioGuardado,
-          curp: datosActualizados.curp,
-          nombre: datosActualizados.nombre
-        };
-
+        alert('¡Perfil actualizado con éxito en la base de datos!');
+        
+        // Actualizar datos locales para reflejar en tiempo real los cambios en pantalla
+        const usuarioSesion = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
+        const usuarioActualizado = { ...usuarioSesion, ...datosActualizados, curp };
+        
         localStorage.setItem('usuarioActivo', JSON.stringify(usuarioActualizado));
-        usuarioActivo = usuarioActualizado;
-
-        actualizarUIAutenticacion(); // Refrescar saludo en el header
-        if (modalPerfil) modalPerfil.style.display = 'none';
       } else {
         alert(`Error al actualizar: ${resultado.mensaje}`);
       }
     } catch (error) {
-      console.error('Error al guardar cambios:', error);
+      console.error('Error al conectar con la API:', error);
       alert('No se pudo conectar con el servidor.');
     }
   });
