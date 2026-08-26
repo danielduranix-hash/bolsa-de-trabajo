@@ -257,20 +257,26 @@ async function cargarDatosPerfil(curp) {
     if (respuesta.ok && datos.exito) {
       const u = datos.usuario;
       
+      // 1. CURP y Nombre
       if (document.getElementById('perfilCurp')) document.getElementById('perfilCurp').value = u.curp || '';
       if (document.getElementById('perfilNombre')) document.getElementById('perfilNombre').value = u.nombre || '';
-      if (document.getElementById('perfilApellidoPaterno')) document.getElementById('perfilApellidoPaterno').value = u.primer_apellido || '';
-      if (document.getElementById('perfilApellidoMaterno')) document.getElementById('perfilApellidoMaterno').value = u.segundo_apellido || '';
+      
+      // 2. Apellidos (Coincidiendo con los IDs de tu HTML)
+      if (document.getElementById('perfilPrimerApellido')) document.getElementById('perfilPrimerApellido').value = u.primer_apellido || '';
+      if (document.getElementById('perfilSegundoApellido')) document.getElementById('perfilSegundoApellido').value = u.segundo_apellido || '';
+      
+      // 3. Correo
       if (document.getElementById('perfilCorreo')) document.getElementById('perfilCorreo').value = u.correo || '';
       
-      if (document.getElementById('perfilFechaNacimiento') && u.fecha_nacimiento) {
-        const fechaFormateada = u.fecha_nacimiento.split('T')[0];
-        document.getElementById('perfilFechaNacimiento').value = fechaFormateada;
+      // 4. Fecha de Nacimiento (Parseada a YYYY-MM-DD para el input type="date")
+      if (document.getElementById('perfilFechaNac') && u.fecha_nacimiento) {
+        const fechaFormateada = new Date(u.fecha_nacimiento).toISOString().split('T')[0];
+        document.getElementById('perfilFechaNac').value = fechaFormateada;
       }
 
-      if (u.sexo) {
-        const radioSexo = document.querySelector(`input[name="perfilSexo"][value="${u.sexo}"]`);
-        if (radioSexo) radioSexo.checked = true;
+      // 5. Sexo (Asignando el valor al elemento <select>)
+      if (document.getElementById('perfilSexo') && u.sexo) {
+        document.getElementById('perfilSexo').value = u.sexo;
       }
     } else {
       alert('No se pudo obtener la información del perfil.');
