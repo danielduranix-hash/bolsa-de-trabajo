@@ -123,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const navTabs = document.querySelectorAll('.nav-tab');
   const tabContent = document.querySelectorAll('.tab-content');
 
+
   navTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       navTabs.forEach(t => t.classList.remove('active'));
@@ -540,12 +541,13 @@ window.addEventListener('click', (e) => {
 /* ==========================================
    5.4 Peticiones HTTP (Login, Guardar Perfil, Salir)
    ========================================== */
-// Login
+
+// LOGIN
 if (formLogin) {
   formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const correo = document.getElementById('loginCorreo').value;
-    const password = document.getElementById('loginPassword').value;
+    const correo = document.getElementById('loginCorreo')?.value;
+    const password = document.getElementById('loginPassword')?.value;
 
     try {
       const respuesta = await fetch('http://localhost:3000/api/login', {
@@ -554,63 +556,35 @@ if (formLogin) {
         body: JSON.stringify({ correo, password })
       });
 
-  // 3. Datos del último empleo
-  const ultimoEmpresa = document.getElementById('ultimoEmpresa');
-  const ultimoPuesto = document.getElementById('ultimoPuesto');
-  const ultimoFunciones = document.getElementById('ultimoFuncionesTiempo');
-  if (ultimoEmpresa) ultimoEmpresa.value = usuario.ultimo_empresa || '';
-  if (ultimoPuesto) ultimoPuesto.value = usuario.ultimo_puesto || '';
-  if (ultimoFunciones) ultimoFunciones.value = usuario.ultimo_funciones_tiempo || '';
+      const datos = await respuesta.json();
 
-  // 4. Detalle general y Habilidades
-  const expDetalle = document.getElementById('experienciaDetalle');
-  const habilidades = document.getElementById('habilidadesDetalle');
-  if (expDetalle) expDetalle.value = usuario.experiencia_detalle || '';
-  if (habilidades) habilidades.value = usuario.habilidades_detalle || '';
-}
-  /* Peticiones HTTP (Login, Guardar Perfil, Salir) */
-  if (formLogin) {
-    formLogin.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const correo = document.getElementById('loginCorreo')?.value;
-      const password = document.getElementById('loginPassword')?.value;
-
-      try {
-        const respuesta = await fetch('http://localhost:3000/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ correo, password })
-        });
-
-        const datos = await respuesta.json();
-
-        if (respuesta.ok && datos.exito) {
-          localStorage.setItem('usuarioActivo', JSON.stringify(datos.usuario));
-          usuarioActivo = datos.usuario;
-          
-          // Llenar inmediatamente los campos del modal de perfil con los datos recibidos
-          cargarDatosPerfilEnModal(datos.usuario);
-          actualizarUIAutenticacion();
-          
-          alert(`¡Bienvenido/a, ${datos.usuario.nombre}!`);
-          formLogin.reset();
-          modalLogin.style.display = 'none';
-        } else {
-          alert(datos.mensaje || 'Error al iniciar sesión.');
-        }
-      } catch (error) {
-        console.error('Error de conexión:', error);
-        alert('No se pudo conectar con el servidor.');
+      if (respuesta.ok && datos.exito) {
+        localStorage.setItem('usuarioActivo', JSON.stringify(datos.usuario));
+        usuarioActivo = datos.usuario;
+        
+        // Llenar datos en modal y actualizar interfaz
+        cargarDatosPerfilEnModal(datos.usuario);
+        actualizarUIAutenticacion();
+        
+        alert(`¡Bienvenido/a, ${datos.usuario.nombre}!`);
+        formLogin.reset();
+        if (modalLogin) modalLogin.style.display = 'none';
+      } else {
+        alert(datos.mensaje || 'Error al iniciar sesión.');
       }
-    });
-  }
+    } catch (error) {
+      console.error('Error de conexión:', error);
+      alert('No se pudo conectar con el servidor.');
+    }
+  });
+}
 
 /* GUARDAR CAMBIOS DE PERFIL (PUT) */
 if (formPerfil) {
   formPerfil.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // 1. Obtener la CURP de forma segura (del input o del objeto de sesión)
+    // 1. Obtener la CURP de forma segura
     const curpInput = document.getElementById('perfilCurp')?.value;
     const curp = (curpInput || usuarioActivo?.curp || '').trim();
 
@@ -619,13 +593,10 @@ if (formPerfil) {
       return;
     }
 
-    // Función auxiliar para obtener el primer valor real (no vacío) entre dos inputs
     const obtenerValor = (id1, id2) => {
       const val1 = document.getElementById(id1)?.value?.trim();
       const val2 = document.getElementById(id2)?.value?.trim();
-      if (val1) return val1;
-      if (val2) return val2;
-      return null;
+      return val1 || val2 || null;
     };
 
     // 2. Construir el objeto con datos limpios
@@ -698,356 +669,351 @@ if (formPerfil) {
       if (respuesta.ok && resultado.exito) {
         alert('¡Perfil actualizado con éxito en la base de datos!');
         
-        // Actualizar localStorage y la variable global en memoria
         const usuarioSesion = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
         const usuarioActualizado = { ...usuarioSesion, ...datosActualizados };
         
         localStorage.setItem('usuarioActivo', JSON.stringify(usuarioActualizado));
         usuarioActivo = usuarioActualizado;
         
-        if (typeof actualizarUIAutenticacion === 'function') {
-          actualizarUIAutenticacion();
-        }
+        actualizarUIAutenticacion();
       } else {
         alert(`Error al actualizar en la base de datos: ${resultado.mensaje || 'Respuesta no exitosa'}`);
       }
     } catch (error) {
       console.error('Error al conectar con la API:', error);
-      alert('No se pudo conectar con el servidor backend. Revisa la consola (F12).');
+      alert('No se pudo conectar con el servidor backend.');
     }
   });
 }
 
-  // Cerrar Sesión
-  if (btnCerrarSesion) {
-    btnCerrarSesion.addEventListener('click', () => {
-      localStorage.removeItem('usuarioActivo');
-      usuarioActivo = null;
-      actualizarUIAutenticacion();
-      alert('Sesión cerrada.');
-    });
-  }
-
-  /* ------------------------------------------------------------------------
-     6. Asistente Virtual y Tour Interactivo
-     ------------------------------------------------------------------------ */
-  const btnHelp = document.getElementById('btnHelp');
-  const assistantBox = document.getElementById('assistantBox');
-  const tutorialOverlay = document.getElementById('tutorialOverlay');
-  const assistantText = document.getElementById('assistantText');
-  const btnNextStep = document.getElementById('btnNextStep');
-  const btnSkipTutorial = document.getElementById('btnSkipTutorial');
-  const btnVoiceRead = document.getElementById('btnVoiceRead');
-
-  let pasoActual = 0;
-
-  const tutorialesPorSeccion = {
-    inicio: [
-      { elementId: 'btnEmpleos', text: 'Bienvenido. Desde este botón puedes acceder directamente al GeoPortal de empleos.' },
-      { elementId: 'heroEmpresas', text: 'Si eres empleador, esta sección te orienta sobre cómo publicar y administrar tus ofertas laborales.' },
-      { elementId: 'bannerCV', text: 'Aquí puedes usar nuestro generador inteligente para estructurar un currículum profesional en minutos.' },
-      { elementId: 'gridCiudadano', text: 'En el espacio ciudadano encontrarás herramientas para buscar empleo y profesionalizar tu perfil.' },
-      { elementId: 'seccionCalendario', text: 'Haz clic en cada tarjeta para abrir su calendario mensual interactivo con fechas de atención.' }
-    ],
-    geoportal: [
-      { elementId: 'filtroBox', text: 'Usa este panel de filtros para acotar las vacantes por zona geográfica, puesto o categoría.' },
-      { elementId: 'mapa', text: 'Haz clic en los marcadores interactivos dentro del mapa para ver los detalles de cada vacante y postularte.' }
-    ]
-  };
-
-  function iniciarTutorial() {
-    pasoActual = 0;
-    if (assistantBox) assistantBox.style.display = 'block';
-    if (tutorialOverlay) tutorialOverlay.style.display = 'block';
-    mostrarPaso();
-  }
-
-  function finalizarTutorial() {
-    if (assistantBox) assistantBox.style.display = 'none';
-    if (tutorialOverlay) tutorialOverlay.style.display = 'none';
-    quitarResaltados();
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  }
-
-  function quitarResaltados() {
-    document.querySelectorAll('.highlight-step').forEach(el => el.classList.remove('highlight-step'));
-  }
-
-  function mostrarPaso() {
-    quitarResaltados();
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-
-    const esGeoPortal = vistaGeoPortal && vistaGeoPortal.style.display !== 'none';
-    const pasarela = esGeoPortal ? tutorialesPorSeccion.geoportal : tutorialesPorSeccion.inicio;
-
-    if (pasoActual >= pasarela.length) {
-      finalizarTutorial();
-      return;
-    }
-
-    const paso = pasarela[pasoActual];
-    if (assistantText) assistantText.textContent = paso.text;
-
-    const elTarget = document.getElementById(paso.elementId);
-    if (elTarget) {
-      elTarget.classList.add('highlight-step');
-      elTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }
-
-  if (btnHelp) btnHelp.addEventListener('click', iniciarTutorial);
-  if (btnNextStep) {
-    btnNextStep.addEventListener('click', () => {
-      pasoActual++;
-      mostrarPaso();
-    });
-  }
-  if (btnSkipTutorial) btnSkipTutorial.addEventListener('click', finalizarTutorial);
-
-  if (btnVoiceRead) {
-    btnVoiceRead.addEventListener('click', () => {
-      if ('speechSynthesis' in window && assistantText) {
-        window.speechSynthesis.cancel();
-        const locucion = new SpeechSynthesisUtterance(assistantText.textContent);
-        locucion.lang = 'es-ES';
-        window.speechSynthesis.speak(locucion);
-      }
-    });
-  }
-  
-  /* ------------------------------------------------------------------------
-     7. PANEL DE ACCESIBILIDAD (GLOBAL)
-     ------------------------------------------------------------------------ */
-  const btnAccesibilidad = document.getElementById('btnAccesibilidad');
-  const panelAccesibilidad = document.getElementById('panelAccesibilidad');
-  const btnCerrarAccesibilidad = document.getElementById('btnCerrarAccesibilidad');
-  const tabs = document.querySelectorAll('.tab-accesibilidad');
-  const tabContents = document.querySelectorAll('.tab-content-accesibilidad');
-
-  if (btnAccesibilidad && panelAccesibilidad) {
-    btnAccesibilidad.addEventListener('click', () => {
-      const isOpen = panelAccesibilidad.style.display === 'block';
-      panelAccesibilidad.style.display = isOpen ? 'none' : 'block';
-    });
-  }
-
-  if (btnCerrarAccesibilidad && panelAccesibilidad) {
-    btnCerrarAccesibilidad.addEventListener('click', () => {
-      panelAccesibilidad.style.display = 'none';
-    });
-  }
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-
-      const target = tab.dataset.tab;
-      tabContents.forEach(content => {
-        content.classList.remove('active');
-        if (content.id === 'tab' + target.charAt(0).toUpperCase() + target.slice(1)) {
-          content.classList.add('active');
-        }
-      });
-    });
+// CERRAR SESIÓN
+if (btnCerrarSesion) {
+  btnCerrarSesion.addEventListener('click', () => {
+    localStorage.removeItem('usuarioActivo');
+    usuarioActivo = null;
+    actualizarUIAutenticacion();
+    alert('Sesión cerrada.');
   });
+}
+/* ------------------------------------------------------------------------
+   6. Asistente Virtual y Tour Interactivo
+   ------------------------------------------------------------------------ */
+const btnHelp = document.getElementById('btnHelp');
+const assistantBox = document.getElementById('assistantBox');
+const tutorialOverlay = document.getElementById('tutorialOverlay');
+const assistantText = document.getElementById('assistantText');
+const btnNextStep = document.getElementById('btnNextStep');
+const btnSkipTutorial = document.getElementById('btnSkipTutorial');
+const btnVoiceRead = document.getElementById('btnVoiceRead');
 
+let pasoActual = 0;
 
-
-  // ==========================================
-  // FUNCIONES GLOBALES DE ACCESIBILIDAD
-  // ==========================================
-
-  // Tamaño de fuente (global)
-  function cambiarFuente(accion) {
-    let current = parseInt(localStorage.getItem('textSize') || '100', 10);
-    let nuevo = accion === 'aumentar' ? Math.min(current + 10, 160) : Math.max(current - 10, 100);
-    document.body.style.fontSize = nuevo + '%';
-    localStorage.setItem('textSize', nuevo);
-    const label = document.getElementById('tamanoTextoLabel');
-    if (label) label.textContent = nuevo + '%';
-  }
-
-  // Toggle de clases
-  function toggleClase(className, key) {
-    document.body.classList.toggle(className);
-    const isActive = document.body.classList.contains(className);
-    localStorage.setItem(key, isActive ? 'true' : 'false');
-
-    // Actualizar estado visual del botón
-    document.querySelectorAll(`[data-accion="${key}"]`).forEach(btn => {
-      btn.classList.toggle('active', isActive);
-    });
-  }
-
-  // Funciones específicas para cada acción
-  window.toggleAltoContraste = () => toggleClase('alto-contraste', 'altoContraste');
-  
-  window.toggleModoOscuro = () => {
-    document.body.classList.toggle('modo-oscuro');
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('modo-oscuro');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
-      btn.classList.toggle('active', isDark);
-    });
-  };
-  
-  window.toggleSubrayar = () => toggleClase('subrayar-enlaces', 'subrayarEnlaces');
-  window.toggleLecturaFacil = () => toggleClase('texto-facil', 'textofacil'); 
-  window.toggleBotonesGrandes = () => toggleClase('botones-grandes', 'botonesGrandes');
-  window.toggleNavegacionTeclado = () => toggleClase('navegacion-teclado', 'navegacionTeclado');
-  window.toggleModoLectura = () => toggleClase('modo-lectura', 'modoLectura');
-  window.toggleResaltarTitulos = () => toggleClase('resaltar-titulos', 'resaltarTitulos');
-
-  // Saltar al contenido
-  window.saltarContenido = () => {
-    const main = document.querySelector('main');
-    if (main) {
-      main.setAttribute('tabindex', '-1');
-      main.focus();
-      main.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  // ==========================================
-  // LECTOR DE PANTALLA (Web Speech API)
-  // ==========================================
-  let synth = window.speechSynthesis;
-  let utterance = null;
-  let isPaused = false;
-
-  function leerTexto(texto) {
-    if (!synth) return;
-    synth.cancel();
-    utterance = new SpeechSynthesisUtterance(texto);
-    utterance.lang = 'es-ES';
-    const velocidad = document.getElementById('velocidadVoz');
-    utterance.rate = velocidad ? parseFloat(velocidad.value) : 1;
-    utterance.onend = () => { isPaused = false; };
-    synth.speak(utterance);
-  }
-
-  window.leerTodo = () => {
-    const bodyText = document.body.innerText;
-    leerTexto(bodyText);
-  };
-
-  window.leerSeleccion = () => {
-    const seleccion = window.getSelection().toString();
-    if (seleccion) {
-      leerTexto(seleccion);
-    } else {
-      alert('Selecciona un texto con el mouse o el teclado para leerlo en voz alta.');
-    }
-  };
-
-  window.pausarVoz = () => {
-    if (synth.speaking) {
-      if (isPaused) {
-        synth.resume();
-        isPaused = false;
-      } else {
-        synth.pause();
-        isPaused = true;
-      }
-    }
-  };
-
-  window.detenerVoz = () => {
-    synth.cancel();
-    isPaused = false;
-  };
-
-  // Velocidad de voz
-  const velocidadInput = document.getElementById('velocidadVoz');
-  const velocidadLabel = document.getElementById('velocidadLabel');
-  if (velocidadInput && velocidadLabel) {
-    velocidadInput.addEventListener('input', () => {
-      velocidadLabel.textContent = parseFloat(velocidadInput.value).toFixed(1) + 'x';
-    });
-  }
-
-  // ==========================================
-  // ASIGNAR EVENTOS A LOS BOTONES DEL PANEL
-  // ==========================================
-
-  // Botones de fuente
-  document.querySelectorAll('.btn-fuente').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const accion = btn.dataset.accion;
-      if (accion === 'aumentar' || accion === 'disminuir') {
-        cambiarFuente(accion);
-      }
-    });
-  });
-
-  // Botones toggle
-  document.querySelectorAll('.btn-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const accion = btn.dataset.accion;
-      const funciones = {
-        'altoContraste': window.toggleAltoContraste,
-        'modoOscuro': window.toggleModoOscuro,
-        'subrayarEnlaces': window.toggleSubrayar,
-        'lecturaFacil': window.toggleLecturaFacil, // Sincronizado con el HTML
-        'botonesGrandes': window.toggleBotonesGrandes,
-        'navegacionTeclado': window.toggleNavegacionTeclado,
-        'modoLectura': window.toggleModoLectura,
-        'resaltarTitulos': window.toggleResaltarTitulos,
-        'saltarContenido': window.saltarContenido
-      };
-      if (funciones[accion]) funciones[accion]();
-    });
-  });
-
-  // Botones de lectura
-  document.querySelectorAll('.btn-lectura').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const accion = btn.dataset.accion;
-      const funciones = {
-        'leerTodo': window.leerTodo,
-        'leerSeleccion': window.leerSeleccion,
-        'pausarVoz': window.pausarVoz,
-        'detenerVoz': window.detenerVoz
-      };
-      if (funciones[accion]) funciones[accion]();
-    });
-  });
-
-  // ==========================================
-  // RESTAURAR PREFERENCIAS GUARDADAS
-  // ==========================================
-  function restaurarAccesibilidad() {
-    const preferencias = {
-      'altoContraste': 'alto-contraste',
-      'subrayarEnlaces': 'subrayar-enlaces',
-      'lecturaFacil': 'texto-facil', 
-      'botonesGrandes': 'botones-grandes',
-      'navegacionTeclado': 'navegacion-teclado',
-      'modoLectura': 'modo-lectura',
-      'resaltarTitulos': 'resaltar-titulos'
+const tutorialesPorSeccion = {
+  inicio: [
+    { elementId: 'btnEmpleos', text: 'Bienvenido. Desde este botón puedes acceder directamente al GeoPortal de empleos.' },
+    { elementId: 'heroEmpresas', text: 'Si eres empleador, esta sección te orienta sobre cómo publicar y administrar tus ofertas laborales.' },
+    { elementId: 'bannerCV', text: 'Aquí puedes usar nuestro generador inteligente para estructurar un currículum profesional en minutos.' },
+    { elementId: 'gridCiudadano', text: 'En el espacio ciudadano encontrarás herramientas para buscar empleo y profesionalizar tu perfil.' },
+    { elementId: 'seccionCalendario', text: 'Haz clic en cada tarjeta para abrir su calendario mensual interactivo con fechas de atención.' }
+  ],
+  geoportal: [
+    { elementId: 'filtroBox', text: 'Usa este panel de filtros para acotar las vacantes por zona geográfica, puesto o categoría.' },
+    { elementId: 'mapa', text: 'Haz clic en los marcadores interactivos dentro del mapa para ver los detalles de cada vacante y postularte.' }
+  ]
 };
 
-    Object.entries(preferencias).forEach(([key, className]) => {
-      if (localStorage.getItem(key) === 'true') {
-        document.body.classList.add(className);
-        document.querySelectorAll(`[data-accion="${key}"]`).forEach(btn => {
-          btn.classList.add('active');
-        });
+function iniciarTutorial() {
+  pasoActual = 0;
+  if (assistantBox) assistantBox.style.display = 'block';
+  if (tutorialOverlay) tutorialOverlay.style.display = 'block';
+  mostrarPaso();
+}
+
+function finalizarTutorial() {
+  if (assistantBox) assistantBox.style.display = 'none';
+  if (tutorialOverlay) tutorialOverlay.style.display = 'none';
+  quitarResaltados();
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+function quitarResaltados() {
+  document.querySelectorAll('.highlight-step').forEach(el => el.classList.remove('highlight-step'));
+}
+
+function mostrarPaso() {
+  quitarResaltados();
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+  const esGeoPortal = typeof vistaGeoPortal !== 'undefined' && vistaGeoPortal && vistaGeoPortal.style.display !== 'none';
+  const pasarela = esGeoPortal ? tutorialesPorSeccion.geoportal : tutorialesPorSeccion.inicio;
+
+  if (pasoActual >= pasarela.length) {
+    finalizarTutorial();
+    return;
+  }
+
+  const paso = pasarela[pasoActual];
+  if (assistantText) assistantText.textContent = paso.text;
+
+  const elTarget = document.getElementById(paso.elementId);
+  if (elTarget) {
+    elTarget.classList.add('highlight-step');
+    elTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+if (btnHelp) btnHelp.addEventListener('click', iniciarTutorial);
+if (btnNextStep) {
+  btnNextStep.addEventListener('click', () => {
+    pasoActual++;
+    mostrarPaso();
+  });
+}
+if (btnSkipTutorial) btnSkipTutorial.addEventListener('click', finalizarTutorial);
+
+if (btnVoiceRead) {
+  btnVoiceRead.addEventListener('click', () => {
+    if ('speechSynthesis' in window && assistantText) {
+      window.speechSynthesis.cancel();
+      const locucion = new SpeechSynthesisUtterance(assistantText.textContent);
+      locucion.lang = 'es-ES';
+      window.speechSynthesis.speak(locucion);
+    }
+  });
+}
+
+/* ------------------------------------------------------------------------
+   7. PANEL DE ACCESIBILIDAD (GLOBAL)
+   ------------------------------------------------------------------------ */
+const btnAccesibilidad = document.getElementById('btnAccesibilidad');
+const panelAccesibilidad = document.getElementById('panelAccesibilidad');
+const btnCerrarAccesibilidad = document.getElementById('btnCerrarAccesibilidad');
+const tabs = document.querySelectorAll('.tab-accesibilidad');
+const tabContents = document.querySelectorAll('.tab-content-accesibilidad');
+
+if (btnAccesibilidad && panelAccesibilidad) {
+  btnAccesibilidad.addEventListener('click', () => {
+    const isOpen = panelAccesibilidad.style.display === 'block';
+    panelAccesibilidad.style.display = isOpen ? 'none' : 'block';
+  });
+}
+
+if (btnCerrarAccesibilidad && panelAccesibilidad) {
+  btnCerrarAccesibilidad.addEventListener('click', () => {
+    panelAccesibilidad.style.display = 'none';
+  });
+}
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    const target = tab.dataset.tab;
+    tabContents.forEach(content => {
+      content.classList.remove('active');
+      if (content.id === 'tab' + target.charAt(0).toUpperCase() + target.slice(1)) {
+        content.classList.add('active');
       }
     });
+  });
+});
 
-    // Modo oscuro
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('modo-oscuro', 'dark-mode');
-      document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
+// ==========================================
+// FUNCIONES GLOBALES DE ACCESIBILIDAD
+// ==========================================
+
+// Tamaño de fuente (global)
+function cambiarFuente(accion) {
+  let current = parseInt(localStorage.getItem('textSize') || '100', 10);
+  let nuevo = accion === 'aumentar' ? Math.min(current + 10, 160) : Math.max(current - 10, 100);
+  document.body.style.fontSize = nuevo + '%';
+  localStorage.setItem('textSize', nuevo);
+  const label = document.getElementById('tamanoTextoLabel');
+  if (label) label.textContent = nuevo + '%';
+}
+
+// Toggle de clases
+function toggleClase(className, key) {
+  document.body.classList.toggle(className);
+  const isActive = document.body.classList.contains(className);
+  localStorage.setItem(key, isActive ? 'true' : 'false');
+
+  // Actualizar estado visual del botón
+  document.querySelectorAll(`[data-accion="${key}"]`).forEach(btn => {
+    btn.classList.toggle('active', isActive);
+  });
+}
+
+// Funciones específicas para cada acción
+window.toggleAltoContraste = () => toggleClase('alto-contraste', 'altoContraste');
+
+window.toggleModoOscuro = () => {
+  document.body.classList.toggle('modo-oscuro');
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('modo-oscuro');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
+    btn.classList.toggle('active', isDark);
+  });
+};
+
+window.toggleSubrayar = () => toggleClase('subrayar-enlaces', 'subrayarEnlaces');
+window.toggleLecturaFacil = () => toggleClase('texto-facil', 'textofacil'); 
+window.toggleBotonesGrandes = () => toggleClase('botones-grandes', 'botonesGrandes');
+window.toggleNavegacionTeclado = () => toggleClase('navegacion-teclado', 'navegacionTeclado');
+window.toggleModoLectura = () => toggleClase('modo-lectura', 'modoLectura');
+window.toggleResaltarTitulos = () => toggleClase('resaltar-titulos', 'resaltarTitulos');
+
+// Saltar al contenido
+window.saltarContenido = () => {
+  const main = document.querySelector('main');
+  if (main) {
+    main.setAttribute('tabindex', '-1');
+    main.focus();
+    main.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
+// ==========================================
+// LECTOR DE PANTALLA (Web Speech API)
+// ==========================================
+let synth = window.speechSynthesis;
+let utterance = null;
+let isPaused = false;
+
+function leerTexto(texto) {
+  if (!synth) return;
+  synth.cancel();
+  utterance = new SpeechSynthesisUtterance(texto);
+  utterance.lang = 'es-ES';
+  const velocidad = document.getElementById('velocidadVoz');
+  utterance.rate = velocidad ? parseFloat(velocidad.value) : 1;
+  utterance.onend = () => { isPaused = false; };
+  synth.speak(utterance);
+}
+
+window.leerTodo = () => {
+  const bodyText = document.body.innerText;
+  leerTexto(bodyText);
+};
+
+window.leerSeleccion = () => {
+  const seleccion = window.getSelection().toString();
+  if (seleccion) {
+    leerTexto(seleccion);
+  } else {
+    alert('Selecciona un texto con el mouse o el teclado para leerlo en voz alta.');
+  }
+};
+
+window.pausarVoz = () => {
+  if (synth.speaking) {
+    if (isPaused) {
+      synth.resume();
+      isPaused = false;
+    } else {
+      synth.pause();
+      isPaused = true;
+    }
+  }
+};
+
+window.detenerVoz = () => {
+  synth.cancel();
+  isPaused = false;
+};
+
+// Velocidad de voz
+const velocidadInput = document.getElementById('velocidadVoz');
+const velocidadLabel = document.getElementById('velocidadLabel');
+if (velocidadInput && velocidadLabel) {
+  velocidadInput.addEventListener('input', () => {
+    velocidadLabel.textContent = parseFloat(velocidadInput.value).toFixed(1) + 'x';
+  });
+}
+
+// ==========================================
+// ASIGNAR EVENTOS A LOS BOTONES DEL PANEL
+// ==========================================
+
+// Botones de fuente
+document.querySelectorAll('.btn-fuente').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const accion = btn.dataset.accion;
+    if (accion === 'aumentar' || accion === 'disminuir') {
+      cambiarFuente(accion);
+    }
+  });
+});
+
+// Botones toggle
+document.querySelectorAll('.btn-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const accion = btn.dataset.accion;
+    const funciones = {
+      'altoContraste': window.toggleAltoContraste,
+      'modoOscuro': window.toggleModoOscuro,
+      'subrayarEnlaces': window.toggleSubrayar,
+      'lecturaFacil': window.toggleLecturaFacil,
+      'botonesGrandes': window.toggleBotonesGrandes,
+      'navegacionTeclado': window.toggleNavegacionTeclado,
+      'modoLectura': window.toggleModoLectura,
+      'resaltarTitulos': window.toggleResaltarTitulos,
+      'saltarContenido': window.saltarContenido
+    };
+    if (funciones[accion]) funciones[accion]();
+  });
+});
+
+// Botones de lectura
+document.querySelectorAll('.btn-lectura').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const accion = btn.dataset.accion;
+    const funciones = {
+      'leerTodo': window.leerTodo,
+      'leerSeleccion': window.leerSeleccion,
+      'pausarVoz': window.pausarVoz,
+      'detenerVoz': window.detenerVoz
+    };
+    if (funciones[accion]) funciones[accion]();
+  });
+});
+
+// ==========================================
+// RESTAURAR PREFERENCIAS GUARDADAS
+// ==========================================
+function restaurarAccesibilidad() {
+  const preferencias = {
+    'altoContraste': 'alto-contraste',
+    'subrayarEnlaces': 'subrayar-enlaces',
+    'lecturaFacil': 'texto-facil', 
+    'botonesGrandes': 'botones-grandes',
+    'navegacionTeclado': 'navegacion-teclado',
+    'modoLectura': 'modo-lectura',
+    'resaltarTitulos': 'resaltar-titulos'
+  };
+
+  Object.entries(preferencias).forEach(([key, className]) => {
+    if (localStorage.getItem(key) === 'true') {
+      document.body.classList.add(className);
+      document.querySelectorAll(`[data-accion="${key}"]`).forEach(btn => {
         btn.classList.add('active');
       });
     }
-  }
+  });
 
-  // Ejecutar al cargar
-  restaurarAccesibilidad();
-  
+  // Modo oscuro
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('modo-oscuro', 'dark-mode');
+    document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
+      btn.classList.add('active');
+    });
+  }
+}
+
+// Ejecutar al cargar
+restaurarAccesibilidad();
+
+// 🔴 Cierre del evento principal (document.addEventListener('DOMContentLoaded', ...))
 });
