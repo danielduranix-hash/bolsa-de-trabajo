@@ -832,8 +832,7 @@ if (formPerfil) {
   };
   
   window.toggleSubrayar = () => toggleClase('subrayar-enlaces', 'subrayarEnlaces');
-  window.toggleEspaciado = () => toggleClase('espaciado-legible', 'espaciado');
-  window.toggleFuenteLegible = () => toggleClase('fuente-legible', 'fuenteLegible');
+  window.toggleLecturaFacil = () => toggleClase('texto-facil', 'textofacil'); 
   window.toggleBotonesGrandes = () => toggleClase('botones-grandes', 'botonesGrandes');
   window.toggleNavegacionTeclado = () => toggleClase('navegacion-teclado', 'navegacionTeclado');
   window.toggleModoLectura = () => toggleClase('modo-lectura', 'modoLectura');
@@ -929,8 +928,7 @@ if (formPerfil) {
         'altoContraste': window.toggleAltoContraste,
         'modoOscuro': window.toggleModoOscuro,
         'subrayarEnlaces': window.toggleSubrayar,
-        'espaciado': window.toggleEspaciado,
-        'fuenteLegible': window.toggleFuenteLegible,
+        'lecturaFacil': window.toggleLecturaFacil, // Sincronizado con el HTML
         'botonesGrandes': window.toggleBotonesGrandes,
         'navegacionTeclado': window.toggleNavegacionTeclado,
         'modoLectura': window.toggleModoLectura,
@@ -962,13 +960,12 @@ if (formPerfil) {
     const preferencias = {
       'altoContraste': 'alto-contraste',
       'subrayarEnlaces': 'subrayar-enlaces',
-      'espaciado': 'espaciado-legible',
-      'fuenteLegible': 'fuente-legible',
+      'lecturaFacil': 'texto-facil', 
       'botonesGrandes': 'botones-grandes',
       'navegacionTeclado': 'navegacion-teclado',
       'modoLectura': 'modo-lectura',
       'resaltarTitulos': 'resaltar-titulos'
-    };
+};
 
     Object.entries(preferencias).forEach(([key, className]) => {
       if (localStorage.getItem(key) === 'true') {

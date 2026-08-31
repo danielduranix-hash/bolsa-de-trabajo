@@ -2,16 +2,15 @@
    1. Reset & Estilos Base
    ========================================== */
 
-/* Importación externa de Google Fonts (Ponla al inicio de tu CSS) */
+/* IMPORTACIÓN COMPLETA Y EXACTA DESDE EL SERVIDOR DE GOOGLE FONTS */
 @import url('https://googleapis.com');
-
 :root {
-  /* Fuente base predeterminada del sitio */
-  --fuente-sitio: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* Fuente base predeterminada del sitio (Idéntica al Geoportal de Mérida) */
+  --fuente-sitio: 'Montserrat', sans-serif;
 }
 
-/* Cuando JavaScript agregue la clase "fuente-accesible" al body, la variable cambiará automáticamente */
-body.fuente-accesible {
+/* Cuando JavaScript agregue la clase "texto-facil", la variable cambia */
+body.texto-facil {
   --fuente-sitio: 'Atkinson Hyperlegible', sans-serif !important;
 }
 
@@ -31,9 +30,31 @@ body {
   font-size: 100%;
 }
 
-/* Forzar herencia absoluta en todos los elementos nativos de interacción */
+/* 1. Definición base para heredar la variable correctamente */
 input, select, textarea, button, h1, h2, h3, p, a {
-  font-family: var(--fuente-sitio) !important;
+  font-family: inherit;
+}
+
+/* ==========================================
+   2. REGLA UNIFICADA: LECTURA FÁCIL COMPLETA (WCAG)
+   ========================================== */
+body.texto-facil, 
+body.texto-facil * {
+  /* Tipo de letra oficial del Instituto Braille */
+  font-family: 'Atkinson Hyperlegible', sans-serif !important;
+
+  /* Fuerza a que absolutamente todo el texto sea negrita */
+  font-weight: 700 !important;
+  
+  /* Criterio WCAG: Espaciados técnicos exactos */
+  line-height: 1.5 !important;         /* Interlineado amplio */
+  letter-spacing: 0.12em !important;   /* Espacio extra entre letras */
+  word-spacing: 0.16em !important;     /* Espacio extra entre palabras */
+}
+
+/* Forzar que los párrafos se separen limpiamente sin usar saltos de línea manuales */
+body.texto-facil p {
+  margin-bottom: 1em !important;       /* Espacio de 2 veces la fuente entre bloques */
 }
 
 /* ==========================================
@@ -1343,21 +1364,6 @@ body.modo-oscuro .checkbox-label {
 .subrayar-enlaces a {
   text-decoration: underline !important;
   text-underline-offset: 3px;
-}
-
-/* Espaciado legible */
-.espaciado-legible {
-  line-height: 1.8 !important;
-  letter-spacing: 0.5px !important;
-}
-.espaciado-legible p,
-.espaciado-legible li {
-  margin-bottom: 1.2em !important;
-}
-
-/* Fuente legible */
-.fuente-legible * {
-  font-family:'Paytone One', sans-serif !important;
 }
 
 /* Botones grandes */
