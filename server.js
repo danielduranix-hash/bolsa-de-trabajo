@@ -20,67 +20,25 @@ const pool = new Pool({
 // 1. ENDPOINT DE REGISTRO DE USUARIOS
 // ============================================================================
 app.post('/api/registro', async (req, res) => {
-  const {
-    curp,
-    nombre,
-    primer_apellido,
-    segundo_apellido,
-    correo,
-    password,
-    fecha_nacimiento,
-    sexo,
-    pertenece_grupo_vulnerable,
-    grupos_vulnerables,
-    tiene_discapacidad,
-    tipos_discapacidad
-  } = req.body;
-
-  if (!curp || !correo || !password) {
-    return res.status(400).json({
-      exito: false,
-      mensaje: 'La CURP, el correo electrónico y la contraseña son campos obligatorios.'
-    });
-  }
-
-  const curpLimpia = curp.trim().toUpperCase();
-  const correoLimpio = correo.trim().toLowerCase();
-
-  let sexoFormateado = 'O';
-  if (sexo && typeof sexo === 'string') {
-    sexoFormateado = sexo.trim().charAt(0).toUpperCase();
-  }
+  // ... (tus validaciones previas de CURP, correo, hash de password) ...
 
   try {
-    const checkCurp = await pool.query('SELECT curp FROM usuarios WHERE curp = $1', [curpLimpia]);
-    if (checkCurp.rows.length > 0) {
-      return res.status(409).json({
-        exito: false,
-        codigo: 'CURP_DUPLICADA',
-        mensaje: 'Esta CURP ya se encuentra registrada en el sistema.'
-      });
-    }
-
-    const checkCorreo = await pool.query('SELECT correo FROM usuarios WHERE correo = $1', [correoLimpio]);
-    if (checkCorreo.rows.length > 0) {
-      return res.status(409).json({
-        exito: false,
-        codigo: 'CORREO_DUPLICADO',
-        mensaje: 'Este correo electrónico ya está asociado a otra cuenta registrada.'
-      });
-    }
+    // ... (tus consultas SELECT para verificar duplicados) ...
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
+    // 🔴 AQUÍ PEGAS TU NUEVO BLOQUE DE CÓDIGO 🔴
     const insertQuery = `
       INSERT INTO usuarios (
         curp, nombre, primer_apellido, segundo_apellido, correo, 
         password_hash, fecha_nacimiento, sexo, pertenece_grupo_vulnerable, 
         grupos_vulnerables, tiene_discapacidad, tipos_discapacidad
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      RETURNING curp, nombre, correo;
     `;
 
-    await pool.query(insertQuery, [
+    const resultadoInsert = await pool.query(insertQuery, [
       curpLimpia,
       nombre || 'Sin Nombre',
       primer_apellido || 'Sin Apellido',
@@ -97,7 +55,8 @@ app.post('/api/registro', async (req, res) => {
 
     res.status(201).json({
       exito: true,
-      mensaje: 'Registro completado exitosamente.'
+      mensaje: 'Registro completado exitosamente.',
+      usuario: resultadoInsert.rows[0]
     });
 
   } catch (error) {
@@ -110,7 +69,7 @@ app.post('/api/registro', async (req, res) => {
 });
 
 // ============================================================================
-// ENDPOINT DE LOGIN
+// 2. ENDPOINT DE LOGIN
 // ============================================================================
 app.post('/api/login', async (req, res) => {
   const { correo, password } = req.body;
@@ -133,7 +92,6 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ exito: false, mensaje: 'Contraseña incorrecta.' });
     }
 
-    // Ocultar el hash por seguridad antes de devolver el objeto
     delete usuario.password_hash;
 
     res.json({ exito: true, usuario });
@@ -144,7 +102,30 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ============================================================================
-// 3. ENDPOINT PARA ACTUALIZAR EL PERFIL (PUT)
+// 3. ENDPOINT PARA CONSULTAR EL PERFIL (GET)
+// ============================================================================
+app.get('/api/perfil/:curp', async (req, res) => {
+  const { curp } = req.params;
+
+  try {
+    const result = await pool.query('SELECT * FROM usuarios WHERE curp = $1', [curp.toUpperCase()]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado.' });
+    }
+
+    const usuario = result.rows[0];
+    delete usuario.password_hash;
+
+    res.json({ exito: true, usuario });
+  } catch (error) {
+    console.error('Error al obtener perfil:', error);
+    res.status(500).json({ exito: false, mensaje: 'Error al consultar datos del usuario.' });
+  }
+});
+
+// ============================================================================
+// 4. ENDPOINT PARA ACTUALIZAR EL PERFIL (PUT)
 // ============================================================================
 app.put('/api/perfil/:curp', async (req, res) => {
   const { curp } = req.params;
@@ -176,7 +157,10 @@ app.put('/api/perfil/:curp', async (req, res) => {
 
   let sexoFormateado = 'O';
   if (sexo && typeof sexo === 'string') {
-    sexoFormateado = sexo.trim().charAt(0).toUpperCase();
+    const char = sexo.trim().toUpperCase().charAt(0);
+    if (['H', 'M', 'O'].includes(char)) {
+      sexoFormateado = char;
+    }
   }
 
   try {
