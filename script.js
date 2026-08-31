@@ -491,6 +491,68 @@ function cargarSeccionEstudios(usuario) {
   } else if (radioExpNo) {
     radioExpNo.checked = true;
   }
+}
+
+/* ==========================================
+   5.3 Control de Eventos de Modales y Perfil
+   ========================================== */
+// Abrir Login
+if (btnUserAuth && modalLogin) {
+  btnUserAuth.addEventListener('click', () => {
+    modalLogin.style.display = 'flex';
+  });
+}
+
+// Abrir Perfil y consultar API
+if (btnMiPerfil) {
+  btnMiPerfil.addEventListener('click', () => {
+    if (modalPerfil) {
+      modalPerfil.style.display = 'flex';
+      if (usuarioActivo && usuarioActivo.curp) {
+        cargarDatosPerfil(usuarioActivo.curp);
+      }
+    } else {
+      alert(`Configuración de perfil para ${usuarioActivo?.nombre || 'usuario'}`);
+    }
+  });
+}
+
+// Botones de Cierre (X)
+if (btnCerrarLogin && modalLogin) btnCerrarLogin.addEventListener('click', () => modalLogin.style.display = 'none');
+if (btnCerrarRegistro && modalRegistro) btnCerrarRegistro.addEventListener('click', () => modalRegistro.style.display = 'none');
+if (btnCerrarPerfil && modalPerfil) btnCerrarPerfil.addEventListener('click', () => modalPerfil.style.display = 'none');
+
+// Alternar entre Login y Registro
+if (btnIrARegistro && modalLogin && modalRegistro) {
+  btnIrARegistro.addEventListener('click', () => {
+    modalLogin.style.display = 'none';
+    modalRegistro.style.display = 'flex';
+  });
+}
+
+// Cerrar modales haciendo clic afuera
+window.addEventListener('click', (e) => {
+  if (e.target === modalLogin) modalLogin.style.display = 'none';
+  if (e.target === modalRegistro) modalRegistro.style.display = 'none';
+  if (e.target === modalPerfil) modalPerfil.style.display = 'none';
+});
+
+/* ==========================================
+   5.4 Peticiones HTTP (Login, Guardar Perfil, Salir)
+   ========================================== */
+// Login
+if (formLogin) {
+  formLogin.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const correo = document.getElementById('loginCorreo').value;
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+      const respuesta = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo, password })
+      });
 
   // 3. Datos del último empleo
   const ultimoEmpresa = document.getElementById('ultimoEmpresa');
