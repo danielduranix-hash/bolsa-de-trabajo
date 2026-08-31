@@ -485,226 +485,511 @@
     </div>
   </div>
   
-<!-- MODAL 3: PERFIL DE USUARIO -->
+<!-- MODAL 3: PERFIL DE USUARIO REDISEÑADO -->
 <div id="modalPerfil" class="modal-overlay" style="display: none;">
-  <div class="modal-registro-container" style="max-width: 800px;">
+  <div class="modal-registro-container" style="max-width: 950px; padding: 0; overflow: hidden;">
     
-    <div class="modal-header">
+    <div class="modal-header" style="padding: 15px 20px; margin-bottom: 0;">
       <h2>Mi Perfil</h2>
       <button type="button" id="btnCerrarPerfil" class="btn-close">&times;</button>
     </div>
 
-    <form id="formPerfil" class="form-registro">
+    <!-- NUEVO CONTENEDOR MODULAR (LAYOUT CON SIDEBAR Y PESTAÑAS) -->
+    <div class="perfil-container">
       
-      <!-- FOTO Y CURP -->
-      <div class="columna" style="text-align: center; margin-bottom: 20px;">
-        
-        <!--  AQUÍ VA LA LÍNEA REEMPLAZADA  -->
-        <div class="profile-avatar-container">👤</div>
+      <!-- SIDEBAR LATERAL -->
+      <aside class="perfil-sidebar">
+        <div class="avatar-section">
+          <div class="avatar-box">👤</div>
+          <button type="button" class="btn-subir-foto">Actualizar foto de perfil</button>
+          <small style="display: block; margin-top: 4px;">Tamaño máximo de 2MB</small>
 
-        <div class="form-group">
-          <label>CURP:</label>
-          <input type="text" id="perfilCurp" readonly style="text-align: center;">
-        </div>
-      </div>
-
-        <!-- INFORMACIÓN GENERAL -->
-        <div class="registro-grid">
-          <div class="columna">
-            <div class="form-group">
-              <label for="perfilNombre">Nombre *</label>
-              <input type="text" id="perfilNombre" required>
-            </div>
-            <div class="form-group">
-              <label for="perfilPrimerApellido">Primer Apellido *</label>
-              <input type="text" id="perfilPrimerApellido" required>
-            </div>
-            <div class="form-group">
-              <label for="perfilSegundoApellido">Segundo Apellido</label>
-              <input type="text" id="perfilSegundoApellido">
-            </div>
+          <!-- CURP DEBAJO DE LA FOTO -->
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="perfilCurp" style="color: #cbd5e1; font-size: 12px;">CURP:</label>
+            <input type="text" id="perfilCurp" readonly class="input-readonly text-center">
           </div>
 
-          <div class="columna">
-            <div class="form-group">
-              <label for="perfilCorreo">Correo electrónico *</label>
-              <input type="email" id="perfilCorreo" required>
-            </div>
-            <div class="form-group">
-              <label for="perfilFechaNac">Fecha de nacimiento *</label>
-              <input type="date" id="perfilFechaNac" required>
-            </div>
-            <div class="form-group">
-              <label for="perfilSexo">Sexo *</label>
-              <select id="perfilSexo">
-                <option value="H">Hombre</option>
-                <option value="M">Mujer</option>
-                <option value="O">Otra (respuesta)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- DIRECCIÓN SIMPLIFICADA -->
-        <div style="border-top: 1px solid #ccc; padding-top: 15px; margin-top: 15px;">
-          <h4>Dirección</h4>
-          <div class="registro-grid">
-            <div class="columna">
-              <div class="form-group">
-                <label for="perfilCalle">Calle *</label>
-                <input type="text" id="perfilCalle">
-              </div>
-              <div class="form-group">
-                <label for="perfilLetraCalle">Letra Calle</label>
-                <input type="text" id="perfilLetraCalle">
-              </div>
-              <div class="form-group">
-                <label for="perfilNumero">Número *</label>
-                <input type="text" id="perfilNumero">
-              </div>
-              <div class="form-group">
-                <label for="perfilLetraNumero">Letra Número</label>
-                <input type="text" id="perfilLetraNumero">
-              </div>
-            </div>
-
-            <div class="columna">
-              <div class="form-group">
-                <label for="perfilPoblacion">Población *</label>
-                <select id="perfilPoblacion">
-                  <option value="MÉRIDA" selected>MÉRIDA</option>
-                  <option value="IZAMAL">IZAMAL</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="perfilColonia">Colonia / Fraccionamiento *</label>
-                <input type="text" id="perfilColonia">
-              </div>
-              <div class="form-group">
-                <label for="perfilCP">Código Postal</label>
-                <input type="text" id="perfilCP" maxlength="5">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CONTACTO Y DISCAPACIDAD -->
-        <div class="registro-grid" style="margin-top: 15px;">
-          <div class="columna">
-            <div class="form-group">
-              <label for="perfilTelFijo">Teléfono Fijo</label>
-              <input type="text" id="perfilTelFijo">
-            </div>
-            <div class="form-group">
-              <label for="perfilCelular">Celular</label>
-              <input type="text" id="perfilCelular">
-            </div>
-          </div>
-          <div class="columna">
-            <div class="form-group">
-              <label for="perfilDiscapacidad">Discapacidad</label>
-              <select id="perfilDiscapacidad" onchange="evaluarNuevoComienzo()">
-                <option value="NINGUNA">NINGUNA</option>
-                <option value="MOTRIZ">MOTRIZ</option>
-                <option value="VISUAL">VISUAL</option>
-                <option value="AUDITIVA">AUDITIVA</option>
-                <option value="OTRA">OTRA</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECCIÓN CONDICIONAL: PROGRAMA NUEVO COMIENZO -->
-        <div id="seccionNuevoComienzo" style="display: none; border: 1px solid #007bff; padding: 15px; border-radius: 8px; margin-top: 15px; background-color: #f8f9fa;">
-          <h4 style="color: #007bff; margin-top: 0;">Información - Programa Nuevo Comienzo</h4>
-          
+          <!-- NOMBRES Y APELLIDOS (SIDEBAR) -->
           <div class="form-group">
-            <label for="perfilTipoApoyo">Tipo de apoyo que utiliza:</label>
-            <input type="text" id="perfilTipoApoyo" placeholder="Ej. Bastón, Silla de ruedas, Sordera parcial">
+            <input type="text" id="perfilNombreSidebar" placeholder="Nombre" readonly class="input-readonly">
           </div>
-
-          <div class="registro-grid">
-            <div class="columna">
-              <div class="form-group">
-                <label for="perfilContactoNombre">Nombre del Contacto de Emergencia:</label>
-                <input type="text" id="perfilContactoNombre">
-              </div>
-            </div>
-            <div class="columna">
-              <div class="form-group">
-                <label for="perfilContactoParentesco">Parentesco:</label>
-                <input type="text" id="perfilContactoParentesco">
-              </div>
-            </div>
+          <div class="form-group">
+            <input type="text" id="perfilPrimerApellidoSidebar" placeholder="Primer Apellido" readonly class="input-readonly">
           </div>
+          <div class="form-group">
+            <input type="text" id="perfilSegundoApellidoSidebar" placeholder="Segundo Apellido" readonly class="input-readonly">
+          </div>
+          <small class="text-muted" style="font-size: 10px; color: #94a3b8;">* Los datos de nombre se emplean en la carta compromiso.</small>
+        </div>
 
-          <div style="border: 1px dashed #17a2b8; padding: 10px; border-radius: 5px; margin-top: 10px;">
-            <strong style="color: #17a2b8;">Credencial de Discapacidad</strong>
-            <div class="registro-grid" style="margin-top: 8px;">
-              <div class="columna">
+        <!-- MENÚ DE NAVEGACIÓN DE PESTAÑAS -->
+        <nav class="perfil-nav">
+          <button type="button" class="nav-tab active" data-tab="tab-personal">Información Personal</button>
+          <button type="button" class="nav-tab" data-tab="tab-estudios">Estudios</button>
+          <button type="button" class="nav-tab" data-tab="tab-experiencia">Experiencia Laboral</button>
+          <button type="button" class="nav-tab" data-tab="tab-otros">Otros</button>
+          <button type="button" class="nav-tab" data-tab="tab-documentacion">Documentación</button>
+        </nav>
+      </aside>
+
+      <!-- FORMULARIO PRINCIPAL -->
+      <main class="perfil-content">
+        <form id="formPerfil">
+          
+          <!-- PESTAÑA 1: INFORMACIÓN PERSONAL -->
+          <section id="tab-personal" class="tab-content active">
+            <h3 style="margin-top: 0; color: #1e293b;">Información Personal</h3>
+            
+            <div class="form-grid">
+              
+              <!-- COLUMNA IZQUIERDA -->
+              <div class="grid-section">
+                
+                <!-- CORREO ELECTRÓNICO (UBICADO ARRIBA) -->
                 <div class="form-group">
-                  <label for="perfilCredencialFolio">Núm. de Folio:</label>
-                  <input type="text" id="perfilCredencialFolio">
+                  <label for="perfilCorreo">*Correo Electrónico:</label>
+                  <input type="email" id="perfilCorreo" required placeholder="correo@ejemplo.com">
                 </div>
-              </div>
-              <div class="columna">
+
+                <div class="form-row gap-2">
+                  <div class="form-group flex-2">
+                    <label for="perfilFechaNac">*Fecha nacimiento:</label>
+                    <input type="date" id="perfilFechaNac" required onchange="calcularEdadPerfil(this.value)">
+                  </div>
+                  <div class="form-group flex-1">
+                    <label for="perfilEdad">Edad:</label>
+                    <input type="text" id="perfilEdad" readonly class="input-readonly">
+                  </div>
+                </div>
+
                 <div class="form-group">
-                  <label for="perfilCredencialVencimiento">Fecha de vencimiento:</label>
-                  <input type="date" id="perfilCredencialVencimiento">
+                  <label>*Sexo:</label>
+                  <div class="radio-group" style="display: flex; gap: 15px; margin-top: 5px;">
+                    <label><input type="radio" name="perfilSexo" value="M"> Mujer</label>
+                    <label><input type="radio" name="perfilSexo" value="H"> Hombre</label>
+                    <label><input type="radio" name="perfilSexo" value="O"> Otra (respuesta)</label>
+                  </div>
                 </div>
+
+                <div class="form-row gap-2">
+                  <div class="form-group flex-1">
+                    <label for="perfilDiscapacidad">Discapacidad:</label>
+                    <select id="perfilDiscapacidad" onchange="evaluarNuevoComienzoPerfil()">
+                      <option value="NINGUNA">NINGUNA</option>
+                      <option value="MOTRIZ">MOTRIZ</option>
+                      <option value="VISUAL">VISUAL</option>
+                      <option value="AUDITIVA">AUDITIVA</option>
+                      <option value="OTRA">OTRA</option>
+                    </select>
+                  </div>
+                  <div class="form-group flex-1">
+                    <label for="perfilEstadoCivil">*Estado civil:</label>
+                    <select id="perfilEstadoCivil" required>
+                      <option value="">SELECCIONE</option>
+                      <option value="SOLTERO">SOLTERO/A</option>
+                      <option value="CASADO">CASADO/A</option>
+                      <option value="DIVORCIADO">DIVORCIADO/A</option>
+                      <option value="VIUDO">VIUDO/A</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- TELÉFONO ÚNICO -->
+                <div class="form-group" style="margin-top: 10px;">
+                  <label for="perfilTelefono">*Teléfono:</label>
+                  <input type="tel" id="perfilTelefono" placeholder="9999999999" maxlength="10" required>
+                </div>
+
+                <!-- PROGRAMA NUEVO COMIENZO (SE ACTIVA CON DISCAPACIDAD != NINGUNA) -->
+                <div id="seccionNuevoComienzoPerfil" style="display: none; border: 1px solid #007bff; padding: 12px; border-radius: 6px; margin-top: 15px; background-color: #f0f7ff;">
+                  <h4 style="color: #007bff; margin-top: 0; font-size: 13px;">Programa Nuevo Comienzo</h4>
+                  
+                  <div class="form-group">
+                    <label for="perfilTipoApoyo">Tipo de apoyo que utiliza:</label>
+                    <input type="text" id="perfilTipoApoyo" placeholder="Ej. Bastón, Silla de ruedas">
+                  </div>
+
+                  <div class="form-row gap-2">
+                    <div class="form-group flex-1">
+                      <label for="perfilContactoNombre">Contacto de Emergencia:</label>
+                      <input type="text" id="perfilContactoNombre">
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="perfilContactoParentesco">Parentesco:</label>
+                      <input type="text" id="perfilContactoParentesco">
+                    </div>
+                  </div>
+
+                  <div class="form-row gap-2" style="margin-top: 5px;">
+                    <div class="form-group flex-1">
+                      <label for="perfilCredencialFolio">Folio Credencial:</label>
+                      <input type="text" id="perfilCredencialFolio">
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="perfilCredencialVencimiento">Vencimiento Credencial:</label>
+                      <input type="date" id="perfilCredencialVencimiento">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- COLUMNA DERECHA -->
+              <div class="grid-section">
+                <h4 class="sub-title" style="margin-top: 0; color: #334155; font-size: 14px;">Dirección</h4>
+
+                <div class="form-row gap-2">
+                  <div class="form-group flex-2">
+                    <label for="perfilCalle">*Calle:</label>
+                    <input type="text" id="perfilCalle" required>
+                  </div>
+                  <div class="form-group flex-1">
+                    <label for="perfilLetraCalle">Letra:</label>
+                    <input type="text" id="perfilLetraCalle">
+                  </div>
+                  <div class="form-group flex-1">
+                    <label for="perfilNumero">*Número:</label>
+                    <input type="text" id="perfilNumero" required>
+                  </div>
+                  <div class="form-group flex-1">
+                    <label for="perfilLetraNumero">Letra:</label>
+                    <input type="text" id="perfilLetraNumero">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="perfilPoblacion">*Población:</label>
+                  <select id="perfilPoblacion" required>
+                    <option value="">SELECCIONE</option>
+                    <option value="MÉRIDA">MÉRIDA</option>
+                    <option value="IZAMAL">IZAMAL</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="perfilColonia">*Colonia:</label>
+                  <input type="text" id="perfilColonia" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="perfilCP">C.P:</label>
+                  <input type="text" id="perfilCP" placeholder="Código postal" maxlength="5">
+                </div>
+
+                <!-- FECHA Y LUGAR DE REGISTRO (CON VALOR INTERNET PREDETERMINADO) -->
+                <div class="form-group" style="margin-top: 15px;">
+                  <label for="perfilFechaRegistro">Fecha de registro:</label>
+                  <input type="text" id="perfilFechaRegistro" readonly class="input-readonly">
+                </div>
+
+                <div class="form-group">
+                  <label for="perfilLugarRegistro">Lugar de registro:</label>
+                  <input type="text" id="perfilLugarRegistro" value="INTERNET" readonly class="input-readonly">
+                </div>
+
               </div>
             </div>
-          </div>
-        </div>
+          </section>
 
-        <!-- DATOS DEL SISTEMA -->
-        <div class="registro-grid" style="margin-top: 15px;">
-          <div class="columna">
-            <div class="form-group">
-              <label>Lugar de Registro:</label>
-              <input type="text" id="perfilLugarRegistro" value="INTERNET" readonly style="background-color: #e0e0e0;">
-            </div>
-          </div>
-          <div class="columna">
-            <div class="form-group">
-              <label>Fecha de Registro:</label>
-              <input type="text" id="perfilFechaRegistro" readonly style="background-color: #e0e0e0;">
-            </div>
-          </div>
-        </div>
+          <!-- PESTAÑAS SECUNDARIAS -->
+          <section id="tab-estudios" class="tab-content">
+            <h3>Estudios</h3>
+            <p>Sección en desarrollo.</p>
+          </section>
 
-        <div class="registro-actions" style="margin-top: 20px;">
-          <button type="submit" id="btnGuardarPerfil" class="btn-submit-registro">Guardar Cambios</button>
-        </div>
-      </form>
+          <section id="tab-experiencia" class="tab-content">
+            <h3>Experiencia Laboral</h3>
+            <p>Sección en desarrollo.</p>
+          </section>
 
+          <section id="tab-otros" class="tab-content">
+            <h3>Otros</h3>
+            <p>Sección en desarrollo.</p>
+          </section>
+
+          <section id="tab-documentacion" class="tab-content">
+            <h3>Documentación</h3>
+            <p>Sección en desarrollo.</p>
+          </section>
+          <!-- Sección Estudios -->
+ <!-- ==========================================
+     SECCIÓN ESTUDIOS
+     ========================================== -->
+<div class="seccion-estudios">
+
+  <!-- Fila 1: Último grado y Titulado -->
+  <div class="fila-estudios">
+    <div class="grupo-estudios">
+      <label for="estudiosGrado">*Último grado de estudios:</label>
+      <select id="estudiosGrado" class="input-perfil">
+        <option value="">SELECCIONE</option>
+        <option value="PRIMARIA">PRIMARIA</option>
+        <option value="SECUNDARIA">SECUNDARIA</option>
+        <option value="BACHILLERATO">BACHILLERATO / PREPARATORIA</option>
+        <option value="TÉCNICO">TÉCNICO / TÉCNICO SUPERIOR</option>
+        <option value="LICENCIATURA">LICENCIATURA</option>
+        <option value="INGENIERÍA">INGENIERÍA</option>
+        <option value="MAESTRÍA">MAESTRÍA</option>
+        <option value="DOCTORADO">DOCTORADO</option>
+      </select>
+    </div>
+
+    <div class="grupo-estudios">
+      <label for="estudiosTitulado">Titulado:</label>
+      <select id="estudiosTitulado" class="input-perfil">
+        <option value="No">No</option>
+        <option value="Sí">Sí</option>
+        <option value="En trámite">En trámite</option>
+        <option value="Pasante">Pasante</option>
+      </select>
     </div>
   </div>
 
-  <!-- Menú Flotante Lateral -->
-  <div class="floating-menu">
-    <a href="#" id="btnVolverInicio">🏠 Inicio</a>
-    <a href="#" id="btnIrGeoPortal">🗺️ GeoPortal</a>
+  <!-- Fila 2: Profesión (Las 50 más buscadas en Mérida) -->
+  <div class="fila-estudios full">
+    <div class="grupo-estudios">
+      <label for="estudiosProfesion">*Profesión:</label>
+      <select id="estudiosProfesion" class="input-perfil">
+        <option value="">SELECCIONE SU PROFESIÓN</option>
+        <option value="Abogado / Lic. en Derecho">Abogado / Lic. en Derecho</option>
+        <option value="Administrador de Empresas">Administrador de Empresas</option>
+        <option value="Administrador de Proyectos (Project Manager)">Administrador de Proyectos (Project Manager)</option>
+        <option value="Administrador de Redes y Sistemas">Administrador de Redes y Sistemas</option>
+        <option value="Agente de Ventas / Ejecutivo Comercial">Agente de Ventas / Ejecutivo Comercial</option>
+        <option value="Analista de Datos / Data Analyst">Analista de Datos / Data Analyst</option>
+        <option value="Analista Financiero">Analista Financiero</option>
+        <option value="Arquitecto">Arquitecto</option>
+        <option value="Asesor Inmobiliario / Real Estate">Asesor Inmobiliario / Real Estate</option>
+        <option value="Asistente Administrativo / Recepcionista">Asistente Administrativo / Recepcionista</option>
+        <option value="Auditor">Auditor</option>
+        <option value="Biomédico">Biomédico</option>
+        <option value="Chef / Gastrónomo">Chef / Gastrónomo</option>
+        <option value="Cirujano Dentista / Odontólogo">Cirujano Dentista / Odontólogo</option>
+        <option value="Contador Público">Contador Público</option>
+        <option value="Desarrollador de Software / Programador">Desarrollador de Software / Programador</option>
+        <option value="Desarrollador Web / Front-End / Back-End">Desarrollador Web / Front-End / Back-End</option>
+        <option value="Diseñador Gráfico / UX/UI">Diseñador Gráfico / UX/UI</option>
+        <option value="Diseñador de Interiores">Diseñador de Interiores</option>
+        <option value="Docente / Profesor de Educación Básica">Docente / Profesor de Educación Básica</option>
+        <option value="Docente de Idiomas / Inglés">Docente de Idiomas / Inglés</option>
+        <option value="Docente Universitario">Docente Universitario</option>
+        <option value="Enfermero / A">Enfermero / A</option>
+        <option value="Especialista en Ciberseguridad">Especialista en Ciberseguridad</option>
+        <option value="Especialista en Comercio Exterior / Logística">Especialista en Comercio Exterior / Logística</option>
+        <option value="Especialista en Mercadotecnia Digital / SEO">Especialista en Mercadotecnia Digital / SEO</option>
+        <option value="Especialista en Recursos Humanos / Reclutador">Especialista en Recursos Humanos / Reclutador</option>
+        <option value="Fisioterapeuta / Rehabilitador">Fisioterapeuta / Rehabilitador</option>
+        <option value="Ingeniero Agrónomo">Ingeniero Agrónomo</option>
+        <option value="Ingeniero Ambiental">Ingeniero Ambiental</option>
+        <option value="Ingeniero Civil">Ingeniero Civil</option>
+        <option value="Ingeniero de Soporte TI">Ingeniero de Soporte TI</option>
+        <option value="Ingeniero en Computación / Sistemas">Ingeniero en Computación / Sistemas</option>
+        <option value="Ingeniero en Energías Renovables">Ingeniero en Energías Renovables</option>
+        <option value="Ingeniero en Logística y Cadena de Suministros">Ingeniero en Logística y Cadena de Suministros</option>
+        <option value="Ingeniero Industrial">Ingeniero Industrial</option>
+        <option value="Ingeniero Mecatrónico / Mecánico">Ingeniero Mecatrónico / Mecánico</option>
+
+        <option value="Ingeniero Químico">Ingeniero Químico</option>
+        <option value="Lic. en Turismo / Gestión Turística">Lic. en Turismo / Gestión Turística</option>
+        <option value="Lic. en Hotelería y Restaurantes">Lic. en Hotelería y Restaurantes</option>
+        <option value="Lic. en Negocios Internacionales">Lic. en Negocios Internacionales</option>
+        <option value="Lic. en Relaciones Públicas / Comunicación">Lic. en Relaciones Públicas / Comunicación</option>
+        <option value="Médico General">Médico General</option>
+        <option value="Médico Veterinario Zootecnista">Médico Veterinario Zootecnista</option>
+        <option value="Mercadólogo / Brand Manager">Mercadólogo / Brand Manager</option>
+        <option value="Nutriólogo">Nutriólogo</option>
+        <option value="Psicólogo Clínico / Organizacional">Psicólogo Clínico / Organizacional</option>
+        <option value="Supervisor de Obra">Supervisor de Obra</option>
+        <option value="Supervisor de Seguridad e Higiene (HSE)">Supervisor de Seguridad e Higiene (HSE)</option>
+        <option value="Trabajador Social">Trabajador Social</option>
+        <option value="OTRA">OTRA</option>
+      </select>
+    </div>
   </div>
 
-  <!-- Capa de Bloqueo para Tutorial -->
-  <div id="tutorialOverlay" class="tutorial-overlay"></div>
+  <!-- Fila 3: ¿Estudias actualmente? y ¿Qué estudias? -->
+  <div class="fila-radio-campo">
+    <div class="contenedor-radios">
+      <span class="radio-titulo">¿Estudias actualmente?</span>
+      <label class="opcion-radio">
+        <input type="radio" name="estudiasActualmente" value="Si" id="estudiasSi"> Sí
+      </label>
+      <label class="opcion-radio">
+        <input type="radio" name="estudiasActualmente" value="No" id="estudiasNo" checked> No
+      </label>
+    </div>
 
-  <!-- Asistente Virtual -->
-  <div id="assistantBox" class="assistant-box">
-    <div class="assistant-header">
-      <div class="assistant-info">
-        <span class="assistant-avatar">🤖</span>
-        <strong>Guía Virtual</strong>
+    <div class="grupo-estudios">
+      <label for="queEstudias">¿QUÉ ESTUDIAS?</label>
+      <input type="text" id="queEstudias" class="input-perfil" placeholder="Ej. Licenciatura, Curso de Inglés, Certificación...">
+    </div>
+  </div>
+
+  <!-- Fila 4: Conocimientos Generales y Tiempo Trabajado -->
+  <div class="fila-estudios">
+    <div class="grupo-estudios">
+      <label for="conocimientosGenerales">Conocimientos generales:</label>
+      <textarea id="conocimientosGenerales" class="input-perfil textarea" placeholder="Ej. Paquería Office, atención a clientes, manejo de inventarios, desarrollo web..."></textarea>
+    </div>
+
+    <div class="grupo-estudios">
+      <label>Tiempo de experiencia laboral:</label>
+      <div class="contenedor-tiempo-experiencia">
+        <div class="subgrupo-tiempo">
+          <input type="number" id="experienciaAnios" class="input-perfil" min="0" max="60" placeholder="0">
+          <span class="label-tiempo">Años</span>
+        </div>
+        <div class="subgrupo-tiempo">
+          <input type="number" id="experienciaMeses" class="input-perfil" min="0" max="11" placeholder="0">
+          <span class="label-tiempo">Meses</span>
+        </div>
       </div>
-      <button id="btnVoiceRead" class="btn-voice" title="Escuchar explicación">🔊</button>
-    </div>
-    <p id="assistantText">¡Hola! Te orientaré paso a paso en el uso de la plataforma.</p>
-    <div class="assistant-buttons">
-      <button id="btnSkipTutorial" class="btn-skip">Omitir</button>
-      <button id="btnNextStep" class="btn-next">Siguiente</button>
     </div>
   </div>
+</div>
+
+<!-- ==========================================
+       SECCIÓN EXPERIENCIA LABORAL (AQUÍ VA)
+       ========================================== -->
+  <div class="seccion-experiencia" style="margin-top: 25px; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+    <h3 style="margin-bottom: 15px; color: #2c3e50;">Experiencia Laboral</h3>
+
+    <!-- Empleo Solicitado -->
+    <div class="fila-estudios full">
+      <div class="grupo-estudios">
+        <label for="empleoSolicitado">*Empleo que solicita:</label>
+        <select id="empleoSolicitado" class="input-perfil">
+          <option value="">SELECCIONE</option>
+          <option value="Desarrollador Web / Front-End / Back-End">Desarrollador Web / Front-End / Back-End</option>
+          <option value="Ingeniero en Computación / Sistemas">Ingeniero en Computación / Sistemas</option>
+          <option value="Asistente Administrativo / Recepcionista">Asistente Administrativo / Recepcionista</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Segunda Opción -->
+    <div class="fila-estudios full">
+      <div class="grupo-estudios">
+        <label for="segundaOpcionSolicitada">*Segunda opción de empleo que solicita:</label>
+        <select id="segundaOpcionSolicitada" class="input-perfil">
+          <option value="">SELECCIONE</option>
+          <option value="Desarrollador de Software / Programador">Desarrollador de Software / Programador</option>
+          <option value="Ingeniero de Soporte TI">Ingeniero de Soporte TI</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Radio: Tiene experiencia -->
+    <div class="fila-radio-campo">
+      <div class="contenedor-radios">
+        <span class="radio-titulo">¿Tienes experiencia laboral?</span>
+        <label class="opcion-radio">
+          <input type="radio" name="tieneExperiencia" value="Si" id="expSi"> Sí
+        </label>
+        <label class="opcion-radio">
+          <input type="radio" name="tieneExperiencia" value="No" id="expNo" checked> No
+        </label>
+      </div>
+    </div>
+
+    <!-- BLOQUE: DATOS DE SU ÚLTIMO EMPLEO -->
+    <div id="bloqueUltimoEmpleo" style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+      <h4 style="margin-bottom: 10px; color: #333; font-size: 0.95rem;">DATOS DE SU ÚLTIMO EMPLEO</h4>
+      
+      <div class="fila-estudios">
+        <div class="grupo-estudios">
+          <label for="ultimoEmpresa">Nombre de la empresa:</label>
+          <input type="text" id="ultimoEmpresa" class="input-perfil" placeholder="Nombre de la empresa">
+        </div>
+        <div class="grupo-estudios">
+          <label for="ultimoPuesto">Puesto:</label>
+          <input type="text" id="ultimoPuesto" class="input-perfil" placeholder="Puesto desempeñado">
+        </div>
+      </div>
+
+      <div class="fila-estudios full">
+        <div class="grupo-estudios">
+          <label for="ultimoFuncionesTiempo">Funciones realizadas y cuánto tiempo:</label>
+          <input type="text" id="ultimoFuncionesTiempo" class="input-perfil" placeholder="Ej. Soporte técnico a equipos y mantenimiento web (1 año 6 meses)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Experiencia General Abierta + Años/Meses -->
+    <div class="fila-estudios" style="margin-top: 15px;">
+      <div class="grupo-estudios full">
+        <label for="experienciaDetalle">Detalle de experiencia laboral previa:</label>
+        <textarea id="experienciaDetalle" class="input-perfil textarea" placeholder="Describa brevemente los empleos o proyectos donde ha trabajado..."></textarea>
+      </div>
+    </div>
+
+    <div class="fila-estudios">
+      <div class="grupo-estudios">
+        <label>Tiempo acumulado de experiencia laboral:</label>
+        <div class="contenedor-tiempo-experiencia">
+          <div class="subgrupo-tiempo">
+            <input type="number" id="experienciaAnios" class="input-perfil" min="0" max="60" placeholder="0">
+            <span class="label-tiempo">Años</span>
+          </div>
+          <div class="subgrupo-tiempo">
+            <input type="number" id="experienciaMeses" class="input-perfil" min="0" max="11" placeholder="0">
+            <span class="label-tiempo">Meses</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campo abierto de Habilidades -->
+    <div class="fila-estudios full">
+      <div class="grupo-estudios">
+        <label for="habilidadesDetalle">*Habilidades:</label>
+        <textarea id="habilidadesDetalle" class="input-perfil textarea" placeholder="Ej. Liderazgo, JavaScript, PostgreSQL, trabajo en equipo..."></textarea>
+      </div>
+    </div>
+
+    <p style="color: #d9534f; font-size: 0.85rem; margin-top: 10px;">
+      Detallar y especificar la experiencia laboral y habilidades de acuerdo a sus empleos para que sea un incentivo o de interés a las empresas.
+    </p>
+
+  </div>
+          <!-- BOTÓN GUARDAR (DENTRO DEL FORMULARIO CON TYPE SUBMIT) -->
+          <footer class="perfil-footer">
+            <button type="submit" id="btnGuardarPerfil" class="btn-primario">Guardar Cambios</button>
+          </footer>
+        </form>
+      </main>
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Menú Flotante Lateral -->
+<div class="floating-menu">
+  <a href="#" id="btnVolverInicio">🏠 Inicio</a>
+  <a href="#" id="btnIrGeoPortal">🗺️ GeoPortal</a>
+</div>
+
+<!-- Capa de Bloqueo para Tutorial -->
+<div id="tutorialOverlay" class="tutorial-overlay"></div>
+
+<!-- Asistente Virtual -->
+<div id="assistantBox" class="assistant-box">
+  <div class="assistant-header">
+    <div class="assistant-info">
+      <span class="assistant-avatar">🤖</span>
+      <strong>Guía Virtual</strong>
+    </div>
+    <button id="btnVoiceRead" class="btn-voice" title="Escuchar explicación">🔊</button>
+  </div>
+  <p id="assistantText">¡Hola! Te orientaré paso a paso en el uso de la plataforma.</p>
+  <div class="assistant-buttons">
+    <button id="btnSkipTutorial" class="btn-skip">Omitir</button>
+    <button id="btnNextStep" class="btn-next">Siguiente</button>
+  </div>
+</div>
 
   <!-- ==========================================
         PANEL DE ACCESIBILIDAD (Flotante)
