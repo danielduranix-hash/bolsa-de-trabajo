@@ -85,10 +85,17 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ exito: false, mensaje: 'Contraseña incorrecta.' });
     }
 
+    // 1. Eliminar datos sensibles de seguridad
     delete usuario.password_hash;
     delete usuario.password;
 
+    // 2. Garantizar que la propiedad 'rol' exista para el Frontend
+    const correoLower = usuario.correo ? usuario.correo.toLowerCase() : '';
+    usuario.rol = usuario.rol || (correoLower.includes('admin') ? 'admin' : 'ciudadano');
+
+    // 3. Responder al frontend con el objeto de usuario listo
     res.json({ exito: true, usuario });
+
   } catch (error) {
     console.error('🔴 Error en login:', error);
     res.status(500).json({ exito: false, mensaje: 'Error al iniciar sesión.' });
