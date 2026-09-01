@@ -234,57 +234,160 @@ body.modo-oscuro .btn-access {
   cursor: pointer;
 }
 
-/* Botón Usuario / Auth */
-.btn-user-auth {
-  background-color: #0b2545;
-  color: #ffffff;
+/* ==========================================
+   Menú Desplegable de Usuario (Nuevo)
+   ========================================== */
+
+/* Contenedor del menú en el header */
+.user-menu-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Botón 'Menú ☰' */
+.btn-user-menu-trigger {
+  background: transparent;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  font-size: 0.95rem;
+  color: #0d3c75;
   font-weight: bold;
-  font-size: 0.85rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-.btn-user-auth:hover {
-  background-color: #13335e;
-}
-
-body.modo-oscuro .btn-user-auth {
-  background-color: #1a3a60;
-  color: #ffffff;
-}
-
-.btn-secundario {
-  background-color: transparent;
-  color: #0d3c75;
-  border: 2px solid #0d3c75;
-  padding: 7px 16px;
+  padding: 6px 12px;
   border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
 }
 
-body.modo-oscuro .btn-secundario {
+.btn-user-menu-trigger:hover {
+  background-color: rgba(13, 60, 117, 0.08);
+}
+
+body.modo-oscuro .btn-user-menu-trigger {
   color: #8bb4f6;
-  border-color: #8bb4f6;
 }
 
-.btn-help {
-  background-color: #7bc143;
-  color: #ffffff;
-  border: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
+/* Tarjeta flotante (Opciones) */
+.user-menu-card {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 250px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 99999;
+  overflow: hidden;
+}
+
+.user-menu-card.show {
+  display: block;
+}
+
+/* Encabezado Hola / Nombre / Correo */
+.user-card-header {
+  padding: 16px 12px 12px 12px;
+  text-align: center;
+  background-color: #ffffff;
+}
+
+.user-card-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #0d3c75;
+  font-weight: normal;
+}
+
+.user-card-name {
+  display: block;
+  font-size: 0.95rem;
   font-weight: bold;
-  font-size: 1.1rem;
-  cursor: pointer;
+  color: #0d3c75;
+  margin-top: 4px;
 }
 
+.user-card-email {
+  display: block;
+  font-size: 0.8rem;
+  color: #666666;
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+/* Lista de botones del menú */
+.user-card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-card-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-top: 1px solid #edf2f7;
+  padding: 10px 14px;
+  color: #0d3c75;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.user-card-btn:hover {
+  background-color: #f7fafc;
+}
+
+.user-card-btn svg {
+  stroke: #0d3c75;
+}
+
+/* Opción Administrador */
+.admin-btn {
+  color: #c53030;
+  font-weight: bold;
+}
+
+.admin-btn svg {
+  stroke: #c53030;
+}
+
+.admin-btn:hover {
+  background-color: #fff5f5;
+}
+
+/* Soporte para modo oscuro en el menú */
+body.modo-oscuro .user-menu-card {
+  background-color: #1a202c;
+  border-color: #2d3748;
+}
+
+body.modo-oscuro .user-card-header h2,
+body.modo-oscuro .user-card-name,
+body.modo-oscuro .user-card-btn {
+  color: #e2e8f0;
+}
+
+body.modo-oscuro .user-card-email {
+  color: #a0aec0;
+}
+
+body.modo-oscuro .user-card-btn {
+  border-top-color: #2d3748;
+}
+
+body.modo-oscuro .user-card-btn:hover {
+  background-color: #2d3748;
+}
+
+body.modo-oscuro .user-card-btn svg {
+  stroke: #e2e8f0;
+}
 /* ==========================================
    4. Hero y Secciones
    ========================================== */
@@ -1087,6 +1190,10 @@ body.modo-oscuro .modal-header {
 body.modo-oscuro .texto-ayuda {
   background: #282828;
   border-left-color: #8bb4f6;
+}
+
+.btn-help * {
+  pointer-events: none;
 }
 
 .registro-inferior {

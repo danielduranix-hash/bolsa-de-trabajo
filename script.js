@@ -369,41 +369,132 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCerrarSesion = document.getElementById('btnCerrarSesion');
   const txtNombreUsuario = document.getElementById('txtNombreUsuario');
 
-  // Control de Estado de Sesión en el Encabezado
+// Control de Estado de Sesión en el Encabezado
   function actualizarUIAutenticacion() {
+    const btnUserAuth = document.getElementById('btnUserAuth');
+    const userMenuContainer = document.getElementById('userMenuContainer');
+    const dropdownNombre = document.getElementById('dropdownNombre');
+    const dropdownCorreo = document.getElementById('dropdownCorreo');
+    const btnVistaAdminMenu = document.getElementById('btnVistaAdminMenu');
+
     if (usuarioActivo) {
+      // Ocultar botón Ingresar y mostrar Menú Desplegable
       if (btnUserAuth) btnUserAuth.style.display = 'none';
-      if (btnMiPerfil) {
-        btnMiPerfil.style.display = 'inline-flex';
-        if (txtNombreUsuario) txtNombreUsuario.textContent = `Hola, ${usuarioActivo.nombre}`;
+      if (userMenuContainer) userMenuContainer.style.display = 'inline-flex';
+
+      // Insertar Nombre y Correo en la tarjeta
+      if (dropdownNombre) {
+        dropdownNombre.textContent = `${usuarioActivo.nombre || ''} ${usuarioActivo.primer_apellido || ''}`.trim();
       }
-      if (btnCerrarSesion) btnCerrarSesion.style.display = 'inline-flex';
+      if (dropdownCorreo) {
+        dropdownCorreo.textContent = usuarioActivo.correo || '';
+      }
+
+      // Detectar si el usuario es Administrador
+      const esAdmin = usuarioActivo.rol === 'admin' || usuarioActivo.correo?.toLowerCase().includes('admin');
+      if (btnVistaAdminMenu) {
+        btnVistaAdminMenu.style.display = esAdmin ? 'flex' : 'none';
+      }
+
     } else {
+      // Si no hay sesión, mostrar botón Ingresar y ocultar Menú
       if (btnUserAuth) btnUserAuth.style.display = 'inline-flex';
-      if (btnMiPerfil) btnMiPerfil.style.display = 'none';
-      if (btnCerrarSesion) btnCerrarSesion.style.display = 'none';
+      if (userMenuContainer) userMenuContainer.style.display = 'none';
     }
   }
 
   // Ejecutar al cargar la página por primera vez
   actualizarUIAutenticacion();
 
-  // Cargar Datos del Perfil desde la API (GET)
-  async function cargarDatosPerfilAPI(curp) {
-    try {
-      const respuesta = await fetch(`http://localhost:3000/api/perfil/${curp}`);
-      const datos = await respuesta.json();
+  // ==========================================
+  // EVENTOS DEL MENÚ DESPLEGABLE
+  // ==========================================
 
-      if (respuesta.ok && datos.exito) {
-        cargarDatosPerfilEnModal(datos.usuario);
-      } else {
-        alert('No se pudo obtener la información del perfil.');
-      }
-    } catch (error) {
-      console.error('Error al obtener el perfil:', error);
-    }
+  // Abrir y cerrar la tarjeta flotante al hacer clic en "Menú"
+  const btnToggleUserMenu = document.getElementById('btnToggleUserMenu');
+  const userDropdownMenu = document.getElementById('userDropdownMenu');
+
+  if (btnToggleUserMenu && userDropdownMenu) {
+    btnToggleUserMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdownMenu.classList.toggle('show');
+    });
+
+    // Cerrar tarjeta al hacer clic en cualquier parte fuera del menú
+    document.addEventListener('click', () => {
+      userDropdownMenu.classList.remove('show');
+    });
   }
 
+  // Evento para Cerrar Sesión desde el menú
+  const btnCerrarSesionMenu = document.getElementById('btnCerrarSesionMenu');
+  if (btnCerrarSesionMenu) {
+    btnCerrarSesionMenu.addEventListener('click', () => {
+      localStorage.removeItem('usuarioActivo');
+      usuarioActivo = null;
+      actualizarUIAutenticacion();
+      if (userDropdownMenu) userDropdownMenu.classList.remove('show');
+    });
+  }
+
+  //Abrir la ventana modal al dar clic en 'Ingresar'
+if (!btnUserAuth) btnUserAuth = document.getElementById('btnUserAuth');
+if (!modalLogin) modalLogin = document.getElementById('modalLogin');
+
+if (btnUserAuth && modalLogin) {
+  btnUserAuth.addEventListener('click', () => {
+    modalLogin.style.display = 'flex';
+  });
+}
+// Abrir y Cargar datos de "Mi perfil" desde el menú flotante
+if (!btnMiPerfilMenu) var btnMiPerfilMenu = document.getElementById('btnMiPerfilMenu');
+
+if (btnMiPerfilMenu) {
+  btnMiPerfilMenu.addEventListener('click', async () => {
+    // 1. Cerrar el menú desplegable
+    if (userDropdownMenu) userDropdownMenu.classList.remove('show');
+
+    // 2. Abrir el modal del perfil inmediatamente
+    if (modalPerfil) modalPerfil.style.display = 'flex';
+
+    // 3. PRIMERO: Renderizar al instante con lo que hay en localStorage
+    if (usuarioActivo) {
+      if (typeof cargarDatosPerfilEnModal === 'function') {
+        cargarDatosPerfilEnModal(usuarioActivo);
+      } else if (typeof cargarDatosEnFormulario === 'function') {
+        cargarDatosEnFormulario(usuarioActivo);
+      }
+    }
+
+    // 4. SEGUNDO: Intentar actualizar los datos desde la API si existe CURP/correo
+    const idUsuario = usuarioActivo?.curp || usuarioActivo?.usuario_curp || usuarioActivo?.correo;
+
+    if (idUsuario) {
+      try {
+        const respuesta = await fetch(`http://localhost:3000/api/perfil/${idUsuario}`);
+        if (respuesta.ok) {
+          const datos = await respuesta.json();
+          const datosUsuario = datos.usuario || datos;
+
+          if (datosUsuario) {
+            // Actualizar el estado global y localStorage con la info de la BD
+            usuarioActivo = { ...usuarioActivo, ...datosUsuario };
+            localStorage.setItem('usuarioActivo', JSON.stringify(usuarioActivo));
+
+            // Volver a renderizar con la información más reciente
+            if (typeof cargarDatosPerfilEnModal === 'function') {
+              cargarDatosPerfilEnModal(usuarioActivo);
+            } else if (typeof cargarDatosEnFormulario === 'function') {
+              cargarDatosEnFormulario(usuarioActivo);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error al actualizar desde el servidor:', error);
+      }
+    }
+  });
+}
   // Abrir Login
   if (btnUserAuth && modalLogin) {
     btnUserAuth.addEventListener('click', () => {
@@ -543,6 +634,7 @@ window.addEventListener('click', (e) => {
    ========================================== */
 
 // LOGIN
+// Simplemente valida si la variable ya existe y asigna el evento:
 if (formLogin) {
   formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -561,14 +653,16 @@ if (formLogin) {
       if (respuesta.ok && datos.exito) {
         localStorage.setItem('usuarioActivo', JSON.stringify(datos.usuario));
         usuarioActivo = datos.usuario;
-        
-        // Llenar datos en modal y actualizar interfaz
-        cargarDatosPerfilEnModal(datos.usuario);
+
+        if (typeof cargarDatosPerfilEnModal === 'function') {
+          cargarDatosPerfilEnModal(datos.usuario);
+        }
         actualizarUIAutenticacion();
-        
+
         alert(`¡Bienvenido/a, ${datos.usuario.nombre}!`);
         formLogin.reset();
         if (modalLogin) modalLogin.style.display = 'none';
+
       } else {
         alert(datos.mensaje || 'Error al iniciar sesión.');
       }
