@@ -964,8 +964,6 @@
   </div>
 </div>
 
-
-
 <!-- Menú Flotante Lateral -->
 <div class="floating-menu">
   <a href="#" id="btnVolverInicio">🏠 Inicio</a>
@@ -975,19 +973,35 @@
 <!-- Capa de Bloqueo para Tutorial -->
 <div id="tutorialOverlay" class="tutorial-overlay"></div>
 
-<!-- Asistente Virtual -->
+<!-- Asistente Virtual Actualizado con botón de Replay -->
 <div id="assistantBox" class="assistant-box">
   <div class="assistant-header">
     <div class="assistant-info">
       <span class="assistant-avatar">🤖</span>
       <strong>Guía Virtual</strong>
     </div>
-    <button id="btnVoiceRead" class="btn-voice" title="Escuchar explicación">🔊</button>
+    <button id="btnVoiceRead" class="btn-voice" title="Sonido del asistente">
+      <!-- El icono inicial con la tachita que se modificará dinámicamente -->
+    <i id="iconoAsistenteVoz" class="fa-solid fa-volume-xmark"></i>
+    </button>
   </div>
-  <p id="assistantText">¡Hola! Te orientaré paso a paso en el uso de la plataforma.</p>
+
+  <!-- Contenedor del texto + botón de repetición manual -->
+  <div style="display: flex; align-items: flex-start; gap: 10px; margin: 10px 0;">
+    <p id="assistantText" style="flex: 1; margin: 0;"></p>
+    <!-- Nuevo Botón de Repetición Manual (Oculto al inicio, aparece al avanzar) -->
+    <button id="btnReplayManual" class="btn-voice" title="Repetir esta instrucción en voz alta" style="display: none; padding: 2px 6px;">
+      <i class="fa-solid fa-rotate-right" style="color: #0d3c75; font-size: 0.9rem;"></i>
+    </button>
+  </div>
+
+  <p id="assistantText"></p>
   <div class="assistant-buttons">
     <button id="btnSkipTutorial" class="btn-skip">Omitir</button>
-    <button id="btnNextStep" class="btn-next">Siguiente</button>
+    <div class="nav-steps-buttons" style="display: flex; gap: 8px;">
+      <button id="btnPrevStep" class="btn-next" style="background-color: #6c757d; display: none;">Atrás</button>
+      <button id="btnNextStep" class="btn-next">Siguiente</button>
+    </div>
   </div>
 </div>
 

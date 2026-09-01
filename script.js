@@ -705,8 +705,11 @@ const assistantText = document.getElementById('assistantText');
 const btnNextStep = document.getElementById('btnNextStep');
 const btnSkipTutorial = document.getElementById('btnSkipTutorial');
 const btnVoiceRead = document.getElementById('btnVoiceRead');
+const iconoAsistenteVoz = document.getElementById('iconoAsistenteVoz');
 
 let pasoActual = 0;
+// Variable simple en memoria para controlar si el audio debe sonar en automático
+let audioAutomaticoActivo = false; 
 
 const tutorialesPorSeccion = {
   inicio: [
@@ -724,6 +727,8 @@ const tutorialesPorSeccion = {
 
 function iniciarTutorial() {
   pasoActual = 0;
+  audioAutomaticoActivo = false; // Inicia desactivado en cada nueva sesión
+  actualizarIconoPantalla(false);
   if (assistantBox) assistantBox.style.display = 'block';
   if (tutorialOverlay) tutorialOverlay.style.display = 'block';
   mostrarPaso();
@@ -733,11 +738,34 @@ function finalizarTutorial() {
   if (assistantBox) assistantBox.style.display = 'none';
   if (tutorialOverlay) tutorialOverlay.style.display = 'none';
   quitarResaltados();
+  audioAutomaticoActivo = false;  
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 
 function quitarResaltados() {
   document.querySelectorAll('.highlight-step').forEach(el => el.classList.remove('highlight-step'));
+}
+
+// Cambiar los íconos de FontAwesome
+function actualizarIconoPantalla(activo) {
+  if (!iconoAsistenteVoz) return;
+  if (activo) {
+    iconoAsistenteVoz.className = "fa-solid fa-volume-high"; // Bocina normal hablando
+    iconoAsistenteVoz.style.color = "#7bc143"; // Color verde opcional
+  } else {
+    iconoAsistenteVoz.className = "fa-solid fa-volume-xmark"; // Bocina con tachita de silenciado
+    iconoAsistenteVoz.style.color = "#666666"; // Gris neutro
+  }
+}
+
+// Ejecuta la lectura nativa por voz
+function hablarTextoActual(texto) {
+  if ('speechSynthesis' in window && texto) {
+    window.speechSynthesis.cancel(); // Detiene cualquier lectura previa inmediatamente
+    const locucion = new SpeechSynthesisUtterance(texto);
+    locucion.lang = 'es-ES'; // Configuración de idioma original
+    window.speechSynthesis.speak(locucion);
+  }
 }
 
 function mostrarPaso() {
@@ -760,25 +788,40 @@ function mostrarPaso() {
     elTarget.classList.add('highlight-step');
     elTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
+
+// ACCIÓN AUTOMÁTICA: Si el usuario ya presionó la bocina una vez, habla solo al cambiar de paso
+  if (audioAutomaticoActivo) {
+    setTimeout(() => {
+      hablarTextoActual(paso.text);
+    }, 200);
+  }
 }
 
 if (btnHelp) btnHelp.addEventListener('click', iniciarTutorial);
+
 if (btnNextStep) {
   btnNextStep.addEventListener('click', () => {
     pasoActual++;
     mostrarPaso();
   });
 }
+
 if (btnSkipTutorial) btnSkipTutorial.addEventListener('click', finalizarTutorial);
 
+// CONTROL DE SONIDO: Alterna entre activo y tachado en un solo botón
 if (btnVoiceRead) {
   btnVoiceRead.addEventListener('click', () => {
-    if ('speechSynthesis' in window && assistantText) {
-      window.speechSynthesis.cancel();
-      const locucion = new SpeechSynthesisUtterance(assistantText.textContent);
-      locucion.lang = 'es-ES';
-      window.speechSynthesis.speak(locucion);
-    }
+    if (!audioAutomaticoActivo) {
+      // 1. Activar el sonido
+      audioAutomaticoActivo = true;
+      actualizarIconoPantalla(true);
+    if (assistantText) hablarTextoActual(assistantText.textContent);
+    } else {
+      // 2. Silenciar y poner la tachita si se vuelve a presionar
+      audioAutomaticoActivo = false;
+      actualizarIconoPantalla(false);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    } 
   });
 }
 
