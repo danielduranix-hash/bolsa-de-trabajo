@@ -947,13 +947,6 @@ if (btnVoiceRead) {
   });
 }
 
-// Botón de Replay manual: Salta la restricción del historial y fuerza la lectura si el usuario lo pide
-if (btnReplayManual) {
-  btnReplayManual.addEventListener('click', () => {
-    if (assistantText) hablarTextoActual(assistantText.textContent);
-  });
-}
-
 /* ------------------------------------------------------------------------
    7. PANEL DE ACCESIBILIDAD (GLOBAL)
    ------------------------------------------------------------------------ */
@@ -1025,8 +1018,10 @@ window.toggleModoOscuro = () => {
   document.body.classList.toggle('dark-mode');
   const isDark = document.body.classList.contains('modo-oscuro');
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
   document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
     btn.classList.toggle('active', isDark);
+    btn.innerHTML = isDark ? '☀️ Modo claro' : '🌙 Modo oscuro';
   });
 };
 
@@ -1180,6 +1175,7 @@ function restaurarAccesibilidad() {
     document.body.classList.add('modo-oscuro', 'dark-mode');
     document.querySelectorAll('[data-accion="modoOscuro"]').forEach(btn => {
       btn.classList.add('active');
+      btn.innerHTML = '☀️ Modo claro';
     });
   }
 }

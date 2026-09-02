@@ -1938,6 +1938,130 @@ body.modo-oscuro .checkbox-label {
     flex-wrap: wrap;
   }
 }
+
+/* ==========================================
+   AISLAR EL PANEL DE CAMBIOS NO DESEADOS
+   ========================================== */
+   
+/* 1. El panel NO cambia de tamaño con el resto de la página */
+.panel-accesibilidad,
+.panel-accesibilidad *,
+body:not(.panel-accesibilidad) .panel-accesibilidad,
+body:not(.panel-accesibilidad) .panel-accesibilidad * {
+  font-size: 1rem !important; /* Tamaño fijo, no hereda del body */
+}
+
+/* 2. El panel NO se ve afectado por "Botones grandes" */
+.panel-accesibilidad .btn-toggle,
+.panel-accesibilidad .btn-lectura,
+.panel-accesibilidad .btn-fuente,
+body:not(.panel-accesibilidad) .panel-accesibilidad .btn-toggle,
+body:not(.panel-accesibilidad) .panel-accesibilidad .btn-lectura,
+body:not(.panel-accesibilidad) .panel-accesibilidad .btn-fuente
+body:not(.panel-accesibilidad) .panel-accesibilidad .tab-accesibilidad {
+  font-size: 0.85rem !important;
+  padding: 8px 14px !important;
+  min-height: auto !important;
+}
+
+/* 2.1. El panel NO se ve afectado por "Botones grandes" en las pestañas */
+.panel-accesibilidad .tab-accesibilidad,
+body:not(.panel-accesibilidad) .panel-accesibilidad .tab-accesibilidad,
+body.botones-grandes .panel-accesibilidad .tab-accesibilidad {
+  background: #f0f0f0 !important;
+  border: none !important;
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  cursor: pointer !important;
+  font-size: 0.85rem !important;
+  transition: 0.3s !important;
+  min-height: auto !important;
+  min-height: 0 !important;
+}
+
+/* Cuando la pestaña está activa, también se mantiene */
+.panel-accesibilidad .tab-accesibilidad.active,
+body:not(.panel-accesibilidad) .panel-accesibilidad .tab-accesibilidad.active,
+body.botones-grandes .panel-accesibilidad .tab-accesibilidad.active {
+  background: #0d3c75 !important;
+  color: white !important;
+}
+
+/* 3. El panel NO se ve afectado por "Espaciado legible" (Lectura fácil) */
+.panel-accesibilidad,
+.panel-accesibilidad p,
+.panel-accesibilidad li,
+body:not(.panel-accesibilidad) .panel-accesibilidad,
+body:not(.panel-accesibilidad) .panel-accesibilidad p,
+body:not(.panel-accesibilidad) .panel-accesibilidad li {
+  line-height: normal !important;
+  letter-spacing: normal !important;
+  margin-bottom: normal !important;
+}
+
+/* 4. El panel NO se ve afectado por "Fuente legible" */
+.panel-accesibilidad,
+.panel-accesibilidad *,
+body:not(.panel-accesibilidad) .panel-accesibilidad,
+body:not(.panel-accesibilidad) .panel-accesibilidad * {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+/* 5. El panel NO se ve afectado por "Subrayar enlaces" */
+.panel-accesibilidad a,
+body:not(.panel-accesibilidad) .panel-accesibilidad a {
+  text-decoration: none !important;
+}
+
+/* 6. El panel NO se ve afectado por "Modo lectura" */
+.panel-accesibilidad .card,
+.panel-accesibilidad .sector-card,
+.panel-accesibilidad .cv-banner-card,
+body:not(.panel-accesibilidad) .panel-accesibilidad .card,
+body:not(.panel-accesibilidad) .panel-accesibilidad .sector-card,
+body:not(.panel-accesibilidad) .panel-accesibilidad .cv-banner-card {
+  background: inherit !important;
+  box-shadow: inherit !important;
+  border: inherit !important;
+}
+.panel-accesibilidad img,
+.panel-accesibilidad .card-icon,
+.panel-accesibilidad .sector-icon,
+body:not(.panel-accesibilidad) .panel-accesibilidad img,
+body:not(.panel-accesibilidad) .panel-accesibilidad .card-icon,
+body:not(.panel-accesibilidad) .panel-accesibilidad .sector-icon {
+  display: inline-block !important;
+}
+
+/* 7. El panel NO se ve afectado por "Resaltar títulos" */
+.panel-accesibilidad h1,
+.panel-accesibilidad h2,
+.panel-accesibilidad h3,
+.panel-accesibilidad .section-title,
+body:not(.panel-accesibilidad) .panel-accesibilidad h1,
+body:not(.panel-accesibilidad) .panel-accesibilidad h2,
+body:not(.panel-accesibilidad) .panel-accesibilidad h3,
+body:not(.panel-accesibilidad) .panel-accesibilidad .section-title {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* 8. El panel NO se ve afectado por "Navegación por teclado" (mantiene su propio foco) */
+.panel-accesibilidad *:focus,
+body:not(.panel-accesibilidad) .panel-accesibilidad *:focus {
+  outline: 2px solid #0d3c75 !important;
+  outline-offset: 2px !important;
+}
+
+/* 9. El panel NO se ve afectado por "Texto fácil" (Atkinson Hyperlegible) */
+.panel-accesibilidad,
+.panel-accesibilidad *,
+body:not(.panel-accesibilidad) .panel-accesibilidad,
+body:not(.panel-accesibilidad) .panel-accesibilidad * {
+  font-weight: normal !important;
+  line-height: normal !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
 /* Estado oculto por defecto */
 .modal {
   display: none; 
