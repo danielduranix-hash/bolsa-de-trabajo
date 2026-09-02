@@ -319,6 +319,45 @@ app.put('/api/perfil/:curp', async (req, res) => {
 });
 
 // ============================================================================
+// ENDPOINTS DE ADMINISTRACIÓN (Usan poolBolsa)
+// ============================================================================
+
+// DELETE: ELIMINAR USUARIO (Exclusivo para Super Administrador)
+app.delete('/api/usuarios/:curp', async (req, res) => {
+  const { rolSolicitante } = req.body;
+
+  // 1. Validar que la petición venga de un superadmin
+  if (rolSolicitante !== 'superadmin') {
+    return res.status(403).json({ 
+      exito: false, 
+      mensaje: 'Acceso denegado: Se requieren permisos de Super Administrador.' 
+    });
+  }
+
+  const curpLimpia = (req.params.curp || '').trim().toUpperCase();
+
+  if (!curpLimpia) {
+    return res.status(400).json({ exito: false, mensaje: 'CURP requerida.' });
+  }
+
+  try {
+    const result = await poolBolsa.query(
+      'DELETE FROM usuarios WHERE LOWER(TRIM(curp)) = LOWER(TRIM($1)) RETURNING curp', 
+      [curpLimpia]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado para eliminar.' });
+    }
+
+    res.json({ exito: true, mensaje: `Usuario con CURP ${curpLimpia} eliminado correctamente.` });
+  } catch (error) {
+    console.error('🔴 Error al eliminar usuario:', error);
+    res.status(500).json({ exito: false, mensaje: 'Error al eliminar usuario en la base de datos.' });
+  }
+});
+
+// ============================================================================
 // ENDPOINTS DEL GENERADOR DE CV CON IA (Usarán poolCV)
 // ============================================================================
 

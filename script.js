@@ -33,7 +33,6 @@ function evaluarNuevoComienzoPerfil() {
 // Cálculo dinámico de edad según la fecha seleccionada
 function calcularEdadPerfil(fechaNacimiento) {
   if (!fechaNacimiento) return;
-  
   const hoy = new Date();
   const nac = new Date(fechaNacimiento);
   let edad = hoy.getFullYear() - nac.getFullYear();
@@ -111,6 +110,10 @@ function cargarDatosPerfilEnModal(usuario) {
   }
 }
 
+let usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo')) || null;
+const formLogin = document.getElementById('formLogin');
+const formPerfil = document.getElementById('formPerfil');
+const modalLogin = document.getElementById('modalLogin');
 
 /* ==========================================================================
    2. LÓGICA AL CARGAR EL DOM
@@ -347,61 +350,59 @@ document.addEventListener('DOMContentLoaded', () => {
     sectorCards.forEach(c => c.classList.remove('activo'));
   });
 
-  /* ------------------------------------------------------------------------
-     5. Modales y Lógica de Sesión, Registro y Perfil
-     ------------------------------------------------------------------------ */
-  const btnUserAuth = document.getElementById('btnUserAuth');
-  const btnCerrarLogin = document.getElementById('btnCerrarLogin');
-  const btnCerrarRegistro = document.getElementById('btnCerrarRegistro');
-  const btnIrARegistro = document.getElementById('btnIrARegistro');
+/* ==========================================================================
+   5. MODALES Y LÓGICA DE SESIÓN, REGISTRO Y PERFIL
+   ========================================================================== */
 
-  const modalLogin = document.getElementById('modalLogin');
-  const modalRegistro = document.getElementById('modalRegistro');
-  const modalPerfil = document.getElementById('modalPerfil');
-  const btnCerrarPerfil = document.getElementById('btnCerrarPerfil');
+// 1. Declaración limpia de elementos del DOM
+const btnUserAuth = document.getElementById('btnUserAuth');
+const btnCerrarLogin = document.getElementById('btnCerrarLogin');
+const btnCerrarRegistro = document.getElementById('btnCerrarRegistro');
+const btnIrARegistro = document.getElementById('btnIrARegistro');
 
-  const formLogin = document.getElementById('formLogin');
-  const formPerfil = document.getElementById('formPerfil');
+const modalLogin = document.getElementById('modalLogin');
+const modalRegistro = document.getElementById('modalRegistro');
+const modalPerfil = document.getElementById('modalPerfil');
+const btnCerrarPerfil = document.getElementById('btnCerrarPerfil');
 
-  let usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+const formLogin = document.getElementById('formLogin');
+const formPerfil = document.getElementById('formPerfil');
 
-  const btnMiPerfil = document.getElementById('btnMiPerfil');
-  const btnCerrarSesion = document.getElementById('btnCerrarSesion');
-  const txtNombreUsuario = document.getElementById('txtNombreUsuario');
+const btnMiPerfil = document.getElementById('btnMiPerfil');
+const btnMiPerfilMenu = document.getElementById('btnMiPerfilMenu');
+const btnCerrarSesion = document.getElementById('btnCerrarSesion');
+const txtNombreUsuario = document.getElementById('txtNombreUsuario');
 
-// Control de Estado de Sesión en el Encabezado
-  function actualizarUIAutenticacion() {
-    const btnUserAuth = document.getElementById('btnUserAuth');
-    const userMenuContainer = document.getElementById('userMenuContainer');
-    const dropdownNombre = document.getElementById('dropdownNombre');
-    const dropdownCorreo = document.getElementById('dropdownCorreo');
-    const btnVistaAdminMenu = document.getElementById('btnVistaAdminMenu');
+// 2. Control de Estado de Sesión en el Encabezado
+function actualizarUIAutenticacion() {
+  const userMenuContainer = document.getElementById('userMenuContainer');
+  const dropdownNombre = document.getElementById('dropdownNombre');
+  const dropdownCorreo = document.getElementById('dropdownCorreo');
+  const btnVistaAdminMenu = document.getElementById('btnVistaAdminMenu');
 
-    if (usuarioActivo) {
-      // Ocultar botón Ingresar y mostrar Menú Desplegable
-      if (btnUserAuth) btnUserAuth.style.display = 'none';
-      if (userMenuContainer) userMenuContainer.style.display = 'inline-flex';
+  if (usuarioActivo) {
+    if (btnUserAuth) btnUserAuth.style.display = 'none';
+    if (userMenuContainer) userMenuContainer.style.display = 'inline-flex';
 
-      // Insertar Nombre y Correo en la tarjeta
-      if (dropdownNombre) {
-        dropdownNombre.textContent = `${usuarioActivo.nombre || ''} ${usuarioActivo.primer_apellido || ''}`.trim();
-      }
-      if (dropdownCorreo) {
-        dropdownCorreo.textContent = usuarioActivo.correo || '';
-      }
-
-      // Detectar si el usuario es Administrador
-      const esAdmin = usuarioActivo.rol === 'admin' || usuarioActivo.correo?.toLowerCase().includes('admin');
-      if (btnVistaAdminMenu) {
-        btnVistaAdminMenu.style.display = esAdmin ? 'flex' : 'none';
-      }
-
-    } else {
-      // Si no hay sesión, mostrar botón Ingresar y ocultar Menú
-      if (btnUserAuth) btnUserAuth.style.display = 'inline-flex';
-      if (userMenuContainer) userMenuContainer.style.display = 'none';
+    if (dropdownNombre) {
+      dropdownNombre.textContent = `${usuarioActivo.nombre || ''} ${usuarioActivo.primer_apellido || ''}`.trim();
     }
+    if (dropdownCorreo) {
+      dropdownCorreo.textContent = usuarioActivo.correo || '';
+    }
+
+    const esAdmin = usuarioActivo.rol === 'admin' || usuarioActivo.correo?.toLowerCase().includes('admin');
+    if (btnVistaAdminMenu) {
+      btnVistaAdminMenu.style.display = esAdmin ? 'flex' : 'none';
+    }
+  } else {
+    if (btnUserAuth) btnUserAuth.style.display = 'inline-flex';
+    if (userMenuContainer) userMenuContainer.style.display = 'none';
   }
+}
+
+// Ejecutar UI inicial al cargar
+actualizarUIAutenticacion();
 
   // Ejecutar al cargar la página por primera vez
   actualizarUIAutenticacion();
@@ -410,32 +411,31 @@ document.addEventListener('DOMContentLoaded', () => {
   // EVENTOS DEL MENÚ DESPLEGABLE
   // ==========================================
 
-  // Abrir y cerrar la tarjeta flotante al hacer clic en "Menú"
-  const btnToggleUserMenu = document.getElementById('btnToggleUserMenu');
-  const userDropdownMenu = document.getElementById('userDropdownMenu');
+// 3. Eventos del Menú Desplegable de Usuario
+const btnToggleUserMenu = document.getElementById('btnToggleUserMenu');
+const userDropdownMenu = document.getElementById('userDropdownMenu');
 
-  if (btnToggleUserMenu && userDropdownMenu) {
-    btnToggleUserMenu.addEventListener('click', (e) => {
-      e.stopPropagation();
-      userDropdownMenu.classList.toggle('show');
-    });
+if (btnToggleUserMenu && userDropdownMenu) {
+  btnToggleUserMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userDropdownMenu.classList.toggle('show');
+  });
 
-    // Cerrar tarjeta al hacer clic en cualquier parte fuera del menú
-    document.addEventListener('click', () => {
-      userDropdownMenu.classList.remove('show');
-    });
-  }
+  document.addEventListener('click', () => {
+    userDropdownMenu.classList.remove('show');
+  });
+}
 
-  // Evento para Cerrar Sesión desde el menú
-  const btnCerrarSesionMenu = document.getElementById('btnCerrarSesionMenu');
-  if (btnCerrarSesionMenu) {
-    btnCerrarSesionMenu.addEventListener('click', () => {
-      localStorage.removeItem('usuarioActivo');
-      usuarioActivo = null;
-      actualizarUIAutenticacion();
-      if (userDropdownMenu) userDropdownMenu.classList.remove('show');
-    });
-  }
+ // Cerrar Sesión desde el Menú Desplegable
+const btnCerrarSesionMenu = document.getElementById('btnCerrarSesionMenu');
+if (btnCerrarSesionMenu) {
+  btnCerrarSesionMenu.addEventListener('click', () => {
+    localStorage.removeItem('usuarioActivo');
+    usuarioActivo = null;
+    actualizarUIAutenticacion();
+    if (userDropdownMenu) userDropdownMenu.classList.remove('show');
+  });
+}
 
   //Abrir la ventana modal al dar clic en 'Ingresar'
 if (!btnUserAuth) btnUserAuth = document.getElementById('btnUserAuth');
@@ -446,29 +446,23 @@ if (btnUserAuth && modalLogin) {
     modalLogin.style.display = 'flex';
   });
 }
-// Abrir y Cargar datos de "Mi perfil" desde el menú flotante
-if (!btnMiPerfilMenu) var btnMiPerfilMenu = document.getElementById('btnMiPerfilMenu');
-
+// Abrir y cargar datos de "Mi perfil" desde el menú flotante
 if (btnMiPerfilMenu) {
   btnMiPerfilMenu.addEventListener('click', async () => {
     // 1. Cerrar el menú desplegable
     if (userDropdownMenu) userDropdownMenu.classList.remove('show');
 
-    // 2. Abrir el modal del perfil inmediatamente
+    // 2. Abrir el modal del perfil
     if (modalPerfil) modalPerfil.style.display = 'flex';
 
-    // 3. PRIMERO: Renderizar al instante con lo que hay en localStorage
     if (usuarioActivo) {
       if (typeof cargarDatosPerfilEnModal === 'function') {
         cargarDatosPerfilEnModal(usuarioActivo);
-      } else if (typeof cargarDatosEnFormulario === 'function') {
-        cargarDatosEnFormulario(usuarioActivo);
       }
     }
 
-    // 4. SEGUNDO: Intentar actualizar los datos desde la API si existe CURP/correo
+    // 3. Consultar datos actualizados al servidor
     const idUsuario = usuarioActivo?.curp || usuarioActivo?.usuario_curp || usuarioActivo?.correo;
-
     if (idUsuario) {
       try {
         const respuesta = await fetch(`http://localhost:3000/api/perfil/${idUsuario}`);
@@ -477,20 +471,15 @@ if (btnMiPerfilMenu) {
           const datosUsuario = datos.usuario || datos;
 
           if (datosUsuario) {
-            // Actualizar el estado global y localStorage con la info de la BD
             usuarioActivo = { ...usuarioActivo, ...datosUsuario };
             localStorage.setItem('usuarioActivo', JSON.stringify(usuarioActivo));
-
-            // Volver a renderizar con la información más reciente
             if (typeof cargarDatosPerfilEnModal === 'function') {
               cargarDatosPerfilEnModal(usuarioActivo);
-            } else if (typeof cargarDatosEnFormulario === 'function') {
-              cargarDatosEnFormulario(usuarioActivo);
             }
           }
         }
       } catch (error) {
-        console.error('Error al actualizar desde el servidor:', error);
+        console.error('Error al actualizar perfil:', error);
       }
     }
   });
@@ -502,39 +491,73 @@ if (btnMiPerfilMenu) {
     });
   }
 
-  // Abrir Perfil y consultar API
-  if (btnMiPerfil) {
-    btnMiPerfil.addEventListener('click', () => {
-      if (modalPerfil) {
-        modalPerfil.style.display = 'flex';
-        if (usuarioActivo && usuarioActivo.curp) {
-          cargarDatosPerfilAPI(usuarioActivo.curp);
-        }
-      } else {
-        alert(`Configuración de perfil para ${usuarioActivo?.nombre || 'usuario'}`);
+// Abrir Perfil desde el Menú Desplegable
+if (btnMiPerfilMenu) {
+  btnMiPerfilMenu.addEventListener('click', async () => {
+    if (userDropdownMenu) userDropdownMenu.classList.remove('show');
+    if (modalPerfil) modalPerfil.style.display = 'flex';
+
+    if (usuarioActivo) {
+      if (typeof cargarDatosPerfilEnModal === 'function') {
+        cargarDatosPerfilEnModal(usuarioActivo);
       }
-    });
-  }
+    }
 
-  // Botones de Cierre (X)
-  if (btnCerrarLogin && modalLogin) btnCerrarLogin.addEventListener('click', () => modalLogin.style.display = 'none');
-  if (btnCerrarRegistro && modalRegistro) btnCerrarRegistro.addEventListener('click', () => modalRegistro.style.display = 'none');
-  if (btnCerrarPerfil && modalPerfil) btnCerrarPerfil.addEventListener('click', () => modalPerfil.style.display = 'none');
+    const idUsuario = usuarioActivo?.curp || usuarioActivo?.usuario_curp || usuarioActivo?.correo;
+    if (idUsuario) {
+      try {
+        const respuesta = await fetch(`http://localhost:3000/api/perfil/${idUsuario}`);
+        if (respuesta.ok) {
+          const datos = await respuesta.json();
+          const datosUsuario = datos.usuario || datos;
 
-  // Alternar entre Login y Registro
-  if (btnIrARegistro && modalLogin && modalRegistro) {
-    btnIrARegistro.addEventListener('click', () => {
-      modalLogin.style.display = 'none';
-      modalRegistro.style.display = 'flex';
-    });
-  }
-
-  // Cerrar modales haciendo clic afuera
-  window.addEventListener('click', (e) => {
-    if (e.target === modalLogin) modalLogin.style.display = 'none';
-    if (e.target === modalRegistro) modalRegistro.style.display = 'none';
-    if (e.target === modalPerfil) modalPerfil.style.display = 'none';
+          if (datosUsuario) {
+            usuarioActivo = { ...usuarioActivo, ...datosUsuario };
+            localStorage.setItem('usuarioActivo', JSON.stringify(usuarioActivo));
+            if (typeof cargarDatosPerfilEnModal === 'function') {
+              cargarDatosPerfilEnModal(usuarioActivo);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error al actualizar desde el servidor:', error);
+      }
+    }
   });
+}
+
+// Abrir Perfil con botón simple (si aplica)
+if (btnMiPerfil) {
+  btnMiPerfil.addEventListener('click', () => {
+    if (modalPerfil) {
+      modalPerfil.style.display = 'flex';
+      if (usuarioActivo && typeof cargarDatosPerfilEnModal === 'function') {
+        cargarDatosPerfilEnModal(usuarioActivo);
+      }
+    }
+  });
+}
+
+// Botones de Cierre (X)
+if (btnCerrarLogin && modalLogin) btnCerrarLogin.addEventListener('click', () => modalLogin.style.display = 'none');
+if (btnCerrarRegistro && modalRegistro) btnCerrarRegistro.addEventListener('click', () => modalRegistro.style.display = 'none');
+if (btnCerrarPerfil && modalPerfil) btnCerrarPerfil.addEventListener('click', () => modalPerfil.style.display = 'none');
+
+// Alternar entre Login y Registro
+if (btnIrARegistro && modalLogin && modalRegistro) {
+  btnIrARegistro.addEventListener('click', () => {
+    modalLogin.style.display = 'none';
+    modalRegistro.style.display = 'flex';
+  });
+}
+
+// Cerrar Modales al hacer clic fuera
+window.addEventListener('click', (e) => {
+  if (e.target === modalLogin) modalLogin.style.display = 'none';
+  if (e.target === modalRegistro) modalRegistro.style.display = 'none';
+  if (e.target === modalPerfil) modalPerfil.style.display = 'none';
+});
+
 /* ============================================================================
    FUNCIÓN AUXILIAR: CARGAR DATOS DE ESTUDIOS EN EL FORMULARIO
    ============================================================================ */
@@ -629,12 +652,16 @@ window.addEventListener('click', (e) => {
   if (e.target === modalPerfil) modalPerfil.style.display = 'none';
 });
 
+
+
 /* ==========================================
    5.4 Peticiones HTTP (Login, Guardar Perfil, Salir)
    ========================================== */
 
-// LOGIN
-// Simplemente valida si la variable ya existe y asigna el evento:
+/* ==========================================
+   5.4 Peticiones HTTP (Login)
+   ========================================== */
+
 if (formLogin) {
   formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -649,17 +676,20 @@ if (formLogin) {
       });
 
       const datos = await respuesta.json();
+      console.log('Respuesta del backend:', respuesta.status, datos); // <--- AÑADE ESTA LÍNEA
+      if (respuesta.ok && (datos.exito || datos.usuario)) {
+        const usuarioObtenido = datos.usuario || datos;
 
-      if (respuesta.ok && datos.exito) {
-        localStorage.setItem('usuarioActivo', JSON.stringify(datos.usuario));
-        usuarioActivo = datos.usuario;
+        localStorage.setItem('usuarioActivo', JSON.stringify(usuarioObtenido));
+        usuarioActivo = usuarioObtenido;
 
         if (typeof cargarDatosPerfilEnModal === 'function') {
-          cargarDatosPerfilEnModal(datos.usuario);
+          cargarDatosPerfilEnModal(usuarioObtenido);
         }
+
         actualizarUIAutenticacion();
 
-        alert(`¡Bienvenido/a, ${datos.usuario.nombre}!`);
+        alert(`¡Bienvenido/a, ${usuarioObtenido.nombre || 'Usuario'}!`);
         formLogin.reset();
         if (modalLogin) modalLogin.style.display = 'none';
 
@@ -673,12 +703,11 @@ if (formLogin) {
   });
 }
 
-/* GUARDAR CAMBIOS DE PERFIL (PUT) */
+// Submit Formulario de Perfil (Guardar Cambios PUT)
 if (formPerfil) {
   formPerfil.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // 1. Obtener la CURP de forma segura
     const curpInput = document.getElementById('perfilCurp')?.value;
     const curp = (curpInput || usuarioActivo?.curp || '').trim();
 
@@ -693,7 +722,6 @@ if (formPerfil) {
       return val1 || val2 || null;
     };
 
-    // 2. Construir el objeto con datos limpios
     const datosActualizados = {
       curp: curp,
       nombre: obtenerValor('perfilNombreSidebar', 'perfilNombre'),
@@ -703,8 +731,6 @@ if (formPerfil) {
       fecha_nacimiento: document.getElementById('perfilFechaNac')?.value || null,
       edad: document.getElementById('perfilEdad')?.value ? parseInt(document.getElementById('perfilEdad').value, 10) : null,
       sexo: document.getElementById('perfilSexo')?.value || document.querySelector('input[name="perfilSexo"]:checked')?.value || 'O',
-      
-      // Datos de residencia y contacto
       estado_civil: document.getElementById('perfilEstadoCivil')?.value || null,
       calle: document.getElementById('perfilCalle')?.value?.trim() || null,
       letra_calle: document.getElementById('perfilLetraCalle')?.value?.trim() || null,
@@ -715,67 +741,54 @@ if (formPerfil) {
       codigo_postal: document.getElementById('perfilCP')?.value?.trim() || null,
       telefono_fijo: document.getElementById('perfilTelFijo')?.value?.trim() || null,
       celular: document.getElementById('perfilTelefono')?.value?.trim() || document.getElementById('perfilCelular')?.value?.trim() || null,
-      
-      // Apoyos y credencial
       discapacidad: document.getElementById('perfilDiscapacidad')?.value || 'NINGUNA',
       es_nuevo_comienzo: (document.getElementById('perfilDiscapacidad')?.value || 'NINGUNA') !== 'NINGUNA',
       tipo_apoyo: document.getElementById('perfilTipoApoyo')?.value?.trim() || null,
       contacto_nombre: document.getElementById('perfilContactoNombre')?.value?.trim() || null,
       contacto_parentesco: document.getElementById('perfilContactoParentesco')?.value?.trim() || null,
       credencial_folio: document.getElementById('perfilCredencialFolio')?.value?.trim() || null,
-      credencial_vencimiento: document.getElementById('perfilCredencialVencimiento')?.value || null,
-
-      // Sección Estudios
-      grado_estudios: document.getElementById('estudiosGrado')?.value || document.getElementById('gradoEstudios')?.value || null,
-      titulado: document.getElementById('estudiosTitulado')?.value || document.getElementById('titulado')?.value || 'No',
-      profesion: document.getElementById('estudiosProfesion')?.value || document.getElementById('profesion')?.value || null,
-      estudias_actualmente: document.getElementById('estudiasSi')?.checked || false,
-      que_estudias: document.getElementById('queEstudias')?.value?.trim() || null,
-      conocimientos_generales: document.getElementById('conocimientosGenerales')?.value?.trim() || null,
-
-      // Sección Experiencia Laboral
-      empleo_solicitado: document.getElementById('empleoSolicitado')?.value || null,
-      segunda_opcion_empleo: document.getElementById('segundaOpcionSolicitada')?.value || null,
-      tiene_experiencia: document.getElementById('expSi')?.checked || false,
-      ultimo_empresa: document.getElementById('ultimoEmpresa')?.value?.trim() || null,
-      ultimo_puesto: document.getElementById('ultimoPuesto')?.value?.trim() || null,
-      ultimo_funciones_tiempo: document.getElementById('ultimoFuncionesTiempo')?.value?.trim() || null,
-      experiencia_detalle: document.getElementById('experienciaDetalle')?.value?.trim() || null,
-      experiencia_anios: parseInt(document.getElementById('experienciaAnios')?.value || 0, 10),
-      experiencia_meses: parseInt(document.getElementById('experienciaMeses')?.value || 0, 10),
-      habilidades_detalle: document.getElementById('habilidadesDetalle')?.value?.trim() || null
+      credencial_vencimiento: document.getElementById('perfilCredencialVencimiento')?.value || null
     };
 
-    console.log('Enviando datos al servidor:', datosActualizados);
-
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/perfil/${encodeURIComponent(curp)}`, {
+      const respuesta = await fetch(`http://localhost:3000/api/perfil/${curp}`, {
         method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datosActualizados)
       });
 
       const resultado = await respuesta.json();
 
-      if (respuesta.ok && resultado.exito) {
-        alert('¡Perfil actualizado con éxito en la base de datos!');
-        
-        const usuarioSesion = JSON.parse(localStorage.getItem('usuarioActivo')) || {};
-        const usuarioActualizado = { ...usuarioSesion, ...datosActualizados };
-        
-        localStorage.setItem('usuarioActivo', JSON.stringify(usuarioActualizado));
-        usuarioActivo = usuarioActualizado;
-        
+      if (respuesta.ok && (resultado.exito || resultado.actualizado)) {
+        usuarioActivo = { ...usuarioActivo, ...datosActualizados };
+        localStorage.setItem('usuarioActivo', JSON.stringify(usuarioActivo));
         actualizarUIAutenticacion();
+        alert('¡Perfil actualizado con éxito!');
+        if (modalPerfil) modalPerfil.style.display = 'none';
       } else {
-        alert(`Error al actualizar en la base de datos: ${resultado.mensaje || 'Respuesta no exitosa'}`);
+        alert(`Error al actualizar perfil: ${resultado.mensaje || 'Respuesta no válida del servidor'}`);
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
-      alert('No se pudo conectar con el servidor backend.');
+      console.error('Error al guardar los datos del perfil:', error);
+      alert('Error de conexión con el servidor backend al intentar guardar el perfil.');
+    }
+  });
+}
+
+const btnAdmin = document.getElementById('btnVistaAdminMenu'); // <-- Cambiado de 'btn-opcion-admin' a 'btnVistaAdminMenu'
+
+if (btnAdmin) {
+  btnAdmin.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Obtener el usuario activo desde localStorage
+    const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+
+    // Verificar si el usuario existe y cuenta con rol administrativo
+    if (usuario && (usuario.rol === 'admin' || usuario.rol === 'superadmin')) {
+      window.location.href = 'admin.html';
+    } else {
+      alert('Acceso no autorizado: Se requieren permisos administrativos.');
     }
   });
 }
