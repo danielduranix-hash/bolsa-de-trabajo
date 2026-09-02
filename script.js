@@ -797,13 +797,14 @@ const assistantBox = document.getElementById('assistantBox');
 const tutorialOverlay = document.getElementById('tutorialOverlay');
 const assistantText = document.getElementById('assistantText');
 const btnNextStep = document.getElementById('btnNextStep');
+const btnPrevStep = document.getElementById('btnPrevStep');
 const btnSkipTutorial = document.getElementById('btnSkipTutorial');
 const btnVoiceRead = document.getElementById('btnVoiceRead');
-const iconoAsistenteVoz = document.getElementById('iconoAsistenteVoz');
+const iconoAsistenteVoz = document.getElementById('iconoAsistenteVoz')
 
 let pasoActual = 0;
-// Variable simple en memoria para controlar si el audio debe sonar en automático
-let audioAutomaticoActivo = false; 
+// Control de audio (True = Encendido, False = Silenciado)
+  let audioAutomaticoActivo = false;
 
 const tutorialesPorSeccion = {
   inicio: [
@@ -832,7 +833,7 @@ function finalizarTutorial() {
   if (assistantBox) assistantBox.style.display = 'none';
   if (tutorialOverlay) tutorialOverlay.style.display = 'none';
   quitarResaltados();
-  audioAutomaticoActivo = false;  
+  audioAutomaticoActivo = false;
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 
@@ -848,7 +849,7 @@ function actualizarIconoPantalla(activo) {
     iconoAsistenteVoz.style.color = "#7bc143"; // Color verde opcional
   } else {
     iconoAsistenteVoz.className = "fa-solid fa-volume-xmark"; // Bocina con tachita de silenciado
-    iconoAsistenteVoz.style.color = "#666666"; // Gris neutro
+    iconoAsistenteVoz.style.color = "#666666"; // Gris silenciado
   }
 }
 
@@ -877,13 +878,18 @@ function mostrarPaso() {
   const paso = pasarela[pasoActual];
   if (assistantText) assistantText.textContent = paso.text;
 
+  // Visibilidad del botón Atrás
+  if (btnPrevStep) {
+    btnPrevStep.style.display = pasoActual > 0 ? 'inline-block' : 'none';
+  }
+
   const elTarget = document.getElementById(paso.elementId);
   if (elTarget) {
     elTarget.classList.add('highlight-step');
     elTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-// ACCIÓN AUTOMÁTICA: Si el usuario ya presionó la bocina una vez, habla solo al cambiar de paso
+  // REPRODUCCIÓN GENERAL: Habla de forma automática al cambiar de paso (Siguiente o Atrás)
   if (audioAutomaticoActivo) {
     setTimeout(() => {
       hablarTextoActual(paso.text);
@@ -900,9 +906,18 @@ if (btnNextStep) {
   });
 }
 
+if (btnPrevStep) {
+  btnPrevStep.addEventListener('click', () => {
+    if (pasoActual > 0) {
+      pasoActual--;
+      mostrarPaso();
+    }
+  });
+}
+
 if (btnSkipTutorial) btnSkipTutorial.addEventListener('click', finalizarTutorial);
 
-// CONTROL DE SONIDO: Alterna entre activo y tachado en un solo botón
+// Bocina general: Enciende o apaga el modo de voz
 if (btnVoiceRead) {
   btnVoiceRead.addEventListener('click', () => {
     if (!audioAutomaticoActivo) {
@@ -916,6 +931,13 @@ if (btnVoiceRead) {
       actualizarIconoPantalla(false);
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     } 
+  });
+}
+
+// Botón de Replay manual: Salta la restricción del historial y fuerza la lectura si el usuario lo pide
+if (btnReplayManual) {
+  btnReplayManual.addEventListener('click', () => {
+    if (assistantText) hablarTextoActual(assistantText.textContent);
   });
 }
 
