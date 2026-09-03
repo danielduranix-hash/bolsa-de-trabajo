@@ -119,7 +119,14 @@ const modalLogin = document.getElementById('modalLogin');
    2. LÓGICA AL CARGAR EL DOM
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
+  const correoGuardado = localStorage.getItem('correoRecordado');
+  const inputCorreo = document.getElementById('loginCorreo');
+  const checkRecordar = document.getElementById('checkRecordar');
 
+  if (correoGuardado && inputCorreo) {
+    inputCorreo.value = correoGuardado;
+    if (checkRecordar) checkRecordar.checked = true;
+  }
   /* ------------------------------------------------------------------------
      Navegación por Pestañas del Perfil
      ------------------------------------------------------------------------ */
@@ -401,9 +408,6 @@ function actualizarUIAutenticacion() {
   }
 }
 
-// Ejecutar UI inicial al cargar
-actualizarUIAutenticacion();
-
   // Ejecutar al cargar la página por primera vez
   actualizarUIAutenticacion();
 
@@ -652,12 +656,6 @@ window.addEventListener('click', (e) => {
   if (e.target === modalPerfil) modalPerfil.style.display = 'none';
 });
 
-
-
-/* ==========================================
-   5.4 Peticiones HTTP (Login, Guardar Perfil, Salir)
-   ========================================== */
-
 /* ==========================================
    5.4 Peticiones HTTP (Login)
    ========================================== */
@@ -665,8 +663,13 @@ window.addEventListener('click', (e) => {
 if (formLogin) {
   formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const correo = document.getElementById('loginCorreo')?.value;
-    const password = document.getElementById('loginPassword')?.value;
+    const inputCorreo = document.getElementById('loginCorreo');
+    const inputPassword = document.getElementById('loginPassword');
+    const checkRecordar = document.getElementById('checkRecordar');
+
+    const correo = inputCorreo?.value;
+    const password = inputPassword?.value;
+    const recordar = checkRecordar?.checked;
 
     try {
       const respuesta = await fetch('http://localhost:3000/api/login', {
@@ -676,10 +679,36 @@ if (formLogin) {
       });
 
       const datos = await respuesta.json();
-      console.log('Respuesta del backend:', respuesta.status, datos); // <--- AÑADE ESTA LÍNEA
+
+
+console.log('Respuesta del backend:', respuesta.status, datos);
+
       if (respuesta.ok && (datos.exito || datos.usuario)) {
         const usuarioObtenido = datos.usuario || datos;
 
+        // 1. Guardar o remover el correo según el checkbox (Solo si el login fue exitoso)
+        if (recordar && correo) {
+          localStorage.setItem('correoRecordado', correo);
+        } else {
+          localStorage.removeItem('correoRecordado');
+        }
+
+        // 2. Notificar al navegador para ofrecer guardar la contraseña
+        if (window.PasswordCredential && inputCorreo && inputPassword) {
+          try {
+            const credencial = new PasswordCredential({
+              id: correo,
+              password: password,
+              name: usuarioObtenido.nombre || correo
+            });
+            navigator.credentials.store(credencial);
+          } catch (err) {
+            console.log('El navegador gestionará el autocompletado mediante el formulario.');
+          }
+        }
+
+
+        // 2. Guardar sesión
         localStorage.setItem('usuarioActivo', JSON.stringify(usuarioObtenido));
         usuarioActivo = usuarioObtenido;
 
@@ -690,7 +719,13 @@ if (formLogin) {
         actualizarUIAutenticacion();
 
         alert(`¡Bienvenido/a, ${usuarioObtenido.nombre || 'Usuario'}!`);
-        formLogin.reset();
+
+        // 3. Limpiar ÚNICAMENTE la contraseña para no perder el correo recordado
+        if (inputPassword) inputPassword.value = '';
+
+        // 4. Si NO marcó recordar correo, entonces sí limpiamos el campo de correo
+        if (!recordar && inputCorreo) inputCorreo.value = '';
+
         if (modalLogin) modalLogin.style.display = 'none';
 
       } else {
@@ -702,7 +737,6 @@ if (formLogin) {
     }
   });
 }
-
 // Submit Formulario de Perfil (Guardar Cambios PUT)
 if (formPerfil) {
   formPerfil.addEventListener('submit', async (e) => {
