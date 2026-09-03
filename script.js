@@ -1066,16 +1066,6 @@ window.toggleNavegacionTeclado = () => toggleClase('navegacion-teclado', 'navega
 window.toggleModoLectura = () => toggleClase('modo-lectura', 'modoLectura');
 window.toggleResaltarTitulos = () => toggleClase('resaltar-titulos', 'resaltarTitulos');
 
-// Saltar al contenido
-window.saltarContenido = () => {
-  const main = document.querySelector('main');
-  if (main) {
-    main.setAttribute('tabindex', '-1');
-    main.focus();
-    main.scrollIntoView({ behavior: 'smooth' });
-  }
-};
-
 // ==========================================
 // LECTOR DE PANTALLA (Web Speech API)
 // ==========================================
@@ -1161,7 +1151,6 @@ document.querySelectorAll('.btn-toggle').forEach(btn => {
       'navegacionTeclado': window.toggleNavegacionTeclado,
       'modoLectura': window.toggleModoLectura,
       'resaltarTitulos': window.toggleResaltarTitulos,
-      'saltarContenido': window.saltarContenido
     };
     if (funciones[accion]) funciones[accion]();
   });

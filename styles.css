@@ -1948,7 +1948,7 @@ body.modo-oscuro .checkbox-label {
 .panel-accesibilidad *,
 body:not(.panel-accesibilidad) .panel-accesibilidad,
 body:not(.panel-accesibilidad) .panel-accesibilidad * {
-  font-size: 1rem !important; /* Tamaño fijo, no hereda del body */
+  font-size: 1.25rem !important; /* Tamaño fijo, no hereda del body */
 }
 
 /* 2. El panel NO se ve afectado por "Botones grandes" */
@@ -2046,14 +2046,7 @@ body:not(.panel-accesibilidad) .panel-accesibilidad .section-title {
   padding: 0 !important;
 }
 
-/* 8. El panel NO se ve afectado por "Navegación por teclado" (mantiene su propio foco) */
-.panel-accesibilidad *:focus,
-body:not(.panel-accesibilidad) .panel-accesibilidad *:focus {
-  outline: 2px solid #0d3c75 !important;
-  outline-offset: 2px !important;
-}
-
-/* 9. El panel NO se ve afectado por "Texto fácil" (Atkinson Hyperlegible) */
+/* 8. El panel NO se ve afectado por "Texto fácil" (Atkinson Hyperlegible) */
 .panel-accesibilidad,
 .panel-accesibilidad *,
 body:not(.panel-accesibilidad) .panel-accesibilidad,
@@ -2073,4 +2066,5 @@ body:not(.panel-accesibilidad) .panel-accesibilidad * {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+}
 }
