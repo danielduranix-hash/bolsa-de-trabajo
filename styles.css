@@ -2062,6 +2062,7 @@ body:not(.panel-accesibilidad) .panel-accesibilidad * {
   line-height: normal !important;
   letter-spacing: normal !important;
   word-spacing: normal !important;
+}
 /* Estado oculto por defecto */
 .modal {
   display: none; 
