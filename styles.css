@@ -1511,12 +1511,6 @@ body.modo-oscuro .checkbox-label {
   padding: 0 8px !important;
 }
 
-/* Navegación por teclado */
-.navegacion-teclado *:focus {
-  outline: 3px solid #ff0 !important;
-  outline-offset: 2px !important;
-}
-
 /* ==========================================
    Solución específica para el Botón de Accesibilidad
    ========================================== */
@@ -2067,4 +2061,59 @@ body:not(.panel-accesibilidad) .panel-accesibilidad * {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
 }
+
+/* ==========================================
+   AISLAR EL BOTÓN DE ACCESIBILIDAD FLOTANTE
+   ========================================== */
+
+/* 1. El botón NO cambia de tamaño con "Botones grandes" */
+.botones-grandes .btn-accesibilidad-flotante,
+.botones-grandes .btn-accesibilidad-flotante *,
+body.texto-facil .btn-accesibilidad-flotante,
+body.texto-facil .btn-accesibilidad-flotante * {
+  font-size: 2rem !important; /* Tamaño original del icono */
+  width: 60px !important;
+  height: 60px !important;
+  min-height: 60px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  line-height: normal !important;
+}
+
+/* 2. El botón NO cambia la tipografía con "Lectura fácil" */
+body.texto-facil .btn-accesibilidad-flotante,
+body.texto-facil .btn-accesibilidad-flotante * {
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-weight: 900 !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+}
+
+/* 3. El botón mantiene su posición y orden interno */
+.btn-accesibilidad-flotante {
+  position: fixed !important;
+  bottom: 80px !important;
+  right: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: row !important;
+  z-index: 9999 !important;
+}
+
+.btn-accesibilidad-flotante i,
+.btn-accesibilidad-flotante .fas,
+.btn-accesibilidad-flotante .fa-universal-access {
+  display: inline-block !important;
+  order: initial !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 4. El botón NO se ve afectado por "Alto contraste" */
+.alto-contraste .btn-accesibilidad-flotante,
+.alto-contraste .btn-accesibilidad-flotante * {
+  background: #0d3c75 !important;
+  color: #ffffff !important;
+  border: none !important;
 }

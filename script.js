@@ -1062,7 +1062,6 @@ window.toggleModoOscuro = () => {
 window.toggleSubrayar = () => toggleClase('subrayar-enlaces', 'subrayarEnlaces');
 window.toggleLecturaFacil = () => toggleClase('texto-facil', 'textofacil'); 
 window.toggleBotonesGrandes = () => toggleClase('botones-grandes', 'botonesGrandes');
-window.toggleNavegacionTeclado = () => toggleClase('navegacion-teclado', 'navegacionTeclado');
 window.toggleModoLectura = () => toggleClase('modo-lectura', 'modoLectura');
 window.toggleResaltarTitulos = () => toggleClase('resaltar-titulos', 'resaltarTitulos');
 
@@ -1148,7 +1147,6 @@ document.querySelectorAll('.btn-toggle').forEach(btn => {
       'subrayarEnlaces': window.toggleSubrayar,
       'lecturaFacil': window.toggleLecturaFacil,
       'botonesGrandes': window.toggleBotonesGrandes,
-      'navegacionTeclado': window.toggleNavegacionTeclado,
       'modoLectura': window.toggleModoLectura,
       'resaltarTitulos': window.toggleResaltarTitulos,
     };
@@ -1179,7 +1177,6 @@ function restaurarAccesibilidad() {
     'subrayarEnlaces': 'subrayar-enlaces',
     'lecturaFacil': 'texto-facil', 
     'botonesGrandes': 'botones-grandes',
-    'navegacionTeclado': 'navegacion-teclado',
     'modoLectura': 'modo-lectura',
     'resaltarTitulos': 'resaltar-titulos'
   };
