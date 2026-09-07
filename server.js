@@ -321,42 +321,33 @@ app.put('/api/perfil/:curp', async (req, res) => {
 // ============================================================================
 // ENDPOINTS DE ADMINISTRACIÓN (Usan poolBolsa)
 // ============================================================================
+// GET: OBTENER TODOS LOS CIUDADANOS
+app.get('/api/admin/ciudadanos', async (req, res) => {
+  try {
+    const result = await poolBolsa.query('SELECT * FROM public.usuarios ORDER BY curp DESC');
 
-// DELETE: ELIMINAR USUARIO (Exclusivo para Super Administrador)
-app.delete('/api/usuarios/:curp', async (req, res) => {
-  const { rolSolicitante } = req.body;
+    const usuarios = result.rows.map(u => ({
+      id: u.curp || u.id,
+      curp: u.curp || '',
+      folio: u.credencial_folio || u.folio || u.curp || 'S/N',
+      correo: u.correo || 'Sin correo',
+      nombre: u.nombre || '',
+      primer_apellido: u.primer_apellido || u.paterno || '',
+      segundo_apellido: u.segundo_apellido || u.materno || '',
+      anotaciones: u.anotaciones || '',
+      activo: u.activo !== false,
+      disponible: u.disponible !== false
+    }));
 
-  // 1. Validar que la petición venga de un superadmin
-  if (rolSolicitante !== 'superadmin') {
-    return res.status(403).json({ 
+    return res.status(200).json(usuarios);
+  } catch (error) {
+    console.error('🔴 Error en base de datos:', error.message);
+    return res.status(500).json({ 
       exito: false, 
-      mensaje: 'Acceso denegado: Se requieren permisos de Super Administrador.' 
+      mensaje: `Error en la base de datos: ${error.message}` 
     });
   }
-
-  const curpLimpia = (req.params.curp || '').trim().toUpperCase();
-
-  if (!curpLimpia) {
-    return res.status(400).json({ exito: false, mensaje: 'CURP requerida.' });
-  }
-
-  try {
-    const result = await poolBolsa.query(
-      'DELETE FROM usuarios WHERE LOWER(TRIM(curp)) = LOWER(TRIM($1)) RETURNING curp', 
-      [curpLimpia]
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ exito: false, mensaje: 'Usuario no encontrado para eliminar.' });
-    }
-
-    res.json({ exito: true, mensaje: `Usuario con CURP ${curpLimpia} eliminado correctamente.` });
-  } catch (error) {
-    console.error('🔴 Error al eliminar usuario:', error);
-    res.status(500).json({ exito: false, mensaje: 'Error al eliminar usuario en la base de datos.' });
-  }
 });
-
 // ============================================================================
 // ENDPOINTS DEL GENERADOR DE CV CON IA (Usarán poolCV)
 // ============================================================================
