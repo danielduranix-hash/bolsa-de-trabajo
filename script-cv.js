@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ==========================================
   // 1. DICCIONARIOS Y CONFIGURACIÓN GLOBAL
-  // ==========================================
+
   const traducciones = {
     es: { 
       exp: "Experiencia Laboral", 
@@ -45,9 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const STORAGE_KEY = 'cv_builder_draft';
 
-  // ==========================================
   // 2. SISTEMA DE NAVEGACIÓN Y PASOS
-  // ==========================================
   let pasoActual = 1;
   const totalPasos = 7;
 
@@ -136,9 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ==========================================
   // 3. ACTUALIZACIÓN EN VIVO (VISTA PREVIA)
-  // ==========================================
   const idiomaCvSelect = document.getElementById('idiomaCv');
   const inputFechaNac = document.getElementById('fechaNacimiento');
   const pvFechaNac = document.getElementById('pvFechaNac');
@@ -202,24 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const fotoInput = document.getElementById('fotoInput');
-  if (fotoInput) {
-    fotoInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          const imgHTML = `<img src="${evt.target.result}" alt="Foto CV" style="width:100%; height:100%; object-fit:cover;">`;
-          const prev = document.getElementById('photoPreview');
-          const pvCont = document.getElementById('pvPhotoContainer');
-          if (prev) prev.innerHTML = imgHTML;
-          if (pvCont) pvCont.innerHTML = imgHTML;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }
-
   if (idiomaCvSelect) {
     idiomaCvSelect.addEventListener('change', (e) => {
       const lang = e.target.value;
@@ -241,9 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ==========================================
   // 4. GESTIÓN DE IDIOMAS DINÁMICOS
-  // ==========================================
   const idiomasLista = document.getElementById('idiomasLista');
   const btnAgregarIdioma = document.getElementById('btnAgregarIdioma');
   const pvIdiomas = document.getElementById('pvIdiomas');
@@ -313,119 +288,69 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ==========================================
-
-  // 5. INTEGRACIÓN CON BACKEND IA (FASTAPI / GROQ)
-
-  // ==========================================
-
+  // 5. INTEGRACIÓN CON BACKEND IA (FASTAPI / GROQ) CON MENSAJE INFORMATIVO
   document.querySelectorAll('.btn-ai, .btn-ia, [data-ai="true"]').forEach(button => {
-
     button.addEventListener('click', async (e) => {
-
       e.preventDefault();
-
-
-
       const targetId = button.getAttribute('data-target') || 'experienciaTexto';
-
       const seccion = button.getAttribute('data-seccion') || 'experiencia';
-
       const targetTextarea = document.getElementById(targetId);
-
-
-
       if (!targetTextarea) return;
-
-
-
       const textoOriginal = targetTextarea.value.trim();
 
       if (!textoOriginal) {
-
         alert("Escribe algo en la casilla antes de optimizar con IA.");
-
         return;
-
       }
 
+      // Mensaje de confirmación/aviso sobre el uso de IA
+      const confirmarIA = confirm(
+        "💡 Nota importante sobre el asistente IA:\n\n" +
+        "La optimización generada sirve como una base o sugerencia profesional. " +
+        "Te recomendamos revisar el contenido y realizar los cambios o ajustes finales que consideres necesarios para reflejar fielmente tu experiencia.\n\n" +
+        "¿Deseas continuar?"
+      );
 
+      if (!confirmarIA) return;
 
       const textoBotonOriginal = button.innerText;
-
       button.disabled = true;
-
       button.innerText = "✨ Optimizando...";
 
-
-
       try {
-
         const lang = document.getElementById('idiomaCv')?.value || 'es';
-
         const response = await fetch("http://127.0.0.1:8000/api/mejorar-cv", {
-
           method: "POST",
-
           headers: { "Content-Type": "application/json" },
-
           body: JSON.stringify({
-
             texto: textoOriginal,
-
             seccion: seccion,
-
             idioma: lang
-
           })
-
         });
 
-
-
         const data = await response.json();
-
-
-
         if (response.ok) {
-
           targetTextarea.value = data.resultado;
 
           // Actualizar vista previa y guardar
-
           targetTextarea.dispatchEvent(new Event('input'));
-
           targetTextarea.dispatchEvent(new Event('change'));
-
           guardarProgreso();
-
         } else {
-
           alert("Error de Servidor: " + (data.detail || "No se pudo optimizar el texto."));
-
         }
-
       } catch (err) {
-
         console.error("Error al conectar con la API:", err);
-
         alert("No se pudo conectar con el servidor local (http://127.0.0.1:8000). Asegúrate de que FastAPI esté activo.");
-
       } finally {
-
         button.disabled = false;
-
         button.innerText = textoBotonOriginal;
-
       }
-
     });
-
   });
 
-  // ==========================================
   // 6. PLANTILLAS Y DESCARGA EN PDF
-  // ==========================================
   const cvPaper = document.getElementById('cvPaper');
   
   document.querySelectorAll('input[name="disenoCv"]').forEach(radio => {
@@ -560,9 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ==========================================
   // 8. PERSISTENCIA DE DATOS (LOCALSTORAGE)
-  // ==========================================
   function guardarProgreso() {
     const arregloIdiomas = [];
     document.querySelectorAll('.idioma-row').forEach(row => {

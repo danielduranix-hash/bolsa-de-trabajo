@@ -27,27 +27,27 @@
         <div class="position-sticky pt-3">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link active fw-bold text-dark" href="#" onclick="cambiarSeccionAdmin('empresas')">
+              <a class="nav-link text-dark" href="#" onclick="event.preventDefault(); cambiarSeccionAdmin('empresas')">
                 <i class="bi bi-building me-2"></i>Empresas
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-dark" href="#" onclick="cambiarSeccionAdmin('vacantes')">
+              <a class="nav-link text-dark" href="#" onclick="event.preventDefault(); cambiarSeccionAdmin('vacantes')">
                 <i class="bi bi-briefcase me-2"></i>Vacantes
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-dark" href="#" onclick="cambiarSeccionAdmin('ciudadania')">
+              <a class="nav-link text-dark" href="#" onclick="event.preventDefault(); cambiarSeccionAdmin('ciudadania')">
                 <i class="bi bi-people me-2"></i>Ciudadanía
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-dark" href="#" onclick="cambiarSeccionAdmin('postulaciones')">
+              <a class="nav-link text-dark" href="#" onclick="event.preventDefault(); cambiarSeccionAdmin('postulaciones')">
                 <i class="bi bi-file-earmark-text me-2"></i>Postulaciones
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-dark" href="#" onclick="cambiarSeccionAdmin('catalogos')">
+              <a class="nav-link text-dark" href="#" onclick="event.preventDefault(); cambiarSeccionAdmin('catalogos')">
                 <i class="bi bi-folder me-2"></i>Catálogos
               </a>
             </li>
@@ -58,13 +58,13 @@
       <!-- Área Principal de Contenido -->
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
         <div id="admin-contenido">
-          <h2>Módulo de Vacantes</h2>
-          <p>Selecciona una opción de la barra lateral.</p>
+          <h2>Cargando módulo...</h2>
         </div>
       </main>
     </div>
   </div>
 
+  <!-- RUTA CORREGIDA: Apunta a admin.js directamente en la raíz -->
   <script src="admin.js"></script>
 </body>
 </html>

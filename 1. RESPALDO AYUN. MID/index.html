@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bolsa de Trabajo Municipal | Conectando talento con oportunidades</title>
+
+  <!-- Tailwind CSS v3 -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0d3c75',
+              deep: '#0a2a52',
+              blue: '#1e3a8a',
+              sky: '#38bdf8',
+              emerald: '#10b981',
+              greenLight: '#48bb78',
+              accentGreen: '#70be3b',
+              amber: '#f59e0b',
+              softBg: '#f8fafc'
+            }
+          },
+          borderRadius: {
+            '4xl': '2rem',
+            '5xl': '2.5rem'
+          },
+          boxShadow: {
+            'soft-xl': '0 20px 40px -15px rgba(13, 60, 117, 0.08)',
+            'glow-emerald': '0 10px 25px -5px rgba(16, 185, 129, 0.35)',
+            'glow-blue': '0 10px 25px -5px rgba(13, 60, 117, 0.35)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet CSS para el Mapa -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <!-- FontAwesome para compatibilidad de iconos existentes y panel de accesibilidad -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Archivo de Estilos Principal -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen flex flex-col relative antialiased bg-slate-50 text-slate-800">
+
+  <!-- ==========================================
+        ENCABEZADO PRINCIPAL (NAVBAR)
+        ========================================== -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 w-full">
+      <!-- Identidad / Logo -->
+      <div class="logo-container flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-brand-navy to-brand-blue flex items-center justify-center text-white shadow-md shadow-brand-navy/20">
+          <i class="w-6 h-6" data-lucide="briefcase"></i>
+        </div>
+        <div class="logo-title">
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-brand-navy leading-tight">Bolsa de Trabajo Municipal</h1>
+          <p class="text-xs sm:text-sm font-medium text-slate-500">Conectando talento con oportunidades</p>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="header-buttons flex items-center gap-2.5 sm:gap-4">
+        <!-- Botón GeoPortal -->
+        <button id="btnEmpleos" class="btn-empleos inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-navy text-white text-sm font-semibold tracking-wide hover:bg-brand-deep transition-all shadow-md shadow-brand-navy/25 hover:shadow-lg">
+          <i class="w-4 h-4 text-emerald-400" data-lucide="map-pin"></i>
+          <span>GeoPortal de Empleos</span>
+        </button>
+
+        <!-- Botón Sin Sesión (Login) -->
+        <button id="btnUserAuth" class="btn-user-auth inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 hover:border-brand-navy/30 text-sm font-semibold transition-all" title="Mi Cuenta / Acceso">
+          <i class="w-4 h-4 text-brand-navy" data-lucide="user"></i>
+          <span>Ingresar</span>
+        </button>
+
+        <!-- Menú Desplegable con Sesión Iniciada -->
+        <div class="user-menu-wrapper relative inline-flex items-center" id="userMenuContainer" style="display: none;">
+          <button id="btnToggleUserMenu" type="button" class="btn-user-menu-trigger inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-navy/20 bg-blue-50/50 text-brand-navy font-bold text-sm hover:bg-blue-100/50 transition-all">
+            <span>Menú</span>
+            <i class="w-4 h-4" data-lucide="menu"></i>
+          </button>
+
+          <!-- Dropdown Card -->
+          <div class="user-menu-card" id="userDropdownMenu">
+            <div class="user-card-header">
+              <h2>Hola</h2>
+              <span id="dropdownNombre" class="user-card-name">Cargando...</span>
+              <span id="dropdownCorreo" class="user-card-email">correo@ejemplo.com</span>
+            </div>
+
+            <div class="user-card-body">
+              <button id="btnVistaAdminMenu" class="user-card-btn admin-btn" style="display: none;">
+                <i class="w-4 h-4" data-lucide="shield-alert"></i>
+                <span>Administrador</span>
+              </button>
+
+              <button id="btnMiPerfilMenu" class="user-card-btn">
+                <i class="w-4 h-4" data-lucide="user"></i>
+                <span>Mi perfil</span>
+              </button>
+
+              <button id="btnPostulacionesMenu" class="user-card-btn">
+                <i class="w-4 h-4" data-lucide="file-check"></i>
+                <span>Postulaciones</span>
+              </button>
+
+              <button id="btnCartaCompromisoMenu" class="user-card-btn">
+                <i class="w-4 h-4" data-lucide="file-text"></i>
+                <span>Carta compromiso</span>
+              </button>
+
+              <button id="btnCambiarPasswordMenu" class="user-card-btn">
+                <i class="w-4 h-4" data-lucide="key"></i>
+                <span>Cambiar contraseña</span>
+              </button>
+
+              <button id="btnCerrarSesionMenu" class="user-card-btn logout-btn">
+                <i class="w-4 h-4" data-lucide="log-out"></i>
+                <span>Cerrar sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón Ayuda / Tutorial -->
+        <button id="btnHelp" class="btn-help w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-brand-navy hover:bg-slate-100 transition-colors" title="Ayuda y Tutorial" aria-label="Ayuda y Tutorial">
+          <i class="w-5 h-5" data-lucide="help-circle"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+        VISTA 1: INICIO / LANDING PAGE
+        ========================================== -->
+  <main id="vistaInicio">
+    <!-- Hero Section Juvenil -->
+    <section class="relative pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden bg-gradient-to-b from-blue-50/60 via-slate-50 to-white">
+      <div class="absolute -top-24 -left-20 w-96 h-96 bg-brand-sky/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute top-1/2 -right-24 w-96 h-96 bg-emerald-200/25 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs sm:text-sm font-bold tracking-wide uppercase mb-6 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          Plataforma Laboral Juvenil
+        </div>
+        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-brand-navy tracking-tight leading-[1.15] mb-6">
+          Tu futuro profesional <br class="hidden sm:inline"/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-navy via-brand-blue to-emerald-600">
+            comienza aquí y ahora
+          </span>
+        </h2>
+        <p class="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-slate-600 font-normal leading-relaxed mb-10">
+          Empresas verificadas del municipio buscan talento joven como el tuyo. Conecta con vacantes de medio tiempo, prácticas y tu primer trabajo formal sin trabas burocráticas.
+        </p>
+
+        <!-- Buscador Rápido -->
+        <div class="bg-white p-3 sm:p-4 rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-100 max-w-3xl mx-auto mb-8">
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <div class="flex items-center gap-3 w-full px-4 py-3 bg-slate-50/80 rounded-2xl border border-transparent focus-within:border-brand-sky focus-within:bg-white transition-all">
+              <i class="w-5 h-5 text-slate-400" data-lucide="search"></i>
+              <input class="bg-transparent border-0 p-0 text-slate-800 placeholder:text-slate-400 text-sm sm:text-base focus:ring-0 w-full outline-none" placeholder="Puesto, habilidad o carrera..." type="text"/>
+            </div>
+            <button onclick="document.getElementById('btnEmpleos').click()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-brand-navy hover:bg-brand-deep text-white font-bold text-sm sm:text-base tracking-wide transition-all shadow-md shadow-brand-navy/30 hover:shadow-xl flex items-center justify-center gap-2 whitespace-nowrap">
+              <span>Explorar Mapa</span>
+              <i class="w-4 h-4" data-lucide="arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm font-semibold">
+          <span class="text-slate-400 text-xs uppercase tracking-wider mr-1">Tendencias:</span>
+          <span class="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 shadow-2xs">#PrimerEmpleo</span>
+          <span class="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 shadow-2xs">#Tecnología</span>
+          <span class="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 shadow-2xs">#MedioTiempo</span>
+          <span class="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 shadow-2xs">#Prácticas</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portal del Empleador (Hero Empresas) -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4" id="heroEmpresas">
+      <div class="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200/80 bg-slate-900">
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-deep/95 via-brand-navy/90 to-brand-navy/75 z-10"></div>
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="relative z-20 px-6 sm:px-12 py-10 md:py-12 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          <div class="flex flex-col md:flex-row items-center gap-6 max-w-2xl">
+            <div class="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center text-emerald-400 shadow-inner shrink-0">
+              <i class="w-8 h-8" data-lucide="briefcase"></i>
+            </div>
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold uppercase tracking-wider mb-2">
+                Empresas &amp; Negocios
+              </div>
+              <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Portal del Empleador</h3>
+              <p class="text-slate-200 text-sm sm:text-base mt-1.5 font-light">
+                Publica vacantes y gestiona solicitudes de forma ágil e intuitiva. Encuentra al talento municipal más calificado.
+              </p>
+            </div>
+          </div>
+          <div class="shrink-0">
+            <button class="btn-accede inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-brand-accentGreen hover:bg-emerald-500 text-white font-bold text-sm sm:text-base tracking-wide transition-all shadow-lg hover:shadow-emerald-600/30 hover:scale-105 active:scale-95">
+              <span>Acceder como Empresa</span>
+              <i class="w-4 h-4" data-lucide="arrow-up-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Banner Crea tu CV con IA -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" id="bannerCV">
+      <div class="cv-banner-card rounded-4xl bg-white border border-slate-200/80 p-6 sm:p-10 lg:p-12 shadow-soft-xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div class="cv-banner-image lg:col-span-6 order-2 lg:order-1">
+          <div class="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-100 group">
+            <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80" alt="Crear Curriculum Vitae" class="w-full h-80 sm:h-96 object-cover object-left-bottom transform group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl shadow-md border border-slate-100 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span class="text-xs font-bold text-slate-800">IA Activa v2.4</span>
+            </div>
+            <div class="absolute bottom-4 right-4 bg-brand-navy/90 text-white px-4 py-2 rounded-xl text-xs font-semibold backdrop-blur-sm">
+              ✨ Plantillas Municipales Validadas
+            </div>
+          </div>
+        </div>
+        <div class="cv-banner-content lg:col-span-6 order-1 lg:order-2 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-brand-navy text-xs font-bold tracking-wide uppercase">
+            <i class="w-3.5 h-3.5 text-blue-500" data-lucide="sparkles"></i>
+            Asistente Inteligente
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-black text-brand-navy tracking-tight leading-tight">¿Necesitas ayuda con tu currículum?</h2>
+          <p class="text-slate-600 text-base sm:text-lg leading-relaxed">Genera un CV profesional adaptado a las vacantes del municipio utilizando nuestro asistente inteligente.</p>
+          <ul class="space-y-3 font-medium text-slate-700 text-sm sm:text-base">
+            <li class="flex items-center gap-3">
+              <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                <i class="w-3.5 h-3.5 stroke-[3]" data-lucide="check"></i>
+              </div>
+              <span>Optimizado con Inteligencia Artificial según el puesto</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                <i class="w-3.5 h-3.5 stroke-[3]" data-lucide="check"></i>
+              </div>
+              <span>Formato 100% compatible con filtros de reclutamiento (ATS)</span>
+            </li>
+          </ul>
+          <div class="pt-2">
+            <a href="cv-ia.html" target="_blank" class="btn-crear-cv pill-pulse inline-flex items-center gap-3 px-8 py-4 rounded-full bg-brand-navy hover:bg-brand-deep text-white font-bold text-base transition-all shadow-glow-blue hover:scale-105 active:scale-95">
+              <i class="w-5 h-5 text-emerald-400" data-lucide="file-badge"></i>
+              <span>Crear mi CV con IA</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección Espacio Ciudadano -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14" id="gridCiudadano">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <h2 class="section-title text-2xl sm:text-3xl md:text-4xl font-black text-brand-navy tracking-tight uppercase">Espacio Ciudadano</h2>
+        <div class="flex items-center justify-center gap-1.5 mt-3 mb-4">
+          <span class="w-3 h-1.5 rounded-full bg-brand-navy"></span>
+          <span class="w-3 h-1.5 rounded-full bg-brand-amber"></span>
+          <span class="w-3 h-1.5 rounded-full bg-brand-emerald"></span>
+        </div>
+        <p class="text-slate-500 text-sm sm:text-base">Herramientas rápidas y gratuitas para acelerar tu vinculación con el sector productivo local.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <div class="card bg-white rounded-3xl p-8 border border-slate-100 shadow-soft-xl card-hover-effect flex flex-col items-center text-center group cursor-pointer">
+          <div class="w-20 h-20 rounded-full border-2 border-brand-sky/40 bg-blue-50/60 flex items-center justify-center text-brand-navy group-hover:scale-110 group-hover:bg-brand-sky/20 transition-all duration-300 mb-6 shadow-inner">
+            <i class="w-9 h-9 text-brand-navy" data-lucide="search"></i>
+          </div>
+          <h3 class="text-xl font-bold text-brand-navy mb-3 group-hover:text-brand-blue transition-colors">Consulta Vacantes</h3>
+          <p class="text-slate-500 text-sm leading-relaxed mb-6">Explora ofertas laborales locales ajustadas a tu perfil e intereses.</p>
+          <span class="mt-auto inline-flex items-center gap-1 text-sm font-bold text-brand-navy group-hover:text-emerald-600 transition-colors">
+            Ver ofertas activas <i class="w-4 h-4" data-lucide="chevron-right"></i>
+          </span>
+        </div>
+
+        <div class="card bg-white rounded-3xl p-8 border border-slate-100 shadow-soft-xl card-hover-effect flex flex-col items-center text-center group cursor-pointer">
+          <div class="w-20 h-20 rounded-full border-2 border-brand-amber/40 bg-amber-50/60 flex items-center justify-center text-brand-amber group-hover:scale-110 group-hover:bg-amber-100/60 transition-all duration-300 mb-6 shadow-inner">
+            <i class="w-9 h-9 text-brand-amber" data-lucide="file-text"></i>
+          </div>
+          <h3 class="text-xl font-bold text-brand-navy mb-3 group-hover:text-brand-amber transition-colors">Sube tu CV</h3>
+          <p class="text-slate-500 text-sm leading-relaxed mb-6">Permite que las mejores empresas encuentren tu perfil rápidamente.</p>
+          <span class="mt-auto inline-flex items-center gap-1 text-sm font-bold text-brand-navy group-hover:text-brand-amber transition-colors">
+            Registrar documento <i class="w-4 h-4" data-lucide="chevron-right"></i>
+          </span>
+        </div>
+
+        <div class="card bg-white rounded-3xl p-8 border border-slate-100 shadow-soft-xl card-hover-effect flex flex-col items-center text-center group cursor-pointer">
+          <div class="w-20 h-20 rounded-full border-2 border-pink-400/40 bg-pink-50/60 flex items-center justify-center text-pink-600 group-hover:scale-110 group-hover:bg-pink-100/60 transition-all duration-300 mb-6 shadow-inner">
+            <i class="w-9 h-9 text-pink-600" data-lucide="rocket"></i>
+          </div>
+          <h3 class="text-xl font-bold text-brand-navy mb-3 group-hover:text-pink-600 transition-colors">Impulsa tu Carrera</h3>
+          <p class="text-slate-500 text-sm leading-relaxed mb-6">Accede a programas de capacitación y jornadas de contratación directas.</p>
+          <span class="mt-auto inline-flex items-center gap-1 text-sm font-bold text-brand-navy group-hover:text-pink-600 transition-colors">
+            Descubrir talleres <i class="w-4 h-4" data-lucide="chevron-right"></i>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: Agenda Municipal con Calendarios Desplegables -->
+    <section id="seccionCalendario" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <h2 class="section-title text-2xl sm:text-3xl md:text-4xl font-black text-brand-navy tracking-tight uppercase">Agenda Municipal de Empleo</h2>
+        <p class="section-subtitle text-slate-500 text-sm sm:text-base mt-2">Haz clic sobre una categoría para desplegar su calendario de eventos</p>
+      </div>
+
+      <div class="sectores-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- 1. Día del empleo -->
+        <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer transition-all hover:-translate-y-1" data-sector="diaEmpleo">
+          <div class="sector-header cat-dia-empleo bg-blue-100/70 rounded-2xl p-3.5 flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">☀️</span>
+              <h3 class="font-bold text-brand-navy text-sm">Día del empleo</h3>
+            </div>
+            <span class="badge-count bg-white/90 text-brand-navy font-bold text-xs px-2.5 py-1 rounded-full shadow-2xs">2 Fechas</span>
+          </div>
+          <p class="sector-desc text-slate-500 text-xs leading-relaxed">Jornadas semanales de vinculación directa entre postulantes y empresas en la cabecera municipal.</p>
+          
+          <div class="dropdown-calendar">
+            <div class="calendar-widget">
+              <div class="calendar-top">
+                <span class="cal-month">Agosto 2026</span>
+                <div class="cal-nav"><span>▲</span><span>▼</span></div>
+              </div>
+              <div class="calendar-days-header">
+                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+              </div>
+              <div class="calendar-days-grid">
+                <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
+                <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                <span>16</span><span>17</span><span class="active-today">18</span><span>19</span><span>20</span><span>21</span><span class="event-day" title="Atención en Palacio Municipal (09:00 AM - 02:00 PM)">22</span>
+                <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span>
+                <span>30</span><span>31</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span><span class="muted font-event" title="Módulo Central de Contratación (08:30 AM - 01:30 PM)">4</span><span class="muted">5</span>
+              </div>
+            </div>
+            <div class="event-summary">
+              <strong>📍 Próxima fecha:</strong> 22 de Agosto - Atención en Palacio Municipal (09:00 AM - 02:00 PM)
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Módulo móvil -->
+        <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer transition-all hover:-translate-y-1" data-sector="moduloMovil">
+          <div class="sector-header cat-modulo-movil bg-amber-100/60 rounded-2xl p-3.5 flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🚐</span>
+              <h3 class="font-bold text-amber-900 text-sm">Módulo móvil</h3>
+            </div>
+            <span class="badge-count bg-white/90 text-amber-900 font-bold text-xs px-2.5 py-1 rounded-full shadow-2xs">2 Fechas</span>
+          </div>
+          <p class="sector-desc text-slate-500 text-xs leading-relaxed">Unidades itinerantes que acercan la bolsa de trabajo e información directa a tu colonia o comunidad.</p>
+          
+          <div class="dropdown-calendar">
+            <div class="calendar-widget">
+              <div class="calendar-top">
+                <span class="cal-month">Agosto 2026</span>
+                <div class="cal-nav"><span>▲</span><span>▼</span></div>
+              </div>
+              <div class="calendar-days-header">
+                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+              </div>
+              <div class="calendar-days-grid">
+                <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
+                <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                <span>16</span><span>17</span><span class="active-today">18</span><span>19</span><span>20</span><span>21</span><span>22</span>
+                <span>23</span><span>24</span><span>25</span><span class="event-day" title="Atención Móvil - Sector Norte (09:00 AM - 01:00 PM)">26</span><span>27</span><span>28</span><span>29</span>
+                <span>30</span><span>31</span><span class="muted">1</span><span class="muted font-event" title="Atención Móvil - Sector Poniente (09:30 AM - 02:00 PM)">2</span><span class="muted">3</span><span class="muted">4</span><span class="muted">5</span>
+              </div>
+            </div>
+            <div class="event-summary">
+              <strong>📍 Próxima fecha:</strong> 26 de Agosto - Sector Norte (09:00 AM - 01:00 PM)
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Feria del empleo -->
+        <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer transition-all hover:-translate-y-1" data-sector="feriaEmpleo">
+          <div class="sector-header cat-feria-empleo bg-purple-100/60 rounded-2xl p-3.5 flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🎪</span>
+              <h3 class="font-bold text-purple-900 text-sm">Feria del empleo</h3>
+            </div>
+            <span class="badge-count bg-white/90 text-purple-900 font-bold text-xs px-2.5 py-1 rounded-full shadow-2xs">1 Fecha</span>
+          </div>
+          <p class="sector-desc text-slate-500 text-xs leading-relaxed">Eventos masivos de reclutamiento presencial con participación de decenas de empresas líderes.</p>
+          
+          <div class="dropdown-calendar">
+            <div class="calendar-widget">
+              <div class="calendar-top">
+                <span class="cal-month">Septiembre 2026</span>
+                <div class="cal-nav"><span>▲</span><span>▼</span></div>
+              </div>
+              <div class="calendar-days-header">
+                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+              </div>
+              <div class="calendar-days-grid">
+                <span class="muted">30</span><span class="muted">31</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                <span>6</span><span>7</span><span>8</span><span>9</span><span class="event-day" title="Gran Feria Municipal del Empleo (08:00 AM - 03:00 PM)">10</span><span>11</span><span>12</span>
+                <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
+                <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span>
+                <span>27</span><span>28</span><span>29</span><span>30</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span>
+              </div>
+            </div>
+            <div class="event-summary">
+              <strong>📍 Próxima fecha:</strong> 10 de Septiembre - Gran Feria Municipal (08:00 AM - 03:00 PM)
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Capacitación -->
+        <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer transition-all hover:-translate-y-1" data-sector="capacitacion">
+          <div class="sector-header cat-capacitacion bg-emerald-100/60 rounded-2xl p-3.5 flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🎓</span>
+              <h3 class="font-bold text-emerald-900 text-sm">Capacitación</h3>
+            </div>
+            <span class="badge-count bg-white/90 text-emerald-900 font-bold text-xs px-2.5 py-1 rounded-full shadow-2xs">2 Fechas</span>
+          </div>
+          <p class="sector-desc text-slate-500 text-xs leading-relaxed">Talleres y cursos prácticos para mejorar tu currículum, preparar entrevistas y optimizar habilidades.</p>
+          
+          <div class="dropdown-calendar">
+            <div class="calendar-widget">
+              <div class="calendar-top">
+                <span class="cal-month">Agosto 2026</span>
+                <div class="cal-nav"><span>▲</span><span>▼</span></div>
+              </div>
+              <div class="calendar-days-header">
+                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+              </div>
+              <div class="calendar-days-grid">
+                <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
+                <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                <span>16</span><span>17</span><span class="active-today">18</span><span>19</span><span>20</span><span>21</span><span>22</span>
+                <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span class="event-day" title="Taller: Elaboración de CV impactante (10:00 AM - 12:00 PM)">28</span><span>29</span>
+                <span>30</span><span>31</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span><span class="muted">4</span><span class="muted">5</span>
+              </div>
+            </div>
+            <div class="event-summary">
+              <strong>📍 Próxima fecha:</strong> 28 de Agosto - Taller: Elaboración de CV (10:00 AM - 12:00 PM)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================
+        VISTA 2: GEOPORTAL DE EMPLEOS (MAPA)
+        ========================================== -->
+  <div id="vistaGeoPortal" class="geoportal-container" style="display: none;">
+    <div id="mapa" class="mapa-placeholder"></div>
+
+    <div class="filtro-box" id="filtroBox">
+      <div class="filtro-header" id="btnToggleFiltros">
+        <span>🔍 Filtros de Búsqueda</span>
+        <span class="arrow-down">▼</span>
+      </div>
+      <div class="filtro-body">
+        <div class="field-group">
+          <label>💼</label>
+          <input type="text" id="filtroPalabra" placeholder="Puesto, empresa o palabra clave...">
+        </div>
+        <div class="field-group">
+          <label>📍</label>
+          <select id="filtroZona">
+            <option value="">Todas las zonas</option>
+            <option value="Centro">Centro</option>
+            <option value="Norte">Norte</option>
+            <option value="Sur">Sur</option>
+            <option value="Poniente">Poniente</option>
+            <option value="Oriente">Oriente</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>🏢</label>
+          <select id="filtroCategoria">
+            <option value="">Todas las categorías</option>
+            <option value="Tecnología">Tecnología / Sistemas</option>
+            <option value="Administración">Administración</option>
+            <option value="Ventas">Ventas y Atención a Clientes</option>
+            <option value="Servicios">Servicios Operativos</option>
+          </select>
+        </div>
+        <button id="btnBuscarMapa" class="btn-buscar-mapa">Aplicar Filtros</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+        MODAL 1: INICIAR SESIÓN (LOGIN)
+        ========================================== -->
+  <div id="modalLogin" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <button id="btnCerrarLogin" class="btn-close">&times;</button>
+      
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-brand-navy/10 text-brand-navy mx-auto flex items-center justify-center mb-3">
+          <i class="w-6 h-6" data-lucide="user-check"></i>
+        </div>
+        <h3 class="text-2xl font-black text-brand-navy">Acceso a la Plataforma</h3>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Ingresa a tu cuenta de postulante o reclutador</p>
+      </div>
+
+      <form id="formLogin" method="POST" action="#" autocomplete="on" class="space-y-4">
+        <div class="form-group">
+          <label for="loginCorreo">Correo electrónico:</label>
+          <input 
+            type="email" 
+            id="loginCorreo" 
+            name="username" 
+            placeholder="Escriba su correo electrónico" 
+            autocomplete="username" 
+            required
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="loginPassword">Contraseña:</label>
+          <input 
+            type="password" 
+            id="loginPassword" 
+            name="password" 
+            placeholder="••••••••" 
+            autocomplete="current-password" 
+            required
+          >
+        </div>
+
+        <div class="form-group-checkbox flex items-center gap-2">
+          <input type="checkbox" id="checkRecordar" class="rounded border-slate-300 text-brand-navy focus:ring-0 cursor-pointer">
+          <label for="checkRecordar" class="text-xs text-slate-600 cursor-pointer select-none">Recordar mi correo</label>
+        </div>
+        
+        <button type="submit" class="btn-submit-login">Ingresar</button>
+      </form>
+
+      <div class="modal-footer mt-4 text-center text-xs text-slate-500">
+        <p>¿No tienes una cuenta?</p>
+        <button type="button" id="btnIrARegistro" class="btn-link text-emerald-600 font-bold hover:underline">Regístrate aquí</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+        MODAL 2: REGISTRO DE USUARIO
+        ========================================== -->
+  <div id="modalRegistro" class="modal-overlay" style="display: none;">
+    <div class="modal-registro-container">
+      <div class="modal-header">
+        <h2>Registro</h2>
+        <button type="button" id="btnCerrarRegistro" class="btn-close">&times;</button>
+      </div>
+
+      <form id="formRegistro" class="form-registro">
+        <div class="registro-grid">
+          <!-- Columna Izquierda -->
+          <div class="columna">
+            <div class="form-group">
+              <label for="curp">CURP *</label>
+              <input type="text" id="curp" name="curp" class="input-curp" placeholder="AAAA000000HHHHHH00" maxlength="18" required>
+            </div>
+
+            <div class="form-group">
+              <label for="correo">Correo electrónico *</label>
+              <input type="email" id="correo" name="correo" placeholder="Escriba su correo electrónico" required>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Contraseña *</label>
+              <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres" minlength="8" required>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirmar contraseña *</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmar contraseña" minlength="8" required>
+            </div>
+
+            <p class="texto-ayuda">
+              La contraseña debe tener mínimo 8 caracteres. Evitar el uso de comas. No debe contener coma(,), letras con acentos, ñ o caracteres especiales.
+            </p>
+          </div>
+
+          <!-- Columna Derecha -->
+          <div class="columna">
+            <div class="form-group">
+              <label for="nombre">Nombre *</label>
+              <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
+            </div>
+
+            <div class="form-group">
+              <label for="apellidoPaterno">Apellido Paterno <small style="color: #666; font-weight: normal;">(Opcional)</small></label>
+              <input type="text" id="apellidoPaterno" name="apellidoPaterno" placeholder="Apellido Paterno">
+            </div>
+
+            <div class="form-group">
+              <label for="apellidoMaterno">Apellido Materno <small style="color: #666; font-weight: normal;">(Opcional)</small></label>
+              <input type="text" id="apellidoMaterno" name="apellidoMaterno" placeholder="Apellido Materno">
+            </div>
+          </div>
+        </div>
+
+        <div class="registro-inferior">
+          <div class="form-group group-fecha">
+            <label for="fechaNacimiento">Fecha de nacimiento *</label>
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+          </div>
+
+          <div class="form-group group-sexo">
+            <label>Sexo *</label>
+            <div class="opciones-radio">
+              <label class="radio-label">
+                <input type="radio" name="sexo" value="mujer" required> Mujer
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="sexo" value="hombre" required> Hombre
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="sexo" value="otra" required> Otra (respuesta)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="seccion-vulnerable-box">
+          <div class="form-group">
+            <label>* ¿Considera que pertenece a un grupo vulnerable?</label>
+            <div class="opciones-radio">
+              <label class="radio-label">
+                <input type="radio" name="vulnerable" value="SI" id="vulnerableSi" required> SI
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="vulnerable" value="NO" id="vulnerableNo" required> NO
+              </label>
+            </div>
+          </div>
+
+          <div id="boxTipoVulnerable" class="form-group oculto" style="margin-top: 12px;">
+            <label for="selectTipoVulnerable">¿A cuál?</label>
+            <select id="selectTipoVulnerable">
+              <option value="">-- Seleccione una opción --</option>
+              <option value="discapacidad">Persona con discapacidad</option>
+              <option value="adulto_mayor">Persona adulto mayor</option>
+              <option value="rehabilitada">Persona rehabilitada</option>
+              <option value="violencia">Persona víctima de violencia intrafamiliar</option>
+            </select>
+          </div>
+
+          <div id="boxCatalogoDiscapacidad" class="form-group oculto" style="margin-top: 12px;">
+            <label>Seleccione tipo(s) de discapacidad (Selección múltiple):</label>
+            <div class="catalogo-discapacidades flex flex-wrap gap-3 mt-2">
+              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Motriz"> Motriz</label>
+              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Visual"> Visual</label>
+              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Auditiva"> Auditiva</label>
+              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Intelectual"> Intelectual</label>
+              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Psicosocial"> Psicosocial</label>
+              <label class="checkbox-label"><input type="checkbox" name="tipoDiscapacidad" value="Multiple"> Múltiple</label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="selectCredencial">* Cuentas con credencial:</label>
+            <select id="selectCredencial" name="credencial" required>
+              <option value="">-- Seleccione una opción --</option>
+              <option value="Discapacidad">Discapacidad</option>
+              <option value="INAPAM">INAPAM</option>
+              <option value="Ninguna">Ninguna</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="registro-actions">
+          <button type="submit" class="btn-submit-registro">Registrarse</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- ==========================================
+        MODAL 3: PERFIL DE USUARIO
+        ========================================== -->
+  <div id="modalPerfil" class="modal-overlay" style="display: none;">
+    <div class="modal-registro-container" style="max-width: 950px; padding: 0; overflow: hidden;">
+      <div class="modal-header" style="padding: 15px 20px; margin-bottom: 0;">
+        <h2>Mi Perfil</h2>
+        <button type="button" id="btnCerrarPerfil" class="btn-close">&times;</button>
+      </div>
+
+      <div class="perfil-container">
+        <!-- SIDEBAR -->
+        <aside class="perfil-sidebar">
+          <div class="avatar-section">
+            <div class="avatar-box">👤</div>
+            <button type="button" class="btn-subir-foto">Actualizar foto de perfil</button>
+            <small style="display: block; margin-top: 4px;">Tamaño máximo de 2MB</small>
+
+            <div class="form-group" style="margin-top: 15px;">
+              <label for="perfilCurp" style="color: #cbd5e1; font-size: 12px;">CURP:</label>
+              <input type="text" id="perfilCurp" readonly class="input-readonly text-center">
+            </div>
+
+            <div class="form-group">
+              <input type="text" id="perfilNombreSidebar" placeholder="Nombre" readonly class="input-readonly">
+            </div>
+            <div class="form-group">
+              <input type="text" id="perfilPrimerApellidoSidebar" placeholder="Primer Apellido" readonly class="input-readonly">
+            </div>
+            <div class="form-group">
+              <input type="text" id="perfilSegundoApellidoSidebar" placeholder="Segundo Apellido" readonly class="input-readonly">
+            </div>
+            <small class="text-muted" style="font-size: 10px; color: #94a3b8;">* Los datos de nombre se emplean en la carta compromiso.</small>
+          </div>
+
+          <nav class="perfil-nav">
+            <button type="button" class="nav-tab active" data-tab="tab-personal">Información Personal</button>
+            <button type="button" class="nav-tab" data-tab="tab-estudios">Estudios</button>
+            <button type="button" class="nav-tab" data-tab="tab-experiencia">Experiencia Laboral</button>
+            <button type="button" class="nav-tab" data-tab="tab-otros">Otros</button>
+            <button type="button" class="nav-tab" data-tab="tab-documentacion">Documentación</button>
+          </nav>
+        </aside>
+
+        <!-- CONTENIDO -->
+        <main class="perfil-content">
+          <form id="formPerfil">
+            <!-- PESTAÑA 1: INFORMACIÓN PERSONAL -->
+            <section id="tab-personal" class="tab-content active">
+              <h3 style="margin-top: 0; color: #1e293b;">Información Personal</h3>
+              
+              <div class="form-grid">
+                <div class="grid-section">
+                  <div class="form-group">
+                    <label for="perfilCorreo">*Correo Electrónico:</label>
+                    <input type="email" id="perfilCorreo" required placeholder="correo@ejemplo.com">
+                  </div>
+
+                  <div class="form-row gap-2">
+                    <div class="form-group flex-2">
+                      <label for="perfilFechaNac">*Fecha nacimiento:</label>
+                      <input type="date" id="perfilFechaNac" required onchange="calcularEdadPerfil(this.value)">
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="perfilEdad">Edad:</label>
+                      <input type="text" id="perfilEdad" readonly class="input-readonly">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>*Sexo:</label>
+                    <div class="radio-group" style="display: flex; gap: 15px; margin-top: 5px;">
+                      <label><input type="radio" name="perfilSexo" value="M"> Mujer</label>
+                      <label><input type="radio" name="perfilSexo" value="H"> Hombre</label>
+                      <label><input type="radio" name="perfilSexo" value="O"> Otra (respuesta)</label>
+                    </div>
+                  </div>
+
+                  <div class="form-row gap-2">
+                    <div class="form-group flex-1">
+                      <label for="perfilDiscapacidad">Discapacidad:</label>
+                      <select id="perfilDiscapacidad" onchange="evaluarNuevoComienzoPerfil()">
+                        <option value="NINGUNA">NINGUNA</option>
+                        <option value="MOTRIZ">MOTRIZ</option>
+                        <option value="VISUAL">VISUAL</option>
+                        <option value="AUDITIVA">AUDITIVA</option>
+                        <option value="OTRA">OTRA</option>
+                      </select>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="perfilEstadoCivil">*Estado civil:</label>
+                      <select id="perfilEstadoCivil" required>
+                        <option value="">SELECCIONE</option>
+                        <option value="SOLTERO">SOLTERO/A</option>
+                        <option value="CASADO">CASADO/A</option>
+                        <option value="DIVORCIADO">DIVORCIADO/A</option>
+                        <option value="VIUDO">VIUDO/A</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-top: 10px;">
+                    <label for="perfilTelefono">*Teléfono:</label>
+                    <input type="tel" id="perfilTelefono" placeholder="9999999999" maxlength="10" required>
+                  </div>
+
+                  <div id="seccionNuevoComienzoPerfil" style="display: none; border: 1px solid #007bff; padding: 12px; border-radius: 6px; margin-top: 15px; background-color: #f0f7ff;">
+                    <h4 style="color: #007bff; margin-top: 0; font-size: 13px;">Programa Nuevo Comienzo</h4>
+                    <div class="form-group">
+                      <label for="perfilTipoApoyo">Tipo de apoyo que utiliza:</label>
+                      <input type="text" id="perfilTipoApoyo" placeholder="Ej. Bastón, Silla de ruedas">
+                    </div>
+                    <div class="form-row gap-2">
+                      <div class="form-group flex-1">
+                        <label for="perfilContactoNombre">Contacto de Emergencia:</label>
+                        <input type="text" id="perfilContactoNombre">
+                      </div>
+                      <div class="form-group flex-1">
+                        <label for="perfilContactoParentesco">Parentesco:</label>
+                        <input type="text" id="perfilContactoParentesco">
+                      </div>
+                    </div>
+                    <div class="form-row gap-2" style="margin-top: 5px;">
+                      <div class="form-group flex-1">
+                        <label for="perfilCredencialFolio">Folio Credencial:</label>
+                        <input type="text" id="perfilCredencialFolio">
+                      </div>
+                      <div class="form-group flex-1">
+                        <label for="perfilCredencialVencimiento">Vencimiento Credencial:</label>
+                        <input type="date" id="perfilCredencialVencimiento">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid-section">
+                  <h4 class="sub-title" style="margin-top: 0; color: #334155; font-size: 14px;">Dirección</h4>
+                  <div class="form-row gap-2">
+                    <div class="form-group flex-2">
+                      <label for="perfilCalle">*Calle:</label>
+                      <input type="text" id="perfilCalle" required>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="perfilLetraCalle">Letra:</label>
+                      <input type="text" id="perfilLetraCalle">
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="perfilNumero">*Número:</label>
+                      <input type="text" id="perfilNumero" required>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="perfilLetraNumero">Letra:</label>
+                      <input type="text" id="perfilLetraNumero">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="perfilPoblacion">*Población:</label>
+                    <select id="perfilPoblacion" required>
+                      <option value="">SELECCIONE</option>
+                      <option value="MÉRIDA">MÉRIDA</option>
+                      <option value="IZAMAL">IZAMAL</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="perfilColonia">*Colonia:</label>
+                    <input type="text" id="perfilColonia" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="perfilCP">C.P:</label>
+                    <input type="text" id="perfilCP" placeholder="Código postal" maxlength="5">
+                  </div>
+
+                  <div class="form-group" style="margin-top: 15px;">
+                    <label for="perfilFechaRegistro">Fecha de registro:</label>
+                    <input type="text" id="perfilFechaRegistro" readonly class="input-readonly">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="perfilLugarRegistro">Lugar de registro:</label>
+                    <input type="text" id="perfilLugarRegistro" value="INTERNET" readonly class="input-readonly">
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- PESTAÑA 2: ESTUDIOS -->
+            <section id="tab-estudios" class="tab-content">
+              <div class="seccion-estudios">
+                <div class="fila-estudios">
+                  <div class="grupo-estudios">
+                    <label for="estudiosGrado">*Último grado de estudios:</label>
+                    <select id="estudiosGrado" class="input-perfil">
+                      <option value="">SELECCIONE</option>
+                      <option value="PRIMARIA">PRIMARIA</option>
+                      <option value="SECUNDARIA">SECUNDARIA</option>
+                      <option value="BACHILLERATO">BACHILLERATO / PREPARATORIA</option>
+                      <option value="TÉCNICO">TÉCNICO / TÉCNICO SUPERIOR</option>
+                      <option value="LICENCIATURA">LICENCIATURA</option>
+                      <option value="INGENIERÍA">INGENIERÍA</option>
+                      <option value="MAESTRÍA">MAESTRÍA</option>
+                      <option value="DOCTORADO">DOCTORADO</option>
+                    </select>
+                  </div>
+
+                  <div class="grupo-estudios">
+                    <label for="estudiosTitulado">Titulado:</label>
+                    <select id="estudiosTitulado" class="input-perfil">
+                      <option value="No">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="En trámite">En trámite</option>
+                      <option value="Pasante">Pasante</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="fila-estudios full">
+                  <div class="grupo-estudios">
+                    <label for="estudiosProfesion">*Profesión:</label>
+                    <select id="estudiosProfesion" class="input-perfil">
+                      <option value="">SELECCIONE SU PROFESIÓN</option>
+                      <option value="Abogado / Lic. en Derecho">Abogado / Lic. en Derecho</option>
+                      <option value="Administrador de Empresas">Administrador de Empresas</option>
+                      <option value="Administrador de Redes y Sistemas">Administrador de Redes y Sistemas</option>
+                      <option value="Desarrollador de Software / Programador">Desarrollador de Software / Programador</option>
+                      <option value="Desarrollador Web / Front-End / Back-End">Desarrollador Web / Front-End / Back-End</option>
+                      <option value="Ingeniero en Computación / Sistemas">Ingeniero en Computación / Sistemas</option>
+                      <option value="OTRA">OTRA</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="fila-radio-campo">
+                  <div class="contenedor-radios">
+                    <span class="radio-titulo">¿Estudias actualmente?</span>
+                    <label class="opcion-radio">
+                      <input type="radio" name="estudiasActualmente" value="Si" id="estudiasSi"> Sí
+                    </label>
+                    <label class="opcion-radio">
+                      <input type="radio" name="estudiasActualmente" value="No" id="estudiasNo" checked> No
+                    </label>
+                  </div>
+
+                  <div class="grupo-estudios">
+                    <label for="queEstudias">¿QUÉ ESTUDIAS?</label>
+                    <input type="text" id="queEstudias" class="input-perfil" placeholder="Ej. Licenciatura, Curso de Inglés...">
+                  </div>
+                </div>
+
+                <div class="fila-estudios">
+                  <div class="grupo-estudios">
+                    <label for="conocimientosGenerales">Conocimientos generales:</label>
+                    <textarea id="conocimientosGenerales" class="input-perfil textarea" placeholder="Ej. Paquetería Office, atención a clientes..."></textarea>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- PESTAÑA 3: EXPERIENCIA LABORAL -->
+            <section id="tab-experiencia" class="tab-content">
+              <div class="seccion-experiencia">
+                <div class="fila-estudios full">
+                  <div class="grupo-estudios">
+                    <label for="empleoSolicitado">*Empleo que solicita:</label>
+                    <select id="empleoSolicitado" class="input-perfil">
+                      <option value="">SELECCIONE</option>
+                      <option value="Desarrollador Web / Front-End / Back-End">Desarrollador Web / Front-End / Back-End</option>
+                      <option value="Ingeniero en Computación / Sistemas">Ingeniero en Computación / Sistemas</option>
+                      <option value="Asistente Administrativo / Recepcionista">Asistente Administrativo / Recepcionista</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="fila-estudios full">
+                  <div class="grupo-estudios">
+                    <label for="segundaOpcionSolicitada">*Segunda opción de empleo que solicita:</label>
+                    <select id="segundaOpcionSolicitada" class="input-perfil">
+                      <option value="">SELECCIONE</option>
+                      <option value="Desarrollador de Software / Programador">Desarrollador de Software / Programador</option>
+                      <option value="Ingeniero de Soporte TI">Ingeniero de Soporte TI</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="fila-radio-campo">
+                  <div class="contenedor-radios">
+                    <span class="radio-titulo">¿Tienes experiencia laboral?</span>
+                    <label class="opcion-radio">
+                      <input type="radio" name="tieneExperiencia" value="Si" id="expSi"> Sí
+                    </label>
+                    <label class="opcion-radio">
+                      <input type="radio" name="tieneExperiencia" value="No" id="expNo" checked> No
+                    </label>
+                  </div>
+                </div>
+
+                <div id="bloqueUltimoEmpleo" style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+                  <h4 style="margin-bottom: 10px; color: #333; font-size: 0.95rem;">DATOS DE SU ÚLTIMO EMPLEO</h4>
+                  <div class="fila-estudios">
+                    <div class="grupo-estudios">
+                      <label for="ultimoEmpresa">Nombre de la empresa:</label>
+                      <input type="text" id="ultimoEmpresa" class="input-perfil" placeholder="Nombre de la empresa">
+                    </div>
+                    <div class="grupo-estudios">
+                      <label for="ultimoPuesto">Puesto:</label>
+                      <input type="text" id="ultimoPuesto" class="input-perfil" placeholder="Puesto desempeñado">
+                    </div>
+                  </div>
+                  <div class="fila-estudios full">
+                    <div class="grupo-estudios">
+                      <label for="ultimoFuncionesTiempo">Funciones realizadas y tiempo:</label>
+                      <input type="text" id="ultimoFuncionesTiempo" class="input-perfil">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fila-estudios" style="margin-top: 15px;">
+                  <div class="grupo-estudios full">
+                    <label for="experienciaDetalle">Detalle de experiencia previa:</label>
+                    <textarea id="experienciaDetalle" class="input-perfil textarea"></textarea>
+                  </div>
+                </div>
+
+                <div class="fila-estudios">
+                  <div class="grupo-estudios">
+                    <label>Tiempo acumulado de experiencia laboral:</label>
+                    <div class="contenedor-tiempo-experiencia">
+                      <div class="subgrupo-tiempo">
+                        <input type="number" id="experienciaAnios" class="input-perfil" min="0" max="60" placeholder="0">
+                        <span class="label-tiempo">Años</span>
+                      </div>
+                      <div class="subgrupo-tiempo">
+                        <input type="number" id="experienciaMeses" class="input-perfil" min="0" max="11" placeholder="0">
+                        <span class="label-tiempo">Meses</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fila-estudios full">
+                  <div class="grupo-estudios">
+                    <label for="habilidadesDetalle">*Habilidades:</label>
+                    <textarea id="habilidadesDetalle" class="input-perfil textarea"></textarea>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section id="tab-otros" class="tab-content">
+              <h3>Otros</h3>
+              <p>Sección en desarrollo.</p>
+            </section>
+
+            <section id="tab-documentacion" class="tab-content">
+              <h3>Documentación</h3>
+              <p>Sección en desarrollo.</p>
+            </section>
+
+            <footer class="perfil-footer">
+              <button type="submit" id="btnGuardarPerfil" class="btn-primario">Guardar Cambios</button>
+            </footer>
+          </form>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menú Flotante Lateral -->
+  <aside class="floating-menu fixed right-4 top-1/3 z-30 flex flex-col gap-2.5">
+    <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/90 p-2 flex flex-col gap-1.5">
+      <a href="#" id="btnVolverInicio" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 hover:bg-blue-50 hover:text-brand-navy font-semibold text-xs sm:text-sm transition-all">
+        <span class="text-base">🏠</span>
+        <span class="font-bold">Inicio</span>
+      </a>
+      <a href="#" id="btnIrGeoPortal" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-semibold text-xs sm:text-sm transition-all">
+        <span class="text-base">🗺️</span>
+        <span class="font-bold">GeoPortal</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Capa de Bloqueo para Tutorial -->
+  <div id="tutorialOverlay" class="tutorial-overlay"></div>
+
+  <!-- Asistente Virtual -->
+  <div id="assistantBox" class="assistant-box">
+    <div class="assistant-header">
+      <div class="assistant-info">
+        <span class="assistant-avatar">🤖</span>
+        <strong>Guía Virtual</strong>
+      </div>
+      <button id="btnVoiceRead" class="btn-voice" title="Sonido del asistente">
+        <i id="iconoAsistenteVoz" class="fa-solid fa-volume-xmark"></i>
+      </button>
+    </div>
+    <p id="assistantText" style="flex: 1; margin: 10px 0;"></p>
+    <div class="assistant-buttons">
+      <button id="btnSkipTutorial" class="btn-skip">Omitir</button>
+      <div class="nav-steps-buttons" style="display: flex; gap: 8px;">
+        <button id="btnPrevStep" class="btn-next" style="background-color: #6c757d; display: none;">Atrás</button>
+        <button id="btnNextStep" class="btn-next">Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de Accesibilidad Flotante -->
+  <button id="btnAccesibilidad" class="btn-accesibilidad-flotante" aria-label="Abrir panel de accesibilidad">
+    <i class="fas fa-universal-access"></i>
+  </button>
+
+  <div id="panelAccesibilidad" class="panel-accesibilidad" role="dialog" aria-label="Panel de accesibilidad" style="display: none;">
+    <div class="panel-header">
+      <h3>Accesibilidad</h3>
+      <button id="btnCerrarAccesibilidad" class="btn-cerrar-panel">&times;</button>
+    </div>
+
+    <div class="tabs-accesibilidad">
+      <button class="tab-accesibilidad active" data-tab="vista">👁️ Vista</button>
+      <button class="tab-accesibilidad" data-tab="audio">🎧 Audio</button>
+      <button class="tab-accesibilidad" data-tab="motriz">🖱️ Motriz</button>
+      <button class="tab-accesibilidad" data-tab="cognitiva">🧠 Cognitiva</button>
+    </div>
+
+    <div class="tab-content-accesibilidad active" id="tabVista">
+      <div class="control-group">
+        <label>Tamaño de texto:</label>
+        <div class="control-buttons">
+          <button class="btn-fuente" data-accion="disminuir">A-</button>
+          <span id="tamanoTextoLabel">100%</span>
+          <button class="btn-fuente" data-accion="aumentar">A+</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <button class="btn-toggle" data-accion="altoContraste">🔲 Alto contraste</button>
+        <button class="btn-toggle" data-accion="modoOscuro">🌙 Modo oscuro</button>
+        <button class="btn-toggle" data-accion="subrayarEnlaces">🔗 Subrayar enlaces</button>
+        <button class="btn-toggle" data-accion="lecturaFacil">🔤 Lectura fácil</button>
+      </div>
+    </div>
+
+    <div class="tab-content-accesibilidad" id="tabAudio">
+      <div class="control-group">
+        <button class="btn-lectura" data-accion="leerTodo">🔊 Leer todo</button>
+        <button class="btn-lectura" data-accion="leerSeleccion">📖 Leer selección</button>
+        <button class="btn-lectura" data-accion="pausarVoz">⏸️ Pausar</button>
+        <button class="btn-lectura" data-accion="detenerVoz">⏹️ Detener</button>
+      </div>
+      <div class="control-group">
+        <label for="velocidadVoz">Velocidad de voz:</label>
+        <input type="range" id="velocidadVoz" min="0.5" max="1.5" step="0.1" value="1">
+        <span id="velocidadLabel">1x</span>
+      </div>
+    </div>
+
+    <div class="tab-content-accesibilidad" id="tabMotriz">
+      <div class="control-group">
+        <button class="btn-toggle" data-accion="botonesGrandes">🔲 Botones grandes</button>
+      </div>
+    </div>
+
+    <div class="tab-content-accesibilidad" id="tabCognitiva">
+      <div class="control-group">
+        <button class="btn-toggle" data-accion="modoLectura">📖 Modo lectura</button>
+        <button class="btn-toggle" data-accion="resaltarTitulos">🔦 Resaltar títulos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Moderno -->
+  <footer class="mt-auto bg-white border-t border-slate-200 pt-12 pb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-slate-100">
+        <div class="md:col-span-2 space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-brand-navy text-white flex items-center justify-center">
+              <i class="w-5 h-5" data-lucide="briefcase"></i>
+            </div>
+            <span class="text-lg font-black text-brand-navy">Bolsa de Trabajo Municipal</span>
+          </div>
+          <p class="text-slate-500 text-sm max-w-md leading-relaxed">
+            Iniciativa institucional orientada a potenciar la empleabilidad juvenil y conectar el capital humano local con las oportunidades del sector productivo.
+          </p>
+        </div>
+        <div>
+          <h5 class="text-xs font-bold tracking-wider text-slate-900 uppercase mb-4">Secciones</h5>
+          <ul class="space-y-2.5 text-sm text-slate-500 font-medium">
+            <li><a class="hover:text-brand-navy transition-colors" href="#">Vacantes Recientes</a></li>
+            <li><a class="hover:text-brand-navy transition-colors" href="#" onclick="document.getElementById('btnEmpleos').click()">GeoPortal de Empleos</a></li>
+            <li><a class="hover:text-brand-navy transition-colors" href="#heroEmpresas">Empresas & Negocios</a></li>
+            <li><a class="hover:text-brand-navy transition-colors" href="#seccionCalendario">Agenda Municipal</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="text-xs font-bold tracking-wider text-slate-900 uppercase mb-4">AVISOS DE PRIVACIDAD</h5>
+          <ul class="space-y-2.5 text-sm text-slate-500 font medium">
+            <li><a class="hover:text-brand-navy transition-colors" href="https://www.merida.gob.mx/avisoprivacidad/">Aviso de Privacidad Simplificado</a></li>
+            <li><a class="hover:text-brand-navy transition-colors" href="#">Aviso de Privacidad por Direcciones</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+        <p>© 2026 Bolsa de Trabajo Municipal. Todos los derechos reservados.</p>
+        <div class="flex gap-4">
+          <a class="hover:underline" href="#">Aviso de Privacidad</a>
+          <a class="hover:underline" href="#">Términos de Servicio</a>
+          <a class="hover:underline" href="#">Accesibilidad Web</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Inicialización de Lucide Icons -->
+  <script>
+    lucide.createIcons();
+  </script>
+  <!-- Archivo Lógico Principal -->
+  <script src="script.js"></script>
+</body>
+</html>
