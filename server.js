@@ -15,22 +15,32 @@ app.use(express.json());
 // ============================================================================
 
 // 1. Pool para la Base de Datos Principal (Usuarios y Perfil)
-const poolBolsa = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: 'bolsa_trabajo',
-  password: process.env.DB_PASSWORD || 'gamer358',
-  port: process.env.DB_PORT || 5432,
-});
+const dbConfig = {
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+  ssl: {
+    rejectUnauthorized: false
+  }
+};
+
+// 1. Pool para la Base de Datos Principal (Usuarios y Perfil)
+const poolBolsa = new Pool(dbConfig);
 
 // 2. Pool para la Base de Datos del CV Builder (IA)
-const poolCV = new Pool({
+const poolCV = new Pool(dbConfig);
+
+
+// 2. Pool para la Base de Datos del CV Builder (IA)
+/*const poolCV = new Pool({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
   database: 'cv_builder_db',
   password: process.env.DB_PASSWORD || 'gamer358',
   port: process.env.DB_PORT || 5432,
-});
+});*/
 
 // Verificar conexiones al arrancar
 poolBolsa.connect((err, client, release) => {
