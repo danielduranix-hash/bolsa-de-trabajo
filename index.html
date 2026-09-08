@@ -143,45 +143,41 @@
         VISTA 1: INICIO / LANDING PAGE
         ========================================== -->
   <main id="vistaInicio">
-    <!-- Hero Section -->
-    <section class="relative pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden bg-gradient-to-b from-blue-50/60 via-slate-50 to-white">
-      <div class="absolute -top-24 -left-20 w-96 h-96 bg-brand-sky/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute top-1/2 -right-24 w-96 h-96 bg-emerald-200/25 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center relative z-10">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs sm:text-sm font-bold tracking-wide uppercase mb-6 shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-          Plataforma Laboral Juvenil
+    <!-- Hero Section con Imagen Fotográfica de Mérida Jóvenes de Fondo -->
+    <section class="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden bg-slate-50 border-b border-slate-200/60">
+      <!-- Imagen de Fondo Realista de Mérida -->
+      <div class="absolute inset-0 z-0">
+        <img alt="Jóvenes y profesionistas diversos buscando oportunidades laborales en Mérida" class="w-full h-full object-cover object-right md:object-center filter opacity-90 transition-opacity duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTlkuDh1H3gzRsHnysPWXQMTcF1zup0GOBjIbw5sjJ5lzK5mkq3a020sc1pgEdiyfH4ThcMzFyKfaRBXG84YPP8Y7uKtVu06e4PUQPbthyQ1UR6FC-T2mPydeZrnAuUyyj0KpvrRrmW7DkMJ43DA9eKQOOpxGp9rxk2H1DwAZuxZAL_AlZREDxeW00BorDTJwIdrlTBlPk1mb1zZj4a1UYsUK2cDMbhjCsVaWYjeg4wqVkMOXd3q3I">
+        <!-- Overlay Gradiente Inteligente para perfecta legibilidad -->
+        <div class="absolute inset-0 hero-bg-overlay backdrop-blur-[1px]"></div>
+      </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="max-w-3xl">
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50/95 backdrop-blur-md border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-bold tracking-wide uppercase mb-6 shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          Plataforma Laboral
         </div>
-        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-brand-navy tracking-tight leading-[1.15] mb-6">
-          Tu futuro profesional <br class="hidden sm:inline"/>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-navy via-brand-blue to-emerald-600">
-            comienza aquí y ahora
-          </span>
-        </h2>
-        <p class="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-slate-600 font-normal leading-relaxed mb-10">
-          Empresas verificadas del municipio buscan talento joven como el tuyo. Conecta con vacantes de medio tiempo, prácticas y tu primer trabajo formal sin trabas burocráticas.
-        </p>
-
-        <!-- Buscador Rápido -->
-        <div class="bg-white p-3 sm:p-4 rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-100 max-w-3xl mx-auto mb-8">
-          <div class="flex flex-col sm:flex-row items-center gap-3">
-            <div class="flex items-center gap-3 w-full px-4 py-3 bg-slate-50/80 rounded-2xl border border-transparent focus-within:border-brand-sky focus-within:bg-white transition-all">
-              <i class="w-5 h-5 text-slate-400" data-lucide="search"></i>
-              <input class="bg-transparent border-0 p-0 text-slate-800 placeholder:text-slate-400 text-sm sm:text-base focus:ring-0 w-full outline-none" placeholder="Puesto, habilidad o carrera..." type="text"/>
+          <!-- Título Principal -->
+          <h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-brand-navy tracking-tight leading-[1.12] mb-6">
+            Tu próximo paso profesional <br class="hidden sm:inline">
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-navy via-brand-blue to-emerald-600">
+              comienza aquí y ahora
+            </span>
+          </h2>
+          <p class="text-base sm:text-lg md:text-xl text-slate-700 font-medium leading-relaxed mb-8 max-w-2xl bg-white/40 md:bg-transparent backdrop-blur-xs rounded-xl p-2 md:p-0">
+            Empresas y dependencias locales de Mérida buscan talento joven como el tuyo. Explora vacantes de primer empleo, prácticas profesionales, medio tiempo e inclusión laboral con un proceso ágil y accesible.
+          </p>
+          <div class="flex items-center gap-4 text-xs font-semibold text-slate-600 pt-2">
+            <div class="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-200/80">
+              <i class="w-4 h-4 text-emerald-600" data-lucide="badge-check"></i>
+              <span class="">Empresas Verificadas en Mérida</span>
             </div>
-            <button onclick="document.getElementById('btnEmpleos').click()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-brand-navy hover:bg-brand-deep text-white font-bold text-sm sm:text-base tracking-wide transition-all shadow-md shadow-brand-navy/30 hover:shadow-xl flex items-center justify-center gap-2 whitespace-nowrap">
-              <span>Explorar Mapa</span>
-              <i class="w-4 h-4" data-lucide="arrow-right"></i>
-            </button>
+            <div class="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-200/80">
+              <i class="w-4 h-4 text-brand-navy" data-lucide="shield"></i>
+              <span class="">100% Gratuito y Municipal</span>
+            </div>
           </div>
-        </div>
-
-        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm font-semibold">
-          <span class="text-slate-400 text-xs uppercase tracking-wider mr-1">Tendencias:</span>
-          <span class="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 shadow-2xs">#PrimerEmpleo</span>
-          <span class="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 shadow-2xs">#Tecnología</span>
-          <span class="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 shadow-2xs">#MedioTiempo</span>
-          <span class="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 shadow-2xs">#Prácticas</span>
         </div>
       </div>
     </section>
