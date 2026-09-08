@@ -203,58 +203,65 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* --- Formulario de Registro --- */
-  if (formReg) {
-    formReg.addEventListener('submit', async (e) => {
-      e.preventDefault();
+ /* --- Formulario de Registro --- */
+if (formReg) {
+  formReg.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      const paterno = document.getElementById('apellidoPaterno')?.value.trim();
-      const materno = document.getElementById('apellidoMaterno')?.value.trim();
+    const paterno = document.getElementById('apellidoPaterno')?.value.trim();
+    const materno = document.getElementById('apellidoMaterno')?.value.trim();
 
-      if (!paterno && !materno) {
-        alert('Por favor, ingrese al menos un apellido.');
-        return;
-      }
+    if (!paterno && !materno) {
+      alert('Por favor, ingrese al menos un apellido.');
+      return;
+    }
 
-      const datosRegistro = {
-        curp: document.getElementById('curp')?.value,
-        nombre: document.getElementById('nombre')?.value,
-        primer_apellido: paterno,
-        segundo_apellido: materno,
-        correo: document.getElementById('correo')?.value,
-        password: document.getElementById('password')?.value,
-        fecha_nacimiento: document.getElementById('fechaNacimiento')?.value,
-        sexo: document.getElementById('sexo')?.value,
-        pertenece_grupo_vulnerable: document.getElementById('vulnerable')?.value !== 'NINGUNO',
-        grupos_vulnerables: [document.getElementById('vulnerable')?.value].filter(Boolean),
-        tiene_discapacidad: false,
-        tipos_discapacidad: []
-      };
+    const datosRegistro = {
+      curp: document.getElementById('curp')?.value.trim().toUpperCase(),
+      nombre: document.getElementById('nombre')?.value.trim(),
+      primer_apellido: paterno,
+      segundo_apellido: materno,
+      correo: document.getElementById('correo')?.value.trim(),
+      password: document.getElementById('password')?.value,
+      fecha_nacimiento: document.getElementById('fechaNacimiento')?.value,
+      sexo: document.getElementById('sexo')?.value,
+      pertenece_grupo_vulnerable: document.getElementById('vulnerable')?.value !== 'NINGUNO',
+      grupos_vulnerables: [document.getElementById('vulnerable')?.value].filter(Boolean),
+      tiene_discapacidad: false,
+      tipos_discapacidad: []
+    };
 
+    try {
+      const respuesta = await fetch('http://localhost:3000/api/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datosRegistro)
+      });
+
+      // Intenta leer la respuesta del servidor como JSON
+      let resultado = {};
       try {
-        const respuesta = await fetch('http://localhost:3000/api/registro', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(datosRegistro)
-        });
-
-        const resultado = await respuesta.json();
-
-        if (respuesta.ok && resultado.exito) {
-          alert('¡Registro completado con éxito!');
-          formReg.reset();
-          if (modalRegistro) modalRegistro.style.display = 'none';
-          if (modalLogin) modalLogin.style.display = 'flex';
-        } else {
-          alert(`Error al guardar: ${resultado.mensaje}`);
-        }
-      } catch (error) {
-        console.error('Error al conectar con la API:', error);
-        alert('Error de conexión con el servidor backend.');
+        resultado = await respuesta.json();
+      } catch (errJson) {
+        console.warn('La respuesta del servidor no es un JSON válido:', errJson);
       }
-    });
-  }
 
+      if (respuesta.ok && resultado.exito) {
+        alert('¡Registro completado con éxito!');
+        formReg.reset();
+        if (modalRegistro) modalRegistro.style.display = 'none';
+        if (modalLogin) modalLogin.style.display = 'flex';
+      } else {
+        // Muestra el mensaje del servidor o un aviso de duplicado
+        const mensajeError = resultado.mensaje || 'El CURP o correo ingresado ya existe en el sistema.';
+        alert(`Atención: ${mensajeError}`);
+      }
+    } catch (error) {
+      console.error('Error de red o servidor no disponible:', error);
+      alert('No se pudo conectar con el servidor backend. Revisa que Node.js esté corriendo en el puerto 3000.');
+    }
+  });
+}
   /* --- Navegación e Integración de GeoPortal / Mapa --- */
   const vistaInicio = document.getElementById('vistaInicio');
   const vistaGeoPortal = document.getElementById('vistaGeoPortal');
