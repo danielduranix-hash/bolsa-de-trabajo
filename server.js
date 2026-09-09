@@ -44,8 +44,8 @@ const poolCV = new Pool(dbConfig);
 
 // Verificar conexiones al arrancar
 poolBolsa.connect((err, client, release) => {
-  if (err) return console.error('🔴 Error conectando a bolsa_trabajo:', err.stack);
-  console.log('✅ Conectado a la BD: bolsa_trabajo');
+  if (err) return console.error('🔴 Error conectando a la BD:', err.stack);
+  console.log('✅ Conectado a Neon en la BD:', process.env.DB_NAME);
   release();
 });
 
@@ -325,6 +325,69 @@ app.put('/api/perfil/:curp', async (req, res) => {
     res.status(500).json({ exito: false, mensaje: `Error en BD: ${error.message}` });
   } finally {
     client.release();
+  }
+});
+
+// ============================================================================
+// ENDPOINT DE REGISTRO
+// ============================================================================
+app.post('/api/registro', async (req, res) => {
+  const { curp, correo, password, nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo } = req.body;
+
+  if (!curp || !correo || !password || !nombre || !primer_apellido) {
+    return res.status(400).json({ exito: false, mensaje: 'Faltan campos obligatorios para el registro.' });
+  }
+
+  const curpLimpia = curp.trim().toUpperCase();
+  const correoLimpio = correo.trim().toLowerCase();
+
+  try {
+    // 1. Verificar si el CURP o correo ya existen en Neon
+    const verificar = await poolBolsa.query(
+      'SELECT * FROM usuarios WHERE curp = $1 OR LOWER(correo) = $2',
+      [curpLimpia, correoLimpio]
+    );
+
+    if (verificar.rows.length > 0) {
+      return res.status(400).json({ exito: false, mensaje: 'Atención: El CURP o correo ingresado ya existe en el sistema.' });
+    }
+
+    // 2. Encriptar la contraseña
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    // 3. Insertar el nuevo usuario en Neon
+    const queryInsert = `
+      INSERT INTO usuarios (
+        curp, correo, password_hash, nombre, primer_apellido, segundo_apellido, 
+        fecha_nacimiento, sexo, fecha_registro, lugar_registro
+      ) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, 'INTERNET')
+      RETURNING curp, correo, nombre, primer_apellido;
+    `;
+
+    const valores = [
+      curpLimpia,
+      correoLimpio,
+      passwordHash,
+      nombre.trim(),
+      primer_apellido.trim(),
+      pasarANull(segundo_apellido),
+      pasarANull(fecha_nacimiento),
+      sexo ? sexo.trim().toUpperCase() : 'O'
+    ];
+
+    const nuevoUsuario = await poolBolsa.query(queryInsert, valores);
+
+    res.status(201).json({ 
+      exito: true, 
+      mensaje: 'Usuario registrado exitosamente.', 
+      usuario: nuevoUsuario.rows[0] 
+    });
+
+  } catch (error) {
+    console.error('🔴 Error al registrar usuario:', error.message);
+    res.status(500).json({ exito: false, mensaje: `Error en el servidor: ${error.message}` });
   }
 });
 
