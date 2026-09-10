@@ -353,21 +353,110 @@ if (formReg) {
     });
   }
 
-  /* --- Tarjetas de Sector / Calendario --- */
+/* --- Tarjetas de Sector / Calendario con Carga Dinámica desde Neon --- */
+async function inicializarCalendarioEventos() {
   const sectorCards = document.querySelectorAll('.sector-card');
-  sectorCards.forEach(card => {
-    card.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const estaActivo = card.classList.contains('activo');
-      sectorCards.forEach(c => c.classList.remove('activo'));
-      if (!estaActivo) card.classList.add('activo');
+  const grid = document.getElementById('calendarioGrid');
+
+  try {
+    // 1. Cargar eventos desde Neon
+    const response = await fetch('/api/eventos');
+    const data = await response.json();
+
+    if (!data.exito) return;
+    const eventosGlobales = data.eventos || [];
+
+    // 2. Rellenar contadores y próxima fecha en tarjetas superiores
+    sectorCards.forEach(card => {
+      const sectorTipo = card.getAttribute('data-sector');
+      const evsTipo = eventosGlobales.filter(e => e.tipo_evento === sectorTipo);
+
+      const badgeCount = card.querySelector('.badge-count');
+      const proxFechaText = card.querySelector('.prox-fecha');
+
+      if (badgeCount) {
+        badgeCount.textContent = `${evsTipo.length} ${evsTipo.length === 1 ? 'Fecha' : 'Fechas'}`;
+      }
+
+      if (proxFechaText) {
+        if (evsTipo.length > 0) {
+          const proximo = evsTipo[0];
+          const fechaFormateada = new Date(proximo.fecha_evento).toLocaleDateString('es-MX', {
+            day: 'numeric',
+            month: 'short',
+            timeZone: 'UTC'
+          });
+          proxFechaText.textContent = `Próxima: ${fechaFormateada}`;
+        } else {
+          proxFechaText.textContent = `Próxima: Sin fechas`;
+        }
+      }
     });
-  });
 
-  document.addEventListener('click', () => {
-    sectorCards.forEach(c => c.classList.remove('activo'));
-  });
+    // 3. PINTAR EL CALENDARIO GENERAL (Ej: Días clave de Agosto y Septiembre 2026)
+    if (grid) {
+      grid.innerHTML = ''; // Limpiar contenedor
 
+      const estilos = {
+        dia_empleo: 'bg-blue-900 text-white font-bold shadow-md',
+        modulo_movil: 'bg-amber-500 text-white font-bold shadow-md',
+        feria_empleo: 'bg-purple-700 text-white font-bold shadow-md',
+        capacitacion: 'bg-emerald-600 text-white font-bold shadow-md'
+      };
+
+      // Definir los días que deseas mostrar en el calendario (por ejemplo, del 17 al 30 de Agosto)
+      // O puedes mapear directamente los eventos que vengan de la base de datos
+      for (let dia = 17; dia <= 30; dia++) {
+        // Buscar evento validando día y que pertenezca a agosto (mes 7 en JS)
+        const evEncontrado = eventosGlobales.find(e => {
+          const fechaObj = new Date(e.fecha_evento);
+          return fechaObj.getUTCDate() === dia && fechaObj.getUTCMonth() === 7; // 7 = Agosto
+        });
+
+        const celda = document.createElement('div');
+        celda.className = 'p-3 rounded-2xl flex flex-col items-center justify-center min-h-[75px] transition-all border border-slate-100';
+
+        if (evEncontrado) {
+          const claseEstilo = estilos[evEncontrado.tipo_evento] || 'bg-slate-800 text-white';
+          celda.className += ` ${claseEstilo}`;
+          celda.innerHTML = `
+            <span class="text-base font-bold">${dia}</span>
+            <span class="text-[10px] font-normal truncate max-w-[90px] mt-1">${evEncontrado.lugar || evEncontrado.titulo}</span>
+          `;
+        } else {
+          celda.className += ' bg-slate-50 text-slate-400 hover:bg-slate-100';
+          celda.innerHTML = `<span class="text-base">${dia}</span>`;
+        }
+
+        grid.appendChild(celda);
+      }
+    }
+
+    // 4. Interacción al hacer clic en tarjetas y filtros de leyenda
+    sectorCards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const estaActivo = card.classList.contains('activo');
+        sectorCards.forEach(c => c.classList.remove('activo'));
+        if (!estaActivo) card.classList.add('activo');
+      });
+    });
+
+    document.addEventListener('click', () => {
+      sectorCards.forEach(c => c.classList.remove('activo'));
+    });
+
+  } catch (error) {
+    console.error('Error al sincronizar los eventos con Neon:', error);
+  }
+}
+
+// Ejecutar al cargar la página
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', inicializarCalendarioEventos);
+} else {
+  inicializarCalendarioEventos();
+}
   /* --- Estado de Autenticación y Menú Flotante --- */
   function actualizarUIAutenticacion() {
     const userMenuContainer = document.getElementById('userMenuContainer');

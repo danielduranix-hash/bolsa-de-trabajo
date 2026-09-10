@@ -313,148 +313,92 @@
         <p class="section-subtitle text-slate-500 text-sm sm:text-base mt-2">Haz clic sobre una categoría para desplegar su calendario de eventos</p>
       </div>
 
-      <div class="sectores-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <!-- 1. Día del empleo -->
-        <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer transition-all hover:-translate-y-1" data-sector="diaEmpleo">
-          <div class="sector-header cat-dia-empleo bg-blue-100/70 rounded-2xl p-3.5 flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2.5">
-              <span class="text-2xl">☀️</span>
-              <h3 class="font-bold text-brand-navy text-sm">Día del empleo</h3>
-            </div>
-            <span class="badge-count bg-white/90 text-brand-navy font-bold text-xs px-2.5 py-1 rounded-full shadow-2xs">2 Fechas</span>
-          </div>
-          <p class="sector-desc text-slate-500 text-xs leading-relaxed">Jornadas semanales de vinculación directa entre postulantes y empresas en la cabecera municipal.</p>
-          
-          <div class="dropdown-calendar">
-            <div class="calendar-widget">
-              <div class="calendar-top">
-                <span class="cal-month">Agosto 2026</span>
-                <div class="cal-nav"><span>▲</span><span>▼</span></div>
-              </div>
-              <div class="calendar-days-header">
-                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
-              </div>
-              <div class="calendar-days-grid">
-                <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
-                <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
-                <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
-                <span>16</span><span>17</span><span class="active-today">18</span><span>19</span><span>20</span><span>21</span><span class="event-day" title="Atención en Palacio Municipal (09:00 AM - 02:00 PM)">22</span>
-                <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span>
-                <span>30</span><span>31</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span><span class="muted font-event" title="Módulo Central de Contratación (08:30 AM - 01:30 PM)">4</span><span class="muted">5</span>
-              </div>
-            </div>
-            <div class="event-summary">
-              <strong>📍 Próxima fecha:</strong> 22 de Agosto - Atención en Palacio Municipal (09:00 AM - 02:00 PM)
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. Módulo móvil -->
-        <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer transition-all hover:-translate-y-1" data-sector="moduloMovil">
-          <div class="sector-header cat-modulo-movil bg-amber-100/60 rounded-2xl p-3.5 flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2.5">
-              <span class="text-2xl">🚐</span>
-              <h3 class="font-bold text-amber-900 text-sm">Módulo móvil</h3>
-            </div>
-            <span class="badge-count bg-white/90 text-amber-900 font-bold text-xs px-2.5 py-1 rounded-full shadow-2xs">2 Fechas</span>
-          </div>
-          <p class="sector-desc text-slate-500 text-xs leading-relaxed">Unidades itinerantes que acercan la bolsa de trabajo e información directa a tu colonia o comunidad.</p>
-          
-          <div class="dropdown-calendar">
-            <div class="calendar-widget">
-              <div class="calendar-top">
-                <span class="cal-month">Agosto 2026</span>
-                <div class="cal-nav"><span>▲</span><span>▼</span></div>
-              </div>
-              <div class="calendar-days-header">
-                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
-              </div>
-              <div class="calendar-days-grid">
-                <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
-                <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
-                <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
-                <span>16</span><span>17</span><span class="active-today">18</span><span>19</span><span>20</span><span>21</span><span>22</span>
-                <span>23</span><span>24</span><span>25</span><span class="event-day" title="Atención Móvil - Sector Norte (09:00 AM - 01:00 PM)">26</span><span>27</span><span>28</span><span>29</span>
-                <span>30</span><span>31</span><span class="muted">1</span><span class="muted font-event" title="Atención Móvil - Sector Poniente (09:30 AM - 02:00 PM)">2</span><span class="muted">3</span><span class="muted">4</span><span class="muted">5</span>
-              </div>
-            </div>
-            <div class="event-summary">
-              <strong>📍 Próxima fecha:</strong> 26 de Agosto - Sector Norte (09:00 AM - 01:00 PM)
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Feria del empleo -->
-        <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer transition-all hover:-translate-y-1" data-sector="feriaEmpleo">
-          <div class="sector-header cat-feria-empleo bg-purple-100/60 rounded-2xl p-3.5 flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2.5">
-              <span class="text-2xl">🎪</span>
-              <h3 class="font-bold text-purple-900 text-sm">Feria del empleo</h3>
-            </div>
-            <span class="badge-count bg-white/90 text-purple-900 font-bold text-xs px-2.5 py-1 rounded-full shadow-2xs">1 Fecha</span>
-          </div>
-          <p class="sector-desc text-slate-500 text-xs leading-relaxed">Eventos masivos de reclutamiento presencial con participación de decenas de empresas líderes.</p>
-          
-          <div class="dropdown-calendar">
-            <div class="calendar-widget">
-              <div class="calendar-top">
-                <span class="cal-month">Septiembre 2026</span>
-                <div class="cal-nav"><span>▲</span><span>▼</span></div>
-              </div>
-              <div class="calendar-days-header">
-                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
-              </div>
-              <div class="calendar-days-grid">
-                <span class="muted">30</span><span class="muted">31</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-                <span>6</span><span>7</span><span>8</span><span>9</span><span class="event-day" title="Gran Feria Municipal del Empleo (08:00 AM - 03:00 PM)">10</span><span>11</span><span>12</span>
-                <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
-                <span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span>
-                <span>27</span><span>28</span><span>29</span><span>30</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span>
-              </div>
-            </div>
-            <div class="event-summary">
-              <strong>📍 Próxima fecha:</strong> 10 de Septiembre - Gran Feria Municipal (08:00 AM - 03:00 PM)
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. Capacitación -->
-        <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer transition-all hover:-translate-y-1" data-sector="capacitacion">
-          <div class="sector-header cat-capacitacion bg-emerald-100/60 rounded-2xl p-3.5 flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2.5">
-              <span class="text-2xl">🎓</span>
-              <h3 class="font-bold text-emerald-900 text-sm">Capacitación</h3>
-            </div>
-            <span class="badge-count bg-white/90 text-emerald-900 font-bold text-xs px-2.5 py-1 rounded-full shadow-2xs">2 Fechas</span>
-          </div>
-          <p class="sector-desc text-slate-500 text-xs leading-relaxed">Talleres y cursos prácticos para mejorar tu currículum, preparar entrevistas y optimizar habilidades.</p>
-          
-          <div class="dropdown-calendar">
-            <div class="calendar-widget">
-              <div class="calendar-top">
-                <span class="cal-month">Agosto 2026</span>
-                <div class="cal-nav"><span>▲</span><span>▼</span></div>
-              </div>
-              <div class="calendar-days-header">
-                <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
-              </div>
-              <div class="calendar-days-grid">
-                <span class="muted">26</span><span class="muted">27</span><span class="muted">28</span><span class="muted">29</span><span class="muted">30</span><span class="muted">31</span><span>1</span>
-                <span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
-                <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
-                <span>16</span><span>17</span><span class="active-today">18</span><span>19</span><span>20</span><span>21</span><span>22</span>
-                <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span class="event-day" title="Taller: Elaboración de CV impactante (10:00 AM - 12:00 PM)">28</span><span>29</span>
-                <span>30</span><span>31</span><span class="muted">1</span><span class="muted">2</span><span class="muted">3</span><span class="muted">4</span><span class="muted">5</span>
-              </div>
-            </div>
-            <div class="event-summary">
-              <strong>📍 Próxima fecha:</strong> 28 de Agosto - Taller: Elaboración de CV (10:00 AM - 12:00 PM)
-            </div>
-          </div>
-        </div>
+  <!-- Seccion de Tarjetas Resumen -->
+<div class="sectores-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+  <!-- 1. Día del empleo -->
+  <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer hover:-translate-y-1 transition-all" data-sector="dia_empleo">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">☀️</span>
+        <h3 class="font-bold text-brand-navy text-sm">Día del empleo</h3>
       </div>
-    </section>
-  </main>
+      <span class="badge-count bg-blue-50 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-full">0 Fechas</span>
+    </div>
+    <p class="text-slate-500 text-xs leading-relaxed mb-4">Jornadas semanales de vinculación directa entre postulantes y empresas en la cabecera municipal.</p>
+    <div class="text-blue-700 font-semibold text-xs flex items-center justify-between">
+      <span class="prox-fecha">Próxima: Sin fechas</span>
+      <span>→</span>
+    </div>
+  </div>
+
+  <!-- 2. Módulo móvil -->
+  <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer hover:-translate-y-1 transition-all" data-sector="modulo_movil">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🚐</span>
+        <h3 class="font-bold text-amber-900 text-sm">Módulo móvil</h3>
+      </div>
+      <span class="badge-count bg-amber-50 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-full">0 Fechas</span>
+    </div>
+    <p class="text-slate-500 text-xs leading-relaxed mb-4">Unidades itinerantes que acercan la bolsa de trabajo e información directa a tu colonia.</p>
+    <div class="text-amber-700 font-semibold text-xs flex items-center justify-between">
+      <span class="prox-fecha">Próxima: Sin fechas</span>
+      <span>→</span>
+    </div>
+  </div>
+
+  <!-- 3. Feria del empleo -->
+  <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer hover:-translate-y-1 transition-all" data-sector="feria_empleo">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🎪</span>
+        <h3 class="font-bold text-purple-900 text-sm">Feria del empleo</h3>
+      </div>
+      <span class="badge-count bg-purple-50 text-purple-700 font-bold text-xs px-2.5 py-1 rounded-full">0 Fechas</span>
+    </div>
+    <p class="text-slate-500 text-xs leading-relaxed mb-4">Eventos masivos de reclutamiento presencial con participación de decenas de empresas.</p>
+    <div class="text-purple-700 font-semibold text-xs flex items-center justify-between">
+      <span class="prox-fecha">Próxima: Sin fechas</span>
+      <span>→</span>
+    </div>
+  </div>
+
+  <!-- 4. Capacitación -->
+  <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer hover:-translate-y-1 transition-all" data-sector="capacitacion">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🎓</span>
+        <h3 class="font-bold text-emerald-900 text-sm">Capacitación</h3>
+      </div>
+      <span class="badge-count bg-emerald-50 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-full">0 Fechas</span>
+    </div>
+    <p class="text-slate-500 text-xs leading-relaxed mb-4">Talleres y cursos prácticos para mejorar tu currículum y optimizar tus habilidades.</p>
+    <div class="text-emerald-700 font-semibold text-xs flex items-center justify-between">
+      <span class="prox-fecha">Próxima: Sin fechas</span>
+      <span>→</span>
+    </div>
+  </div>
+</div>
+
+<!-- Sección del Calendario General -->
+<div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft-xl">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h2 class="text-xl font-bold text-brand-navy">Agosto & Septiembre 2026</h2>
+      <p class="text-xs text-slate-500">Calendario interactivo de vinculación ciudadana</p>
+    </div>
+    
+    <!-- Filtros de Leyenda -->
+    <div class="flex flex-wrap gap-2 text-xs font-semibold">
+      <button class="filtro-btn bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full" data-filtro="dia_empleo">● Día Empleo</button>
+      <button class="filtro-btn bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full" data-filtro="modulo_movil">● Módulo</button>
+      <button class="filtro-btn bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full" data-filtro="feria_empleo">● Feria</button>
+      <button class="filtro-btn bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full" data-filtro="capacitacion">● Taller</button>
+    </div>
+  </div>
+
+  <!-- Contenedor donde se pintarán los días dinámicamente -->
+<div id="calendarioGrid" class="grid grid-cols-7 gap-3 mt-6"></div></div>
 
   <!-- ==========================================
         VISTA 2: GEOPORTAL DE EMPLEOS (MAPA)
