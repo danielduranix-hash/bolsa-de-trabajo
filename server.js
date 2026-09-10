@@ -6,15 +6,14 @@ const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.use(express.static(__dirname));
 
 app.use(cors());
 app.use(express.json());
 
-// ============================================================================
 // CONEXIONES A LAS DOS BASES DE DATOS
-// ============================================================================
 
-// 1. Pool para la Base de Datos Principal (Usuarios y Perfil)
+// 1. Configuración de la Base de Datos Principal
 const dbConfig = {
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -26,32 +25,13 @@ const dbConfig = {
   }
 };
 
-// 1. Pool para la Base de Datos Principal (Usuarios y Perfil)
+// 2. Instanciar el Pool principal
 const poolBolsa = new Pool(dbConfig);
 
-// 2. Pool para la Base de Datos del CV Builder (IA)
-const poolCV = new Pool(dbConfig);
-
-
-// 2. Pool para la Base de Datos del CV Builder (IA)
-/*const poolCV = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: 'cv_builder_db',
-  password: process.env.DB_PASSWORD || 'gamer358',
-  port: process.env.DB_PORT || 5432,
-});*/
-
-// Verificar conexiones al arrancar
+// 3. Verificar conexión al arrancar
 poolBolsa.connect((err, client, release) => {
   if (err) return console.error('🔴 Error conectando a la BD:', err.stack);
   console.log('✅ Conectado a Neon en la BD:', process.env.DB_NAME);
-  release();
-});
-
-poolCV.connect((err, client, release) => {
-  if (err) return console.error('🔴 Error conectando a cv_builder_db:', err.stack);
-  console.log('✅ Conectado a la BD: cv_builder_db');
   release();
 });
 
@@ -61,9 +41,7 @@ const pasarANull = (val) => {
   return val;
 };
 
-// ============================================================================
 // ENDPOINTS DE USUARIO Y PERFIL (Usan poolBolsa)
-// ============================================================================
 
 app.post('/api/login', async (req, res) => {
   const { correo, password } = req.body;
@@ -328,9 +306,7 @@ app.put('/api/perfil/:curp', async (req, res) => {
   }
 });
 
-// ============================================================================
 // ENDPOINT DE REGISTRO
-// ============================================================================
 app.post('/api/registro', async (req, res) => {
   const { curp, correo, password, nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo } = req.body;
 
@@ -391,9 +367,7 @@ app.post('/api/registro', async (req, res) => {
   }
 });
 
-// ============================================================================
 // ENDPOINTS DE ADMINISTRACIÓN (Usan poolBolsa)
-// ============================================================================
 // GET: OBTENER TODOS LOS CIUDADANOS
 app.get('/api/admin/ciudadanos', async (req, res) => {
   try {
@@ -421,9 +395,55 @@ app.get('/api/admin/ciudadanos', async (req, res) => {
     });
   }
 });
-// ============================================================================
+
+// ENDPOINTS DE EVENTOS DEL CALENDARIO
+
+// 1. NUEVO GET: Obtener TODOS los eventos (para pintar el calendario general completo)
+app.get('/api/eventos', async (req, res) => {
+  try {
+    const result = await poolBolsa.query(
+      'SELECT * FROM eventos_calendario ORDER BY fecha_evento ASC'
+    );
+    res.json({ exito: true, eventos: result.rows });
+  } catch (error) {
+    console.error('🔴 Error al obtener todos los eventos:', error.message);
+    res.status(500).json({ exito: false, mensaje: 'Error al cargar los eventos del calendario.' });
+  }
+});
+
+// 2. CONSERVAR GET: Obtener eventos por tipo (útil si filtras individualmente por categoría)
+app.get('/api/eventos/:tipo', async (req, res) => {
+  const tipo = req.params.tipo;
+  try {
+    const result = await poolBolsa.query(
+      'SELECT * FROM eventos_calendario WHERE tipo_evento = $1 ORDER BY fecha_evento ASC',
+      [tipo]
+    );
+    res.json({ exito: true, eventos: result.rows });
+  } catch (error) {
+    console.error('🔴 Error al obtener eventos por tipo:', error.message);
+    res.status(500).json({ exito: false, mensaje: 'Error al cargar los eventos.' });
+  }
+});
+
+// 3. CONSERVAR POST: Crear un evento (lo usará el Admin para insertar nuevas fechas)
+app.post('/api/eventos', async (req, res) => {
+  const { tipo_evento, titulo, descripcion, fecha_evento, horario, lugar } = req.body;
+  try {
+    const query = `
+      INSERT INTO eventos_calendario (tipo_evento, titulo, descripcion, fecha_evento, horario, lugar)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *;
+    `;
+    const values = [tipo_evento, titulo, descripcion, fecha_evento, horario, lugar];
+    const nuevoEvento = await poolBolsa.query(query, values);
+    res.status(201).json({ exito: true, mensaje: 'Evento creado exitosamente', evento: nuevoEvento.rows[0] });
+  } catch (error) {
+    console.error('🔴 Error al crear evento:', error.message);
+    res.status(500).json({ exito: false, mensaje: 'Error al guardar el evento.' });
+  }
+});
 // ENDPOINTS DEL GENERADOR DE CV CON IA (Usarán poolCV)
-// ============================================================================
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
