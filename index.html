@@ -1,3 +1,4 @@
+<!-- nada-->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -537,9 +538,75 @@
             </div>
           </form>
         </div>
+
+  <!-- 2. Módulo móvil -->
+  <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer hover:-translate-y-1 transition-all" data-sector="modulo_movil">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🚐</span>
+        <h3 class="font-bold text-amber-900 text-sm">Módulo móvil</h3>
       </div>
-    </section>
-  </main>
+      <span class="badge-count bg-amber-50 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-full">0 Fechas</span>
+    </div>
+    <p class="text-slate-500 text-xs leading-relaxed mb-4">Unidades itinerantes que acercan la bolsa de trabajo e información directa a tu colonia.</p>
+    <div class="text-amber-700 font-semibold text-xs flex items-center justify-between">
+      <span class="prox-fecha">Próxima: Sin fechas</span>
+      <span>→</span>
+    </div>
+  </div>
+
+  <!-- 3. Feria del empleo -->
+  <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer hover:-translate-y-1 transition-all" data-sector="feria_empleo">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🎪</span>
+        <h3 class="font-bold text-purple-900 text-sm">Feria del empleo</h3>
+      </div>
+      <span class="badge-count bg-purple-50 text-purple-700 font-bold text-xs px-2.5 py-1 rounded-full">0 Fechas</span>
+    </div>
+    <p class="text-slate-500 text-xs leading-relaxed mb-4">Eventos masivos de reclutamiento presencial con participación de decenas de empresas.</p>
+    <div class="text-purple-700 font-semibold text-xs flex items-center justify-between">
+      <span class="prox-fecha">Próxima: Sin fechas</span>
+      <span>→</span>
+    </div>
+  </div>
+
+  <!-- 4. Capacitación -->
+  <div class="sector-card bg-white rounded-3xl p-5 border border-slate-200 shadow-soft-xl cursor-pointer hover:-translate-y-1 transition-all" data-sector="capacitacion">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🎓</span>
+        <h3 class="font-bold text-emerald-900 text-sm">Capacitación</h3>
+      </div>
+      <span class="badge-count bg-emerald-50 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-full">0 Fechas</span>
+    </div>
+    <p class="text-slate-500 text-xs leading-relaxed mb-4">Talleres y cursos prácticos para mejorar tu currículum y optimizar tus habilidades.</p>
+    <div class="text-emerald-700 font-semibold text-xs flex items-center justify-between">
+      <span class="prox-fecha">Próxima: Sin fechas</span>
+      <span>→</span>
+    </div>
+  </div>
+</div>
+
+<!-- Sección del Calendario General -->
+<div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft-xl">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h2 class="text-xl font-bold text-brand-navy">Agosto & Septiembre 2026</h2>
+      <p class="text-xs text-slate-500">Calendario interactivo de vinculación ciudadana</p>
+    </div>
+    
+    <!-- Filtros de Leyenda -->
+    <div class="flex flex-wrap gap-2 text-xs font-semibold">
+      <button class="filtro-btn bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full" data-filtro="dia_empleo">● Día Empleo</button>
+      <button class="filtro-btn bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full" data-filtro="modulo_movil">● Módulo</button>
+      <button class="filtro-btn bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full" data-filtro="feria_empleo">● Feria</button>
+      <button class="filtro-btn bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full" data-filtro="capacitacion">● Taller</button>
+    </div>
+  </div>
+
+  <!-- Contenedor donde se pintarán los días dinámicamente -->
+<div id="calendarioGrid" class="grid grid-cols-7 gap-3 mt-6"></div></div>
 
   <!-- ==========================================
         VISTA 2: GEOPORTAL DE EMPLEOS (MAPA)
