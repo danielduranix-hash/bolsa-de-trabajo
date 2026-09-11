@@ -381,24 +381,42 @@
 </div>
 
 <!-- Sección del Calendario General -->
-<div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft-xl">
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
-      <h2 class="text-xl font-bold text-brand-navy">Agosto & Septiembre 2026</h2>
-      <p class="text-xs text-slate-500">Calendario interactivo de vinculación ciudadana</p>
+      <div class="flex items-center gap-3">
+        <button id="btnMesAnterior" class="p-1.5 rounded-full hover:bg-slate-100 text-slate-600 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <h2 id="tituloMes" class="text-xl font-bold text-brand-navy min-w-[180px] text-center sm:text-left">Agosto 2026</h2>
+        <button id="btnMesSiguiente" class="p-1.5 rounded-full hover:bg-slate-100 text-slate-600 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+      <p class="text-xs text-slate-500 mt-1">Calendario interactivo de vinculación ciudadana</p>
     </div>
     
     <!-- Filtros de Leyenda -->
-    <div class="flex flex-wrap gap-2 text-xs font-semibold">
-      <button class="filtro-btn bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full" data-filtro="dia_empleo">● Día Empleo</button>
-      <button class="filtro-btn bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full" data-filtro="modulo_movil">● Módulo</button>
-      <button class="filtro-btn bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full" data-filtro="feria_empleo">● Feria</button>
-      <button class="filtro-btn bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full" data-filtro="capacitacion">● Taller</button>
-    </div>
+  <div class="flex flex-wrap gap-2 text-xs font-semibold">
+    <button class="filtro-btn bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full" data-filtro="dia_empleo">● Día Empleo</button>
+    <button class="filtro-btn bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full" data-filtro="modulo_movil">● Módulo</button>
+    <button class="filtro-btn bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full" data-filtro="feria_empleo">● Feria</button>
+    <button class="filtro-btn bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full" data-filtro="capacitacion">● Taller</button>
+  </div>
+</div>
+
+  <!-- AGREGAR ESTA FILA DE ENCABEZADOS -->
+  <div class="grid grid-cols-7 gap-3 text-center font-bold text-xs text-slate-400 mb-2">
+    <span>Lun</span>
+    <span>Mar</span>
+    <span>Mié</span>
+    <span>Jue</span>
+    <span>Vie</span>
+    <span>Sáb</span>
+    <span>Dom</span>
   </div>
 
-    <!-- Contenedor donde se pintarán los días dinámicamente -->
-  <div id="calendarioGrid" class="grid grid-cols-7 gap-3 mt-6"></div>
+  <!-- Contenedor donde se pintarán los días dinámicamente -->
+  <div id="calendarioGrid" class="grid grid-cols-7 gap-3"></div>
 </div>
 </section>  <!-- ← CIERRE DE AGENDA MUNICIPAL -->
 

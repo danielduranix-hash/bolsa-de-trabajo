@@ -354,13 +354,19 @@ if (formReg) {
   }
 
 /* --- Tarjetas de Sector / Calendario con Carga Dinámica desde Neon --- */
+let mesActualIndex = 0; // 0 = Agosto 2026, 1 = Septiembre 2026
+
+const configuracionMeses = [
+  { nombre: 'Agosto 2026', mesIndex: 7, totalDias: 31, offsetDias: 5 },     // 1 Ags cae en Sábado (5 espacios vacíos)
+  { nombre: 'Septiembre 2026', mesIndex: 8, totalDias: 30, offsetDias: 1 }  // 1 Sep cae en Martes (1 espacio vacío)
+];
+
 async function inicializarCalendarioEventos() {
   const sectorCards = document.querySelectorAll('.sector-card');
-  const grid = document.getElementById('calendarioGrid');
 
   try {
     // 1. Cargar eventos desde Neon
-    const response = await fetch('/api/eventos');
+    const response = await fetch('http://localhost:3000/api/eventos');
     const data = await response.json();
 
     if (!data.exito) return;
@@ -393,8 +399,15 @@ async function inicializarCalendarioEventos() {
       }
     });
 
-    // 3. PINTAR EL CALENDARIO GENERAL (Ej: Días clave de Agosto y Septiembre 2026)
-    if (grid) {
+    // 3. Función para renderizar el mes activo en el Grid
+    function renderizarMes() {
+      const grid = document.getElementById('calendarioGrid');
+      const tituloMes = document.getElementById('tituloMes');
+      if (!grid) return;
+
+      const mesConfig = configuracionMeses[mesActualIndex];
+      if (tituloMes) tituloMes.textContent = mesConfig.nombre;
+
       grid.innerHTML = ''; // Limpiar contenedor
 
       const estilos = {
@@ -404,13 +417,18 @@ async function inicializarCalendarioEventos() {
         capacitacion: 'bg-emerald-600 text-white font-bold shadow-md'
       };
 
-      // Definir los días que deseas mostrar en el calendario (por ejemplo, del 17 al 30 de Agosto)
-      // O puedes mapear directamente los eventos que vengan de la base de datos
-      for (let dia = 17; dia <= 30; dia++) {
-        // Buscar evento validando día y que pertenezca a agosto (mes 7 en JS)
+      // Desplazamiento de celdas vacías según el día en que inicia el mes
+      for (let i = 0; i < mesConfig.offsetDias; i++) {
+        const celdaVacia = document.createElement('div');
+        celdaVacia.className = 'p-3 rounded-2xl bg-transparent min-h-[75px]';
+        grid.appendChild(celdaVacia);
+      }
+
+      // Generar días del mes seleccionado
+      for (let dia = 1; dia <= mesConfig.totalDias; dia++) {
         const evEncontrado = eventosGlobales.find(e => {
           const fechaObj = new Date(e.fecha_evento);
-          return fechaObj.getUTCDate() === dia && fechaObj.getUTCMonth() === 7; // 7 = Agosto
+          return fechaObj.getUTCDate() === dia && fechaObj.getUTCMonth() === mesConfig.mesIndex;
         });
 
         const celda = document.createElement('div');
@@ -421,7 +439,7 @@ async function inicializarCalendarioEventos() {
           celda.className += ` ${claseEstilo}`;
           celda.innerHTML = `
             <span class="text-base font-bold">${dia}</span>
-            <span class="text-[10px] font-normal truncate max-w-[90px] mt-1">${evEncontrado.lugar || evEncontrado.titulo}</span>
+            <span class="text-[10px] font-normal truncate max-w-[90px] mt-1 text-center">${evEncontrado.lugar || evEncontrado.titulo}</span>
           `;
         } else {
           celda.className += ' bg-slate-50 text-slate-400 hover:bg-slate-100';
@@ -432,7 +450,32 @@ async function inicializarCalendarioEventos() {
       }
     }
 
-    // 4. Interacción al hacer clic en tarjetas y filtros de leyenda
+    // Renderizar la vista inicial
+    renderizarMes();
+
+    // 4. Asignar eventos a las flechas de navegación
+    const btnAnt = document.getElementById('btnMesAnterior');
+    const btnSig = document.getElementById('btnMesSiguiente');
+
+    if (btnAnt) {
+      btnAnt.onclick = () => {
+        if (mesActualIndex > 0) {
+          mesActualIndex--;
+          renderizarMes();
+        }
+      };
+    }
+
+    if (btnSig) {
+      btnSig.onclick = () => {
+        if (mesActualIndex < configuracionMeses.length - 1) {
+          mesActualIndex++;
+          renderizarMes();
+        }
+      };
+    }
+
+    // 5. Interacción al hacer clic en tarjetas
     sectorCards.forEach(card => {
       card.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -457,29 +500,29 @@ if (document.readyState === 'loading') {
 } else {
   inicializarCalendarioEventos();
 }
-  /* --- Estado de Autenticación y Menú Flotante --- */
-  function actualizarUIAutenticacion() {
-    const userMenuContainer = document.getElementById('userMenuContainer');
-    const dropdownNombre = document.getElementById('dropdownNombre');
-    const dropdownCorreo = document.getElementById('dropdownCorreo');
-    const btnVistaAdminMenu = document.getElementById('btnVistaAdminMenu');
+/* --- Estado de Autenticación y Menú Flotante --- */
+function actualizarUIAutenticacion() {
+  const userMenuContainer = document.getElementById('userMenuContainer');
+  const dropdownNombre = document.getElementById('dropdownNombre');
+  const dropdownCorreo = document.getElementById('dropdownCorreo');
+  const btnVistaAdminMenu = document.getElementById('btnVistaAdminMenu');
 
-    if (usuarioActivo) {
-      if (btnUserAuth) btnUserAuth.style.display = 'none';
-      if (userMenuContainer) userMenuContainer.style.display = 'inline-flex';
+  if (typeof usuarioActivo !== 'undefined' && usuarioActivo) {
+    if (typeof btnUserAuth !== 'undefined' && btnUserAuth) btnUserAuth.style.display = 'none';
+    if (userMenuContainer) userMenuContainer.style.display = 'inline-flex';
 
-      if (dropdownNombre) dropdownNombre.textContent = `${usuarioActivo.nombre || ''} ${usuarioActivo.primer_apellido || ''}`.trim();
-      if (dropdownCorreo) dropdownCorreo.textContent = usuarioActivo.correo || '';
+    if (dropdownNombre) dropdownNombre.textContent = `${usuarioActivo.nombre || ''} ${usuarioActivo.primer_apellido || ''}`.trim();
+    if (dropdownCorreo) dropdownCorreo.textContent = usuarioActivo.correo || '';
 
-      const esAdmin = usuarioActivo.rol === 'admin' || usuarioActivo.rol === 'superadmin' || usuarioActivo.correo?.toLowerCase().includes('admin');
-      if (btnVistaAdminMenu) btnVistaAdminMenu.style.display = esAdmin ? 'flex' : 'none';
-    } else {
-      if (btnUserAuth) btnUserAuth.style.display = 'inline-flex';
-      if (userMenuContainer) userMenuContainer.style.display = 'none';
-    }
+    const esAdmin = usuarioActivo.rol === 'admin' || usuarioActivo.rol === 'superadmin' || usuarioActivo.correo?.toLowerCase().includes('admin');
+    if (btnVistaAdminMenu) btnVistaAdminMenu.style.display = esAdmin ? 'flex' : 'none';
+  } else {
+    if (typeof btnUserAuth !== 'undefined' && btnUserAuth) btnUserAuth.style.display = 'inline-flex';
+    if (userMenuContainer) userMenuContainer.style.display = 'none';
   }
+}
 
-  actualizarUIAutenticacion();
+actualizarUIAutenticacion();
 
   const btnToggleUserMenu = document.getElementById('btnToggleUserMenu');
   const userDropdownMenu = document.getElementById('userDropdownMenu');
