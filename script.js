@@ -357,22 +357,21 @@ if (formReg) {
 let mesActualIndex = 0; // 0 = Agosto 2026, 1 = Septiembre 2026
 
 const configuracionMeses = [
-  { nombre: 'Agosto 2026', mesIndex: 7, totalDias: 31, offsetDias: 5 },     // 1 Ags cae en Sábado (5 espacios vacíos)
-  { nombre: 'Septiembre 2026', mesIndex: 8, totalDias: 30, offsetDias: 1 }  // 1 Sep cae en Martes (1 espacio vacío)
+  { nombre: 'Agosto 2026', mesIndex: 7, totalDias: 31, offsetDias: 5 },
+  { nombre: 'Septiembre 2026', mesIndex: 8, totalDias: 30, offsetDias: 1 }
 ];
 
 async function inicializarCalendarioEventos() {
   const sectorCards = document.querySelectorAll('.sector-card');
 
   try {
-    // 1. Cargar eventos desde Neon
     const response = await fetch('http://localhost:3000/api/eventos');
     const data = await response.json();
 
     if (!data.exito) return;
     const eventosGlobales = data.eventos || [];
 
-    // 2. Rellenar contadores y próxima fecha en tarjetas superiores
+    // 1. Rellenar contadores y próxima fecha en tarjetas
     sectorCards.forEach(card => {
       const sectorTipo = card.getAttribute('data-sector');
       const evsTipo = eventosGlobales.filter(e => e.tipo_evento === sectorTipo);
@@ -399,7 +398,7 @@ async function inicializarCalendarioEventos() {
       }
     });
 
-    // 3. Función para renderizar el mes activo en el Grid
+    // 2. Renderizar grid del mes activo
     function renderizarMes() {
       const grid = document.getElementById('calendarioGrid');
       const tituloMes = document.getElementById('tituloMes');
@@ -408,7 +407,7 @@ async function inicializarCalendarioEventos() {
       const mesConfig = configuracionMeses[mesActualIndex];
       if (tituloMes) tituloMes.textContent = mesConfig.nombre;
 
-      grid.innerHTML = ''; // Limpiar contenedor
+      grid.innerHTML = '';
 
       const estilos = {
         dia_empleo: 'bg-blue-900 text-white font-bold shadow-md',
@@ -417,14 +416,12 @@ async function inicializarCalendarioEventos() {
         capacitacion: 'bg-emerald-600 text-white font-bold shadow-md'
       };
 
-      // Desplazamiento de celdas vacías según el día en que inicia el mes
       for (let i = 0; i < mesConfig.offsetDias; i++) {
         const celdaVacia = document.createElement('div');
         celdaVacia.className = 'p-3 rounded-2xl bg-transparent min-h-[75px]';
         grid.appendChild(celdaVacia);
       }
 
-      // Generar días del mes seleccionado
       for (let dia = 1; dia <= mesConfig.totalDias; dia++) {
         const evEncontrado = eventosGlobales.find(e => {
           const fechaObj = new Date(e.fecha_evento);
@@ -450,43 +447,72 @@ async function inicializarCalendarioEventos() {
       }
     }
 
-    // Renderizar la vista inicial
     renderizarMes();
 
-    // 4. Asignar eventos a las flechas de navegación
+    // 3. Controles de navegación de meses
     const btnAnt = document.getElementById('btnMesAnterior');
     const btnSig = document.getElementById('btnMesSiguiente');
 
-    if (btnAnt) {
-      btnAnt.onclick = () => {
-        if (mesActualIndex > 0) {
-          mesActualIndex--;
-          renderizarMes();
-        }
-      };
-    }
+    if (btnAnt) btnAnt.onclick = () => { if (mesActualIndex > 0) { mesActualIndex--; renderizarMes(); } };
+    if (btnSig) btnSig.onclick = () => { if (mesActualIndex < configuracionMeses.length - 1) { mesActualIndex++; renderizarMes(); } };
 
-    if (btnSig) {
-      btnSig.onclick = () => {
-        if (mesActualIndex < configuracionMeses.length - 1) {
-          mesActualIndex++;
-          renderizarMes();
-        }
-      };
-    }
-
-    // 5. Interacción al hacer clic en tarjetas
+    // 4. MODAL AL HACER CLIC EN LAS TARJETAS
     sectorCards.forEach(card => {
       card.addEventListener('click', (e) => {
         e.stopPropagation();
-        const estaActivo = card.classList.contains('activo');
-        sectorCards.forEach(c => c.classList.remove('activo'));
-        if (!estaActivo) card.classList.add('activo');
-      });
-    });
+        const sectorTipo = card.getAttribute('data-sector');
+        const evsTipo = eventosGlobales.filter(e => e.tipo_evento === sectorTipo);
+        
+        // Obtener el título legible de la tarjeta
+        const tituloTarjeta = card.querySelector('h3, .font-bold')?.innerText || 'Eventos';
 
-    document.addEventListener('click', () => {
-      sectorCards.forEach(c => c.classList.remove('activo'));
+        // Crear contenedor del Modal
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4';
+        
+        let listaHTML = '';
+        if (evsTipo.length > 0) {
+          listaHTML = evsTipo.map(ev => {
+            const fechaStr = new Date(ev.fecha_evento).toLocaleDateString('es-MX', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              timeZone: 'UTC'
+            });
+            return `
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                <div>
+                  <p class="font-bold text-slate-700 text-sm">📅 ${fechaStr}</p>
+                  <p class="text-xs text-slate-500">📍 ${ev.lugar || 'Sede por confirmar'}</p>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } else {
+          listaHTML = `<p class="text-sm text-slate-400 text-center py-4">No hay eventos próximos para esta categoría.</p>`;
+        }
+
+        modalOverlay.innerHTML = `
+          <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 relative animate-fade-in">
+            <div class="flex justify-between items-center border-b pb-3">
+              <h3 class="font-bold text-slate-800 text-base">${tituloTarjeta}</h3>
+              <button id="cerrarModalBtn" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+            <div class="space-y-2 max-h-60 overflow-y-auto">
+              ${listaHTML}
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(modalOverlay);
+
+        // Eventos para cerrar el modal
+        const cerrarBtn = modalOverlay.querySelector('#cerrarModalBtn');
+        cerrarBtn.onclick = () => modalOverlay.remove();
+        modalOverlay.onclick = (event) => {
+          if (event.target === modalOverlay) modalOverlay.remove();
+        };
+      });
     });
 
   } catch (error) {
@@ -494,12 +520,13 @@ async function inicializarCalendarioEventos() {
   }
 }
 
-// Ejecutar al cargar la página
+// Ejecutar al cargar
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', inicializarCalendarioEventos);
 } else {
   inicializarCalendarioEventos();
 }
+
 /* --- Estado de Autenticación y Menú Flotante --- */
 function actualizarUIAutenticacion() {
   const userMenuContainer = document.getElementById('userMenuContainer');
