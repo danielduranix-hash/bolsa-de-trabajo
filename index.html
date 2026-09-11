@@ -1322,75 +1322,135 @@
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
   <!-- Inicialización de Lucide Icons -->
   <script>
-    lucide.createIcons();
+  lucide.createIcons();
 
-    // Validación del formulario "¿Qué dudas tienes?"
-    const formDudas = document.getElementById('formDudas');
-    if (formDudas) {
-      const inputNombre = document.getElementById('dudaNombre');
-      const inputCorreo = document.getElementById('dudaCorreo');
-      const inputConfirmCorreo = document.getElementById('dudaConfirmCorreo');
-      const inputTelefono = document.getElementById('dudaTelefono');
-      const inputComentarios = document.getElementById('dudaComentarios');
-      const checkTerminos = document.getElementById('checkTerminos');
-      const alertaError = document.getElementById('alertaErrorDudas');
-      const textoError = document.getElementById('textoErrorDudas');
-      const alertaExito = document.getElementById('alertaExitoDudas');
+  const formDudas = document.getElementById('formDudas');
+  if (formDudas) {
+    const inputNombre = document.getElementById('dudaNombre');
+    const inputCorreo = document.getElementById('dudaCorreo');
+    const inputConfirmCorreo = document.getElementById('dudaConfirmCorreo');
+    const inputTelefono = document.getElementById('dudaTelefono');
+    const inputComentarios = document.getElementById('dudaComentarios');
+    const checkTerminos = document.getElementById('checkTerminos');
+    const alertaError = document.getElementById('alertaErrorDudas');
+    const textoError = document.getElementById('textoErrorDudas');
+    const alertaExito = document.getElementById('alertaExitoDudas');
+    const btnEnviar = document.getElementById('btnEnviarDudas');
 
-      formDudas.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const campos = [inputNombre, inputCorreo, inputConfirmCorreo, inputTelefono, inputComentarios];
-        campos.forEach(c => c.closest('div').classList.remove('border-rose-400', 'bg-rose-50/50'));
-        alertaError.classList.add('hidden');
-        alertaExito.classList.add('hidden');
+    // ⚠️ CAMBIAR cuando el sitio esté en producción
+    const API_URL = 'http://localhost:3000/api/consultas';
 
-        let faltantes = false;
-        campos.forEach(campo => {
-          if (!campo.value.trim()) {
-            campo.closest('div').classList.add('border-rose-400', 'bg-rose-50/50');
-            faltantes = true;
-          }
+    formDudas.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      // Limpiar errores previos
+      const campos = [inputNombre, inputCorreo, inputConfirmCorreo, inputTelefono, inputComentarios];
+      campos.forEach(c => c.closest('div').classList.remove('border-rose-400', 'bg-rose-50/50'));
+      alertaError.classList.add('hidden');
+      alertaExito.classList.add('hidden');
+
+      // Validar campos vacíos
+      let faltantes = false;
+      campos.forEach(campo => {
+        if (!campo.value.trim()) {
+          campo.closest('div').classList.add('border-rose-400', 'bg-rose-50/50');
+          faltantes = true;
+        }
+      });
+
+      if (!checkTerminos.checked) faltantes = true;
+
+      if (faltantes) {
+        textoError.textContent = "Todos los campos son obligatorios. Por favor completa los datos y acepta los términos.";
+        alertaError.classList.remove('hidden');
+        alertaError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      // Validar correo
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(inputCorreo.value.trim())) {
+        inputCorreo.closest('div').classList.add('border-rose-400');
+        textoError.textContent = "Por favor ingresa un correo electrónico válido.";
+        alertaError.classList.remove('hidden');
+        return;
+      }
+
+      if (inputCorreo.value.trim().toLowerCase() !== inputConfirmCorreo.value.trim().toLowerCase()) {
+        inputConfirmCorreo.closest('div').classList.add('border-rose-400');
+        textoError.textContent = "La confirmación de correo no coincide.";
+        alertaError.classList.remove('hidden');
+        return;
+      }
+
+      // Validar teléfono
+      if (!/^\d{10}$/.test(inputTelefono.value.trim())) {
+        inputTelefono.closest('div').classList.add('border-rose-400');
+        textoError.textContent = "El teléfono debe tener 10 dígitos.";
+        alertaError.classList.remove('hidden');
+        return;
+      }
+
+      // Deshabilitar botón mientras envía
+      btnEnviar.disabled = true;
+      btnEnviar.style.opacity = '0.6';
+      const textoOriginal = btnEnviar.innerHTML;
+      btnEnviar.innerHTML = '<span>Enviando...</span>';
+
+      // ENVIAR AL BACKEND
+      try {
+        const respuesta = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombre_completo: inputNombre.value.trim(),
+            correo: inputCorreo.value.trim(),
+            confirmacion_correo: inputConfirmCorreo.value.trim(),
+            telefono: inputTelefono.value.trim(),
+            comentarios: inputComentarios.value.trim(),
+            acepta_terminos: checkTerminos.checked
+          })
         });
 
-        if (!checkTerminos.checked) faltantes = true;
+        const datos = await respuesta.json();
 
-        if (faltantes) {
-          textoError.textContent = "Todos los campos son obligatorios. Por favor completa los datos y acepta los términos.";
+        if (respuesta.ok && datos.exito) {
+          // ✅ Éxito
+          alertaExito.classList.remove('hidden');
+          formDudas.reset();
+          alertaExito.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // ❌ Error del servidor
+          textoError.textContent = datos.mensaje || "Error al enviar la consulta.";
           alertaError.classList.remove('hidden');
           alertaError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
         }
+      } catch (error) {
+        // ❌ Error de red
+        console.error('Error:', error);
+        textoError.textContent = "No se pudo conectar con el servidor. Verifica que el backend esté corriendo.";
+        alertaError.classList.remove('hidden');
+      } finally {
+        // Restaurar botón
+        btnEnviar.disabled = false;
+        btnEnviar.style.opacity = '1';
+        btnEnviar.innerHTML = textoOriginal;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }
+    });
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(inputCorreo.value.trim())) {
-          inputCorreo.closest('div').classList.add('border-rose-400');
-          textoError.textContent = "Por favor ingresa un correo electrónico válido.";
-          alertaError.classList.remove('hidden');
-          return;
-        }
-
-        if (inputCorreo.value.trim().toLowerCase() !== inputConfirmCorreo.value.trim().toLowerCase()) {
-          inputConfirmCorreo.closest('div').classList.add('border-rose-400');
-          textoError.textContent = "La confirmación de correo no coincide con el correo ingresado.";
-          alertaError.classList.remove('hidden');
-          return;
-        }
-
-        alertaExito.classList.remove('hidden');
-        formDudas.reset();
-        alertaExito.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Limpiar errores al escribir
+    [inputNombre, inputCorreo, inputConfirmCorreo, inputTelefono, inputComentarios].forEach(campo => {
+      campo.addEventListener('input', () => {
+        campo.closest('div').classList.remove('border-rose-400', 'bg-rose-50/50');
       });
+    });
+  }
+</script>
 
-      [inputNombre, inputCorreo, inputConfirmCorreo, inputTelefono, inputComentarios].forEach(campo => {
-        campo.addEventListener('input', () => {
-          campo.closest('div').classList.remove('border-rose-400', 'bg-rose-50/50');
-        });
-      });
-    }
-  </script>
   <!-- Archivo Lógico Principal -->
   <script src="script.js"></script>
 </body>
