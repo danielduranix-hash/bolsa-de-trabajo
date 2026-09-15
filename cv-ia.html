@@ -3,82 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV Maker con IA | GeoPortal Empleo</title>
-  <link rel="stylesheet" href="styles-cv.css">
-</head>
-<body>
+  <title>Crea tu CV con IA | Bolsa de Trabajo Municipal Mérida</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'brand-navy': '#0B2545',
+            'brand-blue': '#134074',
+            'brand-green': '#84CC16',
+          }
+        }
+      }
+    }
+  </script>
 
-  <!-- Encabezado simple -->
-  <header class="cv-header">
-    <div class="container">
-      <div class="logo">GeoPortal Empleo</div>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between antialiased pb-8">
+  <!-- Header Institucional con Logo en Imagen -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 h-24 flex items-center justify-between">
+      <a href="index.html" class="flex items-center py-2">
+        <img
+          src="logo-Merida-contigo-es-mejor.png" alt="Mérida Contigo es Mejor - Ayuntamiento 2024-2027" class="h-20 sm:h-24 w-auto object-contain"/>
+      </a>
     </div>
   </header>
 
-  <main class="cv-landing">
-    <!-- Hero Banner -->
-    <section class="hero-section">
-      <div class="container">
-        <h1>Crea tu CV con Inteligencia Artificial</h1>
-        <p>Destaca ante los reclutadores optimizando tu currículum en minutos con ayuda de nuestra IA.</p>
-        <!-- Cambiado a enlace direct al formulario -->
-        <a href="formulario-cv.html" id="btnEmpezarCV" class="btn-primary-lg" style="text-decoration: none; display: inline-block;">Comenzar ahora</a>
+  <!-- Contenido Principal -->
+  <main class="max-w-xl mx-auto px-4 py-6 space-y-6 w-full">
+    <!-- Encabezado de Sección -->
+    <div class="text-center space-y-2">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        PLATAFORMA LABORAL MÉRIDA
       </div>
-    </section>
+      <h1 class="text-2xl sm:text-3xl font-black text-brand-navy tracking-tight leading-tight">
+        ¿Cómo deseas crear tu <span class="text-emerald-600">currículum hoy?</span>
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
+        Elige la opción que mejor se adapte a tu ritmo, tiempo y objetivos laborales.
+      </p>
+    </div>
 
-    <!-- Sección explicativa de 3 pasos (Estilo Adecco) -->
-    <section class="steps-section">
-      <div class="container steps-grid">
-        
-        <!-- Paso 1 -->
-        <div class="step-card">
-          <div class="step-icon red-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-              <path d="m9 14 2 2 4-4"></path>
-            </svg>
-          </div>
-          <h3>Crea tu CV en pocos minutos</h3>
-          <p>Completa tus datos, añade tu experiencia y genera un currículum profesional de forma rápida y sencilla.</p>
-        </div>
-
-        <!-- Paso 2 -->
-        <div class="step-card">
-          <div class="step-icon red-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 11 12 14 22 4"></polyline>
-              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-            </svg>
-          </div>
-          <h3>Personaliza tu currículum con IA</h3>
-          <p>Adapta tu CV al tipo de empleo que estás buscando y destaca la información más relevante para cada oferta.</p>
-        </div>
-
-        <!-- Paso 3 -->
-        <div class="step-card">
-          <div class="step-icon red-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path>
-              <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6"></path>
-              <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>
-              <path d="M18 8a2 2 0 0 1 2 2v4a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path>
-            </svg>
-          </div>
-          <h3>Encuentra ofertas que encajan contigo</h3>
-          <p>Utiliza tu currículum para descubrir ofertas de empleo recomendadas según tu perfil profesional.</p>
-        </div>
-
+      <!-- Opción 1: Crear con Asistente IA (Destacada) -->
+    <div class="bg-white rounded-3xl p-6 shadow-xl shadow-brand-navy/5 border-2 border-emerald-500/80 relative space-y-5 transition-transform hover:-translate-y-0.5">
+      <!-- Etiquetas Superiores -->
+      <div class="flex items-center justify-between text-xs font-semibold">
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+          <i class="w-3.5 h-3.5" data-lucide="zap"></i> Recomendado • 3 min
+        </span>
+        <span class="inline-flex items-center gap-1 text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
+          <i class="w-3.5 h-3.5 text-emerald-600" data-lucide="shield-check"></i> Alta efectividad
+        </span>
       </div>
-    </section>
+      <!-- Título e Icono -->
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-brand-navy text-white flex items-center justify-center shrink-0 shadow-lg shadow-brand-navy/30">
+          <i class="w-6 h-6" data-lucide="bot"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-brand-navy leading-snug">Crear con Asistente IA</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Rápido, guiado y optimizado por inteligencia artificial</p>
+        </div>
+      </div>
 
-    <!-- Botón CTA final -->
-    <section class="cta-section">
-      <!-- Cambiado a enlace directo al formulario -->
-      <a href="formulario-cv.html" id="btnIrAFormulario" class="btn-primary-lg" style="text-decoration: none; display: inline-block;">Llenar mis datos personales</a>
-    </section>
+      <!-- Beneficios -->
+      <div class="space-y-2.5 pt-2 border-t border-slate-100">
+        <div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 font-medium">
+          <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+            <i class="w-3.5 h-3.5" data-lucide="check"></i>
+          </div>
+          <span>Carga tu PDF o perfil de LinkedIn con 1 clic</span>
+        </div>
+        <div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 font-medium">
+          <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+            <i class="w-3.5 h-3.5" data-lucide="check"></i>
+          </div>
+          <span>7 columnas de información importante</span>
+        </div>
+        <div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 font-medium">
+          <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+            <i class="w-3.5 h-3.5" data-lucide="check"></i>
+          </div>
+          <span>Optimizado para vacantes locales y filtros ATS</span>
+        </div>
+      </div>
+
+      <!-- Botón de Acción -->
+      <a href="formulario-cv.html" class="w-full py-3.5 px-5 rounded-2xl bg-brand-navy hover:bg-brand-blue text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-navy/20 transition-all text-decoration-none">
+        <span>Empezar con Asistente IA</span>
+        <i class="w-4 h-4" data-lucide="arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Opción 2: Creación Manual -->
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-5 transition-transform hover:-translate-y-0.5">
+     
+      <!-- Etiquetas Superiores -->
+      <div class="flex items-center justify-between text-xs font-semibold">
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 text-slate-600">
+          <i class="w-3.5 h-3.5" data-lucide="sliders"></i> Control Total • 12 min
+        </span>
+        <span class="text-[10px] tracking-wider text-slate-400 font-bold uppercase">
+          MODO PASO A PASO
+        </span>
+      </div>
+
+      <!-- Título e Icono -->
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-slate-100 text-brand-navy flex items-center justify-center shrink-0">
+          <i class="w-6 h-6" data-lucide="file-edit"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-brand-navy leading-snug">Creación Manual Paso a Paso</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Controla cada sección a tu propio ritmo</p>
+        </div>
+      </div>
+
+      <!-- Beneficios -->
+      <div class="space-y-2.5 pt-2 border-t border-slate-100">
+        <div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-600 font-medium">
+          <div class="w-5 h-5 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center shrink-0">
+            <i class="w-3.5 h-3.5" data-lucide="check"></i>
+          </div>
+          <span>Llenado modular sección por sección</span>
+        </div>
+        <div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-600 font-medium">
+          <div class="w-5 h-5 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center shrink-0">
+            <i class="w-3.5 h-3.5" data-lucide="check"></i>
+          </div>
+          <span>Plantillas aprobadas por reclutadores</span>
+        </div>
+        <div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-600 font-medium">
+          <div class="w-5 h-5 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center shrink-0">
+            <i class="w-3.5 h-3.5" data-lucide="check"></i>
+          </div>
+          <span>Edición y descarga a tu propio ritmo</span>
+        </div>
+      </div>
+
+      <!-- Botón de Acción -->
+      <a href="formulario-cv.html" class="w-full py-3.5 px-5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-brand-navy font-bold text-sm flex items-center justify-center gap-2 transition-all text-decoration-none shadow-sm">
+        <span>Iniciar modo manual</span>
+        <i class="w-4 h-4 text-emerald-600" data-lucide="edit-3"></i>
+      </a>
+    </div>
+
+    <!-- Opción 3: ¿Ya tienes un CV previo? -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <i class="w-5 h-5" data-lucide="file-up"></i>
+        </div>
+        <div>
+          <h3 class="text-xs sm:text-sm font-bold text-brand-navy">¿Ya tienes un CV previo?</h3>
+          <p class="text-[11px] sm:text-xs text-slate-500">Sube tu archivo PDF o DOCX para auto-completar.</p>
+        </div>
+      </div>
+      <label class="cursor-pointer px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-brand-navy font-semibold text-xs transition-colors shrink-0">
+        Examinar
+        <input type="file" accept=".pdf,.doc,.docx" class="hidden">
+      </label>
+    </div>
+
+    <!-- Footer / Sellos de Confianza -->
+    <div class="flex flex-wrap items-center justify-center gap-4 pt-4 text-xs font-semibold text-slate-500 text-center">
+      <span class="inline-flex items-center gap-1.5">
+        <i class="w-4 h-4 text-emerald-600" data-lucide="check-circle-2"></i> 100% Gratuito y Municipal
+      </span>
+      <span class="inline-flex items-center gap-1.5">
+        <i class="w-4 h-4 text-brand-navy" data-lucide="building-2"></i> Empresas de Mérida
+      </span>
+      <span class="inline-flex items-center gap-1.5">
+        <i class="w-4 h-4 text-emerald-600" data-lucide="file-text"></i> PDF Inmediato
+      </span>
+    </div>
   </main>
 
-  <!-- Removido script-cv.js ya que este archivo no requiere lógica JavaScript -->
+  <!-- Inicializar Iconos Lucide -->
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>
