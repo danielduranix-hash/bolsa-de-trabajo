@@ -15,6 +15,9 @@
       max-width: 600px; 
       margin: 0 auto; 
       padding: 20px; 
+      background: #ffffff;            /* fondo blanco */
+      border: 4px dashed #10b981;     /* borde verde con rayas */
+      border-radius: 8px;               /* esquinas redondeadas */
     }
     .header { 
       background: linear-gradient(135deg, #0d3c75, #1e3a8a); 
@@ -45,36 +48,88 @@
     }
     
     .content { 
-      background: #f8fafc; 
-      padding: 25px; 
-      border-radius: 0 0 8px 8px; 
+        background: #f8fafc; 
+        padding: 25px; 
+        border-radius: 8px; 
     }
-    .campo { 
-      margin-bottom: 18px; 
+    /* Diseño de tabla y consulta basado en code.html */
+    /* Tarjeta de Datos del Remitente */
+    .data-table {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 18px;
     }
-    .etiqueta { 
-      font-weight: bold; 
-      color: #0d3c75; 
-      font-size: 11px; 
-      text-transform: uppercase; 
-      letter-spacing: 0.5px; 
-      margin-bottom: 5px; 
+    .data-row {
+      border-bottom: 1px solid #f1f5f9;
     }
-    .valor { 
-      background: white; 
-      padding: 12px 16px; 
-      border-radius: 6px; 
-      border: 1px solid #e2e8f0; 
-      font-size: 14px; 
+    .data-row:last-child {
+      border-bottom: none;
     }
-    .comentarios { 
-      background: white; 
-      padding: 16px; 
-      border-radius: 6px; 
-      border-left: 4px solid #10b981; 
-      white-space: pre-wrap; 
-      font-size: 14px; 
+    .data-cell-label {
+      width: 32%;
+      padding: 11px 14px;
+      background-color: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      border-right: 1px solid #e2e8f0;
     }
+    .data-cell-value {
+      padding: 11px 16px;
+      font-size: 14px;
+      color: #0f172a;
+      font-weight: 500;
+    }
+    .data-cell-value a {
+      color: #0d3c75;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .data-cell-value a:hover {
+      text-decoration: underline;
+    }
+
+    /* Caja de la Consulta / Mensaje */
+    .query-box {
+      background-color: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      border-left: 5px solid #10b981;
+      padding: 18px;
+      margin-bottom: 22px;
+    }
+    .query-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #475569;
+      font-weight: 600;
+    }
+    .badge-origin {
+      display: inline-block;
+      background: #e0e7ff;
+      color: #1e3a8a;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .query-text {
+      font-size: 14px;
+      line-height: 1.65;
+      color: #1e293b;
+      white-space: pre-wrap;
+      margin: 0;
+    }
+
+
     .footer { 
       text-align: center; 
       color: #94a3b8; 
@@ -94,11 +149,13 @@
 </head>
 <body>
   <div class="container">
+    <!--
     <div class="header">
       <h1>📩 Nueva consulta ciudadana</h1>
       <p>Consulta #{{idConsulta}}</p>
     </div>
-    
+    -->
+
     <!-- ⬇️ IMAGEN DEBAJO DEL HEADER -->
     <div class="logo-container">
       <img 
@@ -108,24 +165,38 @@
     </div>
     
     <div class="content">
-      <div class="campo">
-        <div class="etiqueta">Nombre completo</div>
-        <div class="valor">{{nombre_completo}}</div>
-      </div>
-      <div class="campo">
-        <div class="etiqueta">Correo electrónico</div>
-        <div class="valor">
-          <a href="mailto:{{correo}}">{{correo}}</a>
+      <div class="section-title">Datos del Solicitante / Ciudadano</div>
+
+      <table class="data-table">
+        <tbody>
+          <tr class="data-row">
+            <td class="data-cell-label">Nombre</td>
+            <td class="data-cell-value"><strong>{{nombre_completo}}</strong></td>
+          </tr>
+          <tr class="data-row">
+            <td class="data-cell-label">Correo electrónico</td>
+            <td class="data-cell-value">
+              <a href="mailto:{{correo}}?subject=Respuesta a consulta {{idConsulta}} - Dirección de Prosperidad" class=""> {{correo}}</a>
+            </td>
+          </tr>
+          <tr class="data-row">
+            <td class="data-cell-label">Teléfono</td>
+            <td class="data-cell-value">
+              <a href="tel:{{telefono}}" style="color: #334155; text-decoration: none;" class="">{{telefono}}</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-title">¿Qué dudas tienes?</div>
+
+      <div class="query-box">
+        <div class="query-header">
+          <span>Mensaje recibido del ciudadano:</span>
         </div>
+        <div class="query-text">{{comentarios}}</div>
       </div>
-      <div class="campo">
-        <div class="etiqueta">Teléfono</div>
-        <div class="valor">{{telefono}}</div>
-      </div>
-      <div class="campo">
-        <div class="etiqueta">Comentarios</div>
-        <div class="comentarios">{{comentarios}}</div>
-      </div>
+
       <div class="footer">
         Recibido el {{fechaEnvio}}<br>
         Dirección de Prosperidad y Bienestar Económico
