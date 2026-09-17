@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const { Pool } = require('pg');
-const nodemailer = require('nodemailer'); //para correos
+const { verificarConexionSMTP, enviarCorreoConsulta } = require('./services/correo-e');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,27 +36,8 @@ poolBolsa.connect((err, client, release) => {
   release();
 });
 
-// =====================================================
-// CONFIGURACIÓN DE CORREO (SMTP)
-// =====================================================
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT) || 587,
-  secure: false, // false para puerto 587
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD
-  }
-});
-
-// Verificar conexión SMTP al arrancar
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('🔴 Error en configuración de correo:', error.message);
-  } else {
-    console.log('📧 Servidor de correo listo para enviar');
-  }
-});
+// Verificar conexión SMTP al arrancar (delegado al servicio)
+verificarConexionSMTP();
 
 const pasarANull = (val) => {
   if (val === undefined || val === null) return null;
@@ -530,93 +511,16 @@ app.post('/api/consultas', async (req, res) => {
     const resultado = await poolBolsa.query(query, valores);
     const idConsulta = resultado.rows[0].id;
     const fechaEnvio = resultado.rows[0].fecha_envio;
-
-    // ============ 2. ENVIAR CORREO ============
-    const correoDestino = process.env.CORREO_DESTINO || process.env.SMTP_USER;
-
-    const opcionesCorreo = {
-      from: `"${process.env.SMTP_FROM_NAME || 'Bolsa de Trabajo'}" <${process.env.SMTP_USER}>`,
-      to: correoDestino,
-      replyTo: correo,
-      subject: `📩 Nueva consulta ciudadana #${idConsulta}`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; margin: 0; padding: 0; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #0d3c75, #1e3a8a); color: white; padding: 25px; border-radius: 8px 8px 0 0; }
-            .header h1 { margin: 0; font-size: 22px; }
-            .header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 14px; }
-            .content { background: #f8fafc; padding: 25px; border-radius: 0 0 8px 8px; }
-            .campo { margin-bottom: 18px; }
-            .etiqueta { font-weight: bold; color: #0d3c75; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-            .valor { background: white; padding: 12px 16px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 14px; }
-            .comentarios { background: white; padding: 16px; border-radius: 6px; border-left: 4px solid #10b981; white-space: pre-wrap; font-size: 14px; }
-            .footer { text-align: center; color: #94a3b8; font-size: 11px; margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; }
-            a { color: #0d3c75; text-decoration: none; }
-            a:hover { text-decoration: underline; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>📩 Nueva consulta ciudadana</h1>
-              <p>Consulta #${idConsulta}</p>
-            </div>
-            <div class="content">
-              <div class="campo">
-                <div class="etiqueta">Nombre completo</div>
-                <div class="valor">${nombre_completo}</div>
-              </div>
-              <div class="campo">
-                <div class="etiqueta">Correo electrónico</div>
-                <div class="valor"><a href="mailto:${correo}">${correo}</a></div>
-              </div>
-              <div class="campo">
-                <div class="etiqueta">Teléfono</div>
-                <div class="valor">${telefono}</div>
-              </div>
-              <div class="campo">
-                <div class="etiqueta">Comentarios</div>
-                <div class="comentarios">${comentarios}</div>
-              </div>
-              <div class="footer">
-                Recibido el ${new Date(fechaEnvio).toLocaleString('es-MX', { 
-                  dateStyle: 'long', 
-                  timeStyle: 'short' 
-                })}<br>
-                Bolsa de Trabajo Municipal de Mérida
-              </div>
-            </div>
-          </div>
-        </body>
-        </html>
-      `,
-      text: `
-Nueva consulta ciudadana #${idConsulta}
-
-Nombre: ${nombre_completo}
-Correo: ${correo}
-Teléfono: ${telefono}
-
-Comentarios:
-${comentarios}
-
-Recibido: ${new Date(fechaEnvio).toLocaleString('es-MX')}
-      `
-    };
-
-    // Enviar el correo (con try/catch para que no tumbe la operación)
-    try {
-      await transporter.sendMail(opcionesCorreo);
-      console.log(`📧 Correo enviado a ${correoDestino} (consulta #${idConsulta})`);
-    } catch (emailError) {
-      // Si falla el correo, la consulta YA ESTÁ guardada en la BD
-      console.error('⚠️ Error al enviar correo:', emailError.message);
-    }
+    
+    // ============ 2. ENVIAR CORREO (delegado al servicio) ============
+    await enviarCorreoConsulta({
+      idConsulta,
+      nombre_completo,
+      correo,
+      telefono,
+      comentarios,
+      fechaEnvio
+    });
 
     // ============ 3. RESPONDER AL FRONTEND ============
     res.status(201).json({
