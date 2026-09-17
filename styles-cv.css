@@ -105,3 +105,21 @@ body {
 .btn-primary-lg:hover {
   background-color: #b82b14;
 }
+
+/* Ajuste de compresión para evitar 2ª hoja en PDF */
+.cv-paper {
+  padding: 20px 25px !important; /* Reduce el relleno superior e inferior */
+  box-sizing: border-box !important;
+}
+
+.cv-paper h2, 
+.cv-paper h3, 
+.cv-paper .section-title {
+  margin-top: 10px !important;
+  margin-bottom: 5px !important;
+}
+
+.cv-paper ul, 
+.cv-paper p {
+  margin-bottom: 4px !important;
+}

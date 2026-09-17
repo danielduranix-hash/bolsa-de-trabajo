@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Definir restricción sintética de extensión según la sección
       const reglasFormato = {
-        experiencia: "Resume en máximo 3 puntos (bullet points) altamente profesionales, concisos y usando verbos de acción. No te extiendas para evitar que el CV ocupe más de una página.",
+        experiencia: "Resume en máximo 5 puntos (bullet points) altamente profesionales, concisos y usando verbos de acción.",
         formacion: "Resume en máximo 2 líneas claras y sintéticas (Título, Institución, Año/Estado).",
         competencias: "Presenta una lista breve de competencias clave divididas por comas o viñetas cortas (máximo 6 habilidades).",
         actividades: "Resume en máximo 2 puntos breves y concretos las actividades o logros principales."
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 6. PLANTILLAS Y DESCARGA EN PDF
+// 6. PLANTILLAS Y DESCARGA EN PDF
   const cvPaper = document.getElementById('cvPaper');
   
   document.querySelectorAll('input[name="disenoCv"]').forEach(radio => {
@@ -384,23 +384,31 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("La librería HTML2PDF aún no ha cargado. Intenta de nuevo en unos momentos.");
         return;
       }
-      
+
+      // Clonamos la vista previa para no alterar lo que el usuario ve en pantalla
       const clon = cvPaper.cloneNode(true);
       clon.style.transform = "none";
-      clon.style.margin = "0";
-      clon.style.width = "210mm";
-      document.body.appendChild(clon);
+      clon.style.margin = "0 auto";
+      clon.style.maxHeight = "285mm"; // Un par de milímetros menos que A4 (297mm) para evitar el salto
+      clon.style.overflow = "hidden";
 
-      html2pdf().set({
+      const opciones = {
         margin: 0,
         filename: 'Curriculum_Vitae.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }).from(clon).save().then(() => document.body.removeChild(clon));
+        html2canvas: { 
+          scale: 1.6, // Escala ligeramente reducida para ajustar el contenido en 1 sola hoja
+          useCORS: true,
+          scrollY: 0
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: 'avoid-all' }
+      };
+
+      html2pdf().set(opciones).from(clon).save();
     });
   }
-
+  
   // ==========================================
   // 7. RECONOCIMIENTO DE VOZ (SPEECH RECOGNITION)
   // ==========================================
