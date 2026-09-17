@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. INTEGRACIÓN CON BACKEND IA (FASTAPI / GROQ) CON MENSAJE INFORMATIVO
+  // 5. INTEGRACIÓN CON BACKEND IA (FASTAPI / GROQ) - RENDERIZADO SINTÉTICO Y CONTROL DE ESPACIO
   document.querySelectorAll('.btn-ai, .btn-ia, [data-ai="true"]').forEach(button => {
     button.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -306,8 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Mensaje de confirmación/aviso sobre el uso de IA
       const confirmarIA = confirm(
         "💡 Nota importante sobre el asistente IA:\n\n" +
-        "La optimización generada sirve como una base o sugerencia profesional. " +
-        "Te recomendamos revisar el contenido y realizar los cambios o ajustes finales que consideres necesarios para reflejar fielmente tu experiencia.\n\n" +
+        "La optimización generada ajustará el texto para mantener un tamaño sintético e ideal para formato de CV impreso (1 página).\n\n" +
+        "Te recomendamos revisar el resultado y hacer ajustes si es necesario.\n\n" +
         "¿Deseas continuar?"
       );
 
@@ -317,13 +317,23 @@ document.addEventListener('DOMContentLoaded', () => {
       button.disabled = true;
       button.innerText = "✨ Optimizando...";
 
+      // Definir restricción sintética de extensión según la sección
+      const reglasFormato = {
+        experiencia: "Resume en máximo 3 puntos (bullet points) altamente profesionales, concisos y usando verbos de acción. No te extiendas para evitar que el CV ocupe más de una página.",
+        formacion: "Resume en máximo 2 líneas claras y sintéticas (Título, Institución, Año/Estado).",
+        competencias: "Presenta una lista breve de competencias clave divididas por comas o viñetas cortas (máximo 6 habilidades).",
+        actividades: "Resume en máximo 2 puntos breves y concretos las actividades o logros principales."
+      };
+
+      const promptRestringido = `${reglasFormato[seccion] || 'Se conciso, sintético y breve.'}\n\nTexto original del usuario:\n${textoOriginal}`;
+
       try {
         const lang = document.getElementById('idiomaCv')?.value || 'es';
         const response = await fetch("http://127.0.0.1:8000/api/mejorar-cv", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            texto: textoOriginal,
+            texto: promptRestringido,
             seccion: seccion,
             idioma: lang
           })
@@ -334,8 +344,8 @@ document.addEventListener('DOMContentLoaded', () => {
           targetTextarea.value = data.resultado;
 
           // Actualizar vista previa y guardar
-          targetTextarea.dispatchEvent(new Event('input'));
-          targetTextarea.dispatchEvent(new Event('change'));
+          targetTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+          targetTextarea.dispatchEvent(new Event('change', { bubbles: true }));
           guardarProgreso();
         } else {
           alert("Error de Servidor: " + (data.detail || "No se pudo optimizar el texto."));
@@ -452,8 +462,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const textoPrevio = targetTextarea.value.trim();
         targetTextarea.value = textoPrevio ? `${textoPrevio} ${transcript}` : transcript;
 
-        targetTextarea.dispatchEvent(new Event('input'));
-        targetTextarea.dispatchEvent(new Event('change'));
+        targetTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+        targetTextarea.dispatchEvent(new Event('change', { bubbles: true }));
         guardarProgreso();
       }
     };
