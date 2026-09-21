@@ -52,7 +52,7 @@
     <main class="form-container">
       <form id="cvForm" onsubmit="return false;">
 
-        <!-- PASO 1: DATOS PERSONALES (SIN FOTO DE PERFIL) -->
+        <!-- PASO 1: DATOS PERSONALES -->
         <section class="step-content active" id="step-1">
           <h3>Datos personales</h3>
           
@@ -89,8 +89,15 @@
             </div>
             <div class="form-group">
               <label for="telefono">Teléfono</label>
-              <input type="tel" id="telefono" placeholder="+52 999 000 0000">
-            </div>
+        <input 
+          type="tel" 
+          id="telefono" 
+          placeholder="Ej. 999 999 9999" 
+          inputmode="numeric" 
+          pattern="[0-9+ ]*" 
+          maxlength="10"
+          oninput="this.value = this.value.replace(/[^0-9+ ]/g, '');"
+>            </div>
           </div>
 
           <div class="form-row">
@@ -103,15 +110,48 @@
               <input type="date" id="fechaNacimiento">
             </div>
           </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="linkedin">LinkedIn <span class="optional">(Opcional)</span></label>
+              <input type="url" id="linkedin" placeholder="https://linkedin.com/in/usuario">
+            </div>
+            <div class="form-group">
+              <label for="github">GitHub / Portafolio <span class="optional">(Opcional)</span></label>
+              <input type="url" id="github" placeholder="https://github.com/usuario">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="perfilProfesional">Perfil Profesional / Resumen</label>
+            <textarea id="perfilProfesional" rows="3" placeholder="Resumen breve de tu experiencia laboral, competencias principales y fortalezas profesionales..."></textarea>
+          </div>
         </section>
 
         <!-- PASO 2: EXPERIENCIA -->
         <section class="step-content" id="step-2">
           <h3>Experiencia Laboral</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expEmpresa">Empresa / Organización</label>
+              <input type="text" id="expEmpresa" placeholder="Ej. Grupo Consultores">
+            </div>
+            <div class="form-group">
+              <label for="expPuesto">Puesto o Cargo</label>
+              <input type="text" id="expPuesto" placeholder="Ej. Desarrollador Web Frontend">
+            </div>
+          </div>
+
           <div class="form-group">
-            <label for="experienciaTexto">Describe tus empleos, puestos y logros principales:</label>
+            <label for="expFechas">Periodo / Fechas</label>
+            <input type="text" id="expFechas" placeholder="Ej. Enero 2023 - Presente / Mar 2021 - Dic 2022">
+          </div>
+
+          <div class="form-group">
+            <label for="experienciaTexto">Actividades principales y Logros</label>
             <div class="voice-input-container">
-              <textarea id="experienciaTexto" rows="8" placeholder="• Desarrollador Frontend en Empresa X (2021 - Presente): Creación de interfaces web..."></textarea>
+              <textarea id="experienciaTexto" rows="6" placeholder="• Actividades: Mantenimiento del portal web, integración de APIs y gestión de bases de datos.&#10;• Logros: Reducción de tiempos de carga en un 20% y automatización del sistema de reportes."></textarea>
               <div class="button-actions" style="margin-top: 8px; display: flex; gap: 8px;">
                 <button type="button" class="btn-voice" data-target="experienciaTexto" title="Dictar por voz">
                   🎤 Hablar
@@ -212,7 +252,16 @@
             </label>
           </div>
 
-          <div class="download-section">
+          <!-- PERSONALIZACIÓN DE COLOR -->
+          <div class="color-picker-section" style="margin-top: 25px; padding: 15px; border-radius: 8px; background-color: #f9f9f9;">
+            <h4 style="margin-bottom: 8px; color: #111111; font-size: 1rem;">Color principal del tema</h4>
+            <div class="color-picker-group">
+              <input type="color" id="inputColorTema" value="#0b3b60">
+              <label for="inputColorTema">Selecciona el tono para títulos y acentos del CV</label>
+            </div>
+          </div>
+
+          <div class="download-section" style="margin-top: 30px;">
             <button type="button" id="btnDescargarPDF" class="btn-primary btn-large">Descargar PDF</button>
           </div>
         </section>
@@ -240,11 +289,20 @@
                 <span id="pvTelefono">+00 0000 0000</span> | 
                 <span id="pvUbicacion">Ciudad, País</span>
               </div>
-              <div class="cv-birthdate" id="pvFechaNac">Fecha de nacimiento: N/A</div>
+              <div class="cv-links-info" style="margin-top: 4px; font-size: 0.85rem; color: #555;">
+                <span id="pvLinkedin">linkedin.com/in/usuario</span> | 
+                <span id="pvGithub">github.com/usuario</span>
+              </div>
+              <div class="cv-birthdate" id="pvFechaNac" style="margin-top: 2px;">Fecha de nacimiento: N/A</div>
             </div>
           </header>
 
           <main class="cv-body">
+            <section class="cv-section" id="pvSectionPerfil">
+              <h3>Perfil Profesional</h3>
+              <p id="pvPerfil" class="preserve-whitespace">Tu resumen profesional aparecerá aquí...</p>
+            </section>
+
             <section class="cv-section">
               <h3 id="lblExperiencia">Experiencia Laboral</h3>
               <p id="pvExperiencia" class="preserve-whitespace">Tu experiencia aparecerá aquí...</p>

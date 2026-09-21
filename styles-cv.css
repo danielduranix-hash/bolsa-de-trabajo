@@ -5,6 +5,11 @@
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
+/* Variables globales y dinámicas */
+:root {
+  --cv-theme-color: #0b3b60;
+}
+
 body {
   background-color: #ffffff;
   color: #222222;
@@ -18,7 +23,7 @@ body {
 
 /* Header */
 .cv-header {
-  padding: 20px 0;
+  padding: 15px 0;
   border-bottom: 1px solid #eeeeee;
 }
 
@@ -47,7 +52,7 @@ body {
   margin: 0 auto 30px;
 }
 
-/* Grid de Pasos (Basado en la captura) */
+/* Grid de Pasos */
 .steps-section {
   padding: 40px 20px 60px;
 }
@@ -84,7 +89,7 @@ body {
   line-height: 1.5;
 }
 
-/* Botones */
+/* Botones Principales */
 .cta-section {
   text-align: center;
   padding-bottom: 80px;
@@ -106,20 +111,104 @@ body {
   background-color: #b82b14;
 }
 
-/* Ajuste de compresión para evitar 2ª hoja en PDF */
-.cv-paper {
-  padding: 20px 25px !important; /* Reduce el relleno superior e inferior */
-  box-sizing: border-box !important;
+/* Selector de color en el formulario */
+.color-picker-section {
+  border: 1px solid #e0e0e0;
 }
 
+.color-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.color-picker-group input[type="color"] {
+  border: none;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0;
+  background: none;
+}
+
+.color-picker-group label {
+  font-size: 0.95rem;
+  color: #555555;
+  font-weight: 500;
+}
+
+/* Campos opcionales (LinkedIn / GitHub) */
+.optional {
+  font-size: 0.85rem;
+  color: #888888;
+  font-weight: normal;
+}
+
+/* ==========================================================================
+   HOJA DEL CV (VISTA PREVIA E IMPRESIÓN)
+   ========================================================================== */
+.cv-paper {
+  padding: 20px 25px !important;
+  box-sizing: border-box !important;
+  background-color: #ffffff;
+  color: #333333;
+}
+
+/* Cambio de color dinámico en la vista previa */
+.cv-paper h1, 
 .cv-paper h2, 
 .cv-paper h3, 
+.cv-paper .cv-section h3,
 .cv-paper .section-title {
-  margin-top: 10px !important;
-  margin-bottom: 5px !important;
+  color: var(--cv-theme-color) !important;
+  margin-top: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+.cv-paper .header-accent,
+.cv-paper .divider-line {
+  background-color: var(--cv-theme-color) !important;
+  border-color: var(--cv-theme-color) !important;
+}
+
+.preserve-whitespace {
+  white-space: pre-line;
+  word-break: break-word;
 }
 
 .cv-paper ul, 
 .cv-paper p {
-  margin-bottom: 4px !important;
+  margin-bottom: 3px !important;
+  line-height: 1.4;
+}
+
+/* Variantes de plantilla */
+.cv-paper.t-clasico {
+  font-family: 'Georgia', serif;
+  border-top: 5px solid var(--cv-theme-color) !important;
+}
+
+.cv-paper.t-moderno {
+  font-family: 'Segoe UI', sans-serif;
+  border-left: 6px solid var(--cv-theme-color) !important;
+}
+
+/* PLANTILLA MINIMALISTA */
+.cv-paper.t-minimalista {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: 0.2px;
+}
+
+/* Forzar color dinámico en los encabezados de la plantilla minimalista */
+.cv-paper.t-minimalista h1,
+.cv-paper.t-minimalista h2,
+.cv-paper.t-minimalista h3,
+.cv-paper.t-minimalista .cv-section h3 {
+  color: var(--cv-theme-color) !important;
+}
+
+/* Línea divisoria debajo de los títulos en la plantilla minimalista */
+.cv-paper.t-minimalista h3 {
+  border-bottom: 1.5px solid var(--cv-theme-color) !important;
 }
