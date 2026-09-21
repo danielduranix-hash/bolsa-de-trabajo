@@ -63,6 +63,13 @@ async function enviarCorreoConsulta(datos) {
   const correoDestino = process.env.CORREO_DESTINO || process.env.SMTP_USER;
   const nombreRemitente = process.env.SMTP_FROM_NAME || 'Bolsa de Trabajo';
 
+  // Formatear fecha en zona horaria de México
+  const fechaFormateada = new Date(fechaEnvio).toLocaleString('es-MX', {
+    timeZone: 'America/Mexico_City',
+    dateStyle: 'long',
+    timeStyle: 'short'
+  });
+
   // Cargar y renderizar la plantilla HTML
   const plantilla = cargarPlantilla('correoConsulta.html');
   const htmlRenderizado = renderizarPlantilla(plantilla, {
@@ -71,10 +78,7 @@ async function enviarCorreoConsulta(datos) {
     correo,
     telefono,
     comentarios,
-    fechaEnvio: new Date(fechaEnvio).toLocaleString('es-MX', {
-      dateStyle: 'long',
-      timeStyle: 'short'
-    })
+    fechaEnvio: fechaFormateada
   });
 
    // Ruta de la imagen del logo
@@ -96,7 +100,7 @@ Teléfono: ${telefono}
 Comentarios:
 ${comentarios}
 
-Recibido: ${new Date(fechaEnvio).toLocaleString('es-MX')}
+Recibido: ${fechaFormateada}
     `,
     attachments: [
       {

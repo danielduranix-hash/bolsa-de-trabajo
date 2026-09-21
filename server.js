@@ -2,6 +2,13 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+// =====================================================
+// Forzar que node-postgres interprete los timestamp SIN zona como UTC
+// (PostgreSQL los guarda en UTC, pero pg los lee como hora local por defecto)
+// =====================================================
+const pg = require('pg');
+pg.types.setTypeParser(1114, (str) => new Date(str + 'Z')); // timestamp sin tz
+pg.types.setTypeParser(1184, (str) => new Date(str));       // timestamptz (ya trae tz)
 const { Pool } = require('pg');
 const { verificarConexionSMTP, enviarCorreoConsulta } = require('./services/correo-e');
 
@@ -542,13 +549,9 @@ app.post('/api/consultas', async (req, res) => {
 // GET: Listar todas las consultas (para el panel admin)
 app.get('/api/consultas', async (req, res) => {
   try {
-    const soloNoLeidas = req.query.no_leidas === 'true';
-
-    const query = soloNoLeidas
-      ? 'SELECT * FROM consultas_ciudadanas WHERE leido = FALSE ORDER BY fecha_envio DESC'
-      : 'SELECT * FROM consultas_ciudadanas ORDER BY fecha_envio DESC';
-
-    const result = await poolBolsa.query(query);
+    const result = await poolBolsa.query(
+      'SELECT * FROM consultas_ciudadanas ORDER BY fecha_envio DESC'
+    );
 
     res.json({
       exito: true,
@@ -562,32 +565,6 @@ app.get('/api/consultas', async (req, res) => {
       exito: false,
       mensaje: 'Error al cargar las consultas.'
     });
-  }
-});
-
-// PUT: Marcar una consulta como leída
-app.put('/api/consultas/:id/leido', async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-
-  if (isNaN(id)) {
-    return res.status(400).json({ exito: false, mensaje: 'ID inválido.' });
-  }
-
-  try {
-    const result = await poolBolsa.query(
-      'UPDATE consultas_ciudadanas SET leido = TRUE WHERE id = $1 RETURNING *',
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ exito: false, mensaje: 'Consulta no encontrada.' });
-    }
-
-    res.json({ exito: true, consulta: result.rows[0] });
-
-  } catch (error) {
-    console.error('🔴 Error al marcar como leída:', error.message);
-    res.status(500).json({ exito: false, mensaje: 'Error al actualizar.' });
   }
 });
 
