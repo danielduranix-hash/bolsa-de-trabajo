@@ -1,9 +1,12 @@
 /* ==========================================================================
-   1. FUNCIONES GLOBALES DEL PERFIL (Ámbito Global)
+   1. FUNCIONES GLOBALES DEL PERFIL Y ESTADO GLOBAL
    ========================================================================== */
 
-// Estado global de la aplicación
 let usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo')) || null;
+let mapa = null;
+let marcadoresGroup = null;
+let marcadoresPorId = {};
+let ultimosResultadosFiltrados = [];
 
 // Mostrar/Ocultar Programa Nuevo Comienzo
 function evaluarNuevoComienzo() {
@@ -46,7 +49,6 @@ function calcularEdadPerfil(fechaNacimiento) {
 function cargarDatosPerfilEnModal(usuario) {
   if (!usuario) return;
 
-  // 1. Sidebar y Encabezados
   if (document.getElementById('perfilCurp')) document.getElementById('perfilCurp').value = usuario.curp || '';
   if (document.getElementById('perfilNombreSidebar')) document.getElementById('perfilNombreSidebar').value = usuario.nombre || '';
   if (document.getElementById('perfilPrimerApellidoSidebar')) document.getElementById('perfilPrimerApellidoSidebar').value = usuario.primer_apellido || '';
@@ -56,12 +58,10 @@ function cargarDatosPerfilEnModal(usuario) {
   if (document.getElementById('perfilPrimerApellido')) document.getElementById('perfilPrimerApellido').value = usuario.primer_apellido || '';
   if (document.getElementById('perfilSegundoApellido')) document.getElementById('perfilSegundoApellido').value = usuario.segundo_apellido || '';
 
-  // 2. Contacto
   if (document.getElementById('perfilCorreo')) document.getElementById('perfilCorreo').value = usuario.correo || '';
   if (document.getElementById('perfilTelFijo')) document.getElementById('perfilTelFijo').value = usuario.telefono_fijo || '';
   if (document.getElementById('perfilCelular')) document.getElementById('perfilCelular').value = usuario.celular || '';
 
-  // 3. Fecha de Nacimiento
   if (usuario.fecha_nacimiento) {
     const fecha = new Date(usuario.fecha_nacimiento).toISOString().split('T')[0];
     if (document.getElementById('perfilFechaNac')) {
@@ -70,7 +70,6 @@ function cargarDatosPerfilEnModal(usuario) {
     }
   }
 
-  // 4. Sexo
   if (usuario.sexo) {
     if (document.getElementById('perfilSexo')) {
       document.getElementById('perfilSexo').value = usuario.sexo;
@@ -79,7 +78,6 @@ function cargarDatosPerfilEnModal(usuario) {
     if (radioSexo) radioSexo.checked = true;
   }
 
-  // 5. Dirección
   if (document.getElementById('perfilCalle')) document.getElementById('perfilCalle').value = usuario.calle || '';
   if (document.getElementById('perfilLetraCalle')) document.getElementById('perfilLetraCalle').value = usuario.letra_calle || '';
   if (document.getElementById('perfilNumero')) document.getElementById('perfilNumero').value = usuario.numero || usuario.numero_calle || '';
@@ -88,7 +86,6 @@ function cargarDatosPerfilEnModal(usuario) {
   if (document.getElementById('perfilColonia')) document.getElementById('perfilColonia').value = usuario.colonia || '';
   if (document.getElementById('perfilCP')) document.getElementById('perfilCP').value = usuario.codigo_postal || usuario.cp || '';
 
-  // 6. Estatus y Apoyos
   if (document.getElementById('perfilDiscapacidad')) {
     document.getElementById('perfilDiscapacidad').value = usuario.discapacidad || 'NINGUNA';
     evaluarNuevoComienzoPerfil();
@@ -142,220 +139,156 @@ function cargarSeccionEstudios(usuario) {
 }
 
 /* ==========================================================================
-   2. LÓGICA AL CARGAR EL DOM
+   2. GEOPORTAL DE EMPLEOS Y MAPA INTERACTIVO
    ========================================================================== */
-document.addEventListener('DOMContentLoaded', () => {
-  // Referencias DOM principales
-  const modalLogin = document.getElementById('modalLogin');
-  const modalRegistro = document.getElementById('modalRegistro');
-  const modalPerfil = document.getElementById('modalPerfil');
-  
-  const formLogin = document.getElementById('formLogin');
-  const formPerfil = document.getElementById('formPerfil');
-  const formReg = document.getElementById('formRegistro');
 
-  const btnUserAuth = document.getElementById('btnUserAuth');
-  const btnCerrarLogin = document.getElementById('btnCerrarLogin');
-  const btnCerrarRegistro = document.getElementById('btnCerrarRegistro');
-  const btnCerrarPerfil = document.getElementById('btnCerrarPerfil');
-  const btnIrARegistro = document.getElementById('btnIrARegistro');
-  const btnMiPerfil = document.getElementById('btnMiPerfil');
-  const btnMiPerfilMenu = document.getElementById('btnMiPerfilMenu');
-  const btnCerrarSesion = document.getElementById('btnCerrarSesion');
-  const btnAdmin = document.getElementById('btnVistaAdminMenu');
+const empleos = [
+  { id: 1, titulo: "Desarrollador Web Frontend", empresa: "Tech Solutions", zona: "Norte", categoria: "Tecnología", lat: 21.0150, lng: -89.6250 },
+  { id: 2, titulo: "Auxiliar Administrativo", empresa: "Grupo Peninsular", zona: "Centro", categoria: "Administración", lat: 20.9670, lng: -89.6237 },
+  { id: 3, titulo: "Ejecutivo de Ventas", empresa: "Comercializadora del Sur", zona: "Sur", categoria: "Ventas", lat: 20.9300, lng: -89.6100 },
+  { id: 4, titulo: "Técnico de Mantenimiento", empresa: "Servicios Múltiples", zona: "Oriente", categoria: "Servicios", lat: 20.9750, lng: -89.5800 },
+  { id: 5, titulo: "Soporte Técnico", empresa: "Sistemas Mérida", zona: "Poniente", categoria: "Tecnología", lat: 20.9700, lng: -89.6600 }
+];
 
-  // Recordar correo
-  const correoGuardado = localStorage.getItem('correoRecordado');
-  const inputCorreo = document.getElementById('loginCorreo');
-  const checkRecordar = document.getElementById('checkRecordar');
+function inicializarMapa() {
+  if (mapa) return;
 
-  if (correoGuardado && inputCorreo) {
-    inputCorreo.value = correoGuardado;
-    if (checkRecordar) checkRecordar.checked = true;
+  mapa = L.map('mapa').setView([20.9670, -89.6237], 12);
+
+  // Mueve botones de aumento/disminución a la derecha para no obstruir el panel
+  if (mapa.zoomControl) {
+    mapa.zoomControl.setPosition('topright');
   }
 
-  /* --- Pestañas del Perfil --- */
-  const navTabs = document.querySelectorAll('.nav-tab');
-  const tabContent = document.querySelectorAll('.tab-content');
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri',
+    maxZoom: 19
+  }).addTo(mapa);
 
-  navTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      navTabs.forEach(t => t.classList.remove('active'));
-      tabContent.forEach(c => c.classList.remove('active'));
-
-      tab.classList.add('active');
-      const targetTab = tab.getAttribute('data-tab');
-      const targetContent = document.getElementById(targetTab);
-      if (targetContent) targetContent.classList.add('active');
-    });
-  });
-
-  /* --- Validación CURP --- */
-  const inputCurp = document.getElementById('curp');
-  if (inputCurp) {
-    inputCurp.addEventListener('input', (e) => {
-      e.target.value = e.target.value.toUpperCase().trim();
-      const regexCurp = /^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[A-Z0-9]{2}$/;
-      
-      if (e.target.value === '') e.target.style.borderColor = '';
-      else if (regexCurp.test(e.target.value)) e.target.style.borderColor = '#28a745';
-      else e.target.style.borderColor = '#dc3545';
-    });
-  }
-
- /* --- Formulario de Registro --- */
-if (formReg) {
-  formReg.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const paterno = document.getElementById('apellidoPaterno')?.value.trim();
-    const materno = document.getElementById('apellidoMaterno')?.value.trim();
-
-    if (!paterno && !materno) {
-      alert('Por favor, ingrese al menos un apellido.');
-      return;
-    }
-
-    const datosRegistro = {
-      curp: document.getElementById('curp')?.value.trim().toUpperCase(),
-      nombre: document.getElementById('nombre')?.value.trim(),
-      primer_apellido: paterno,
-      segundo_apellido: materno,
-      correo: document.getElementById('correo')?.value.trim(),
-      password: document.getElementById('password')?.value,
-      fecha_nacimiento: document.getElementById('fechaNacimiento')?.value,
-      sexo: document.getElementById('sexo')?.value,
-      pertenece_grupo_vulnerable: document.getElementById('vulnerable')?.value !== 'NINGUNO',
-      grupos_vulnerables: [document.getElementById('vulnerable')?.value].filter(Boolean),
-      tiene_discapacidad: false,
-      tipos_discapacidad: []
-    };
-
-    try {
-      const respuesta = await fetch('http://localhost:3000/api/registro', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosRegistro)
-      });
-
-      // Intenta leer la respuesta del servidor como JSON
-      let resultado = {};
-      try {
-        resultado = await respuesta.json();
-      } catch (errJson) {
-        console.warn('La respuesta del servidor no es un JSON válido:', errJson);
-      }
-
-      if (respuesta.ok && resultado.exito) {
-        alert('¡Registro completado con éxito!');
-        formReg.reset();
-        if (modalRegistro) modalRegistro.style.display = 'none';
-        if (modalLogin) modalLogin.style.display = 'flex';
-      } else {
-        // Muestra el mensaje del servidor o un aviso de duplicado
-        const mensajeError = resultado.mensaje || 'El CURP o correo ingresado ya existe en el sistema.';
-        alert(`Atención: ${mensajeError}`);
-      }
-    } catch (error) {
-      console.error('Error de red o servidor no disponible:', error);
-      alert('No se pudo conectar con el servidor backend. Revisa que Node.js esté corriendo en el puerto 3000.');
-    }
-  });
+  marcadoresGroup = L.layerGroup().addTo(mapa);
+  aplicarFiltros();
 }
-  /* --- Navegación e Integración de GeoPortal / Mapa --- */
-  const vistaInicio = document.getElementById('vistaInicio');
-  const vistaGeoPortal = document.getElementById('vistaGeoPortal');
-  const btnEmpleos = document.getElementById('btnEmpleos');
-  const btnVolverInicio = document.getElementById('btnVolverInicio');
-  const btnIrGeoPortal = document.getElementById('btnIrGeoPortal');
 
-  let mapa = null;
-  let marcadores = [];
+function aplicarFiltros() {
+  const inputPalabra = document.getElementById('filtroPalabra');
+  const selectZona = document.getElementById('filtroZona');
+  const selectCategoria = document.getElementById('filtroCategoria');
 
-  const empleos = [
-    { id: 1, titulo: 'Desarrollador Web Junior', empresa: 'TechSol', zona: 'Norte', categoria: 'Tecnología', lat: 20.9753, lng: -89.6169 },
-    { id: 2, titulo: 'Auxiliar Administrativo', empresa: 'Comercial del Sur', zona: 'Sur', categoria: 'Administración', lat: 20.9380, lng: -89.6250 },
-    { id: 3, titulo: 'Ejecutivo de Ventas', empresa: 'Grupo Peninsular', zona: 'Centro', categoria: 'Ventas', lat: 20.9670, lng: -89.6237 },
-    { id: 4, titulo: 'Técnico en Mantenimiento', empresa: 'Logística YUC', zona: 'Poniente', categoria: 'Servicios', lat: 20.9600, lng: -89.6500 }
-  ];
+  const valPalabra = inputPalabra ? inputPalabra.value.toLowerCase().trim() : '';
+  const valZona = selectZona ? selectZona.value.toLowerCase().trim() : '';
+  const valCategoria = selectCategoria ? selectCategoria.value.toLowerCase().trim() : '';
 
-  function mostrarInicio() {
-    if (vistaInicio && vistaGeoPortal) {
-      vistaInicio.style.display = 'block';
-      vistaGeoPortal.style.display = 'none';
-      window.scrollTo(0, 0);
-    }
-  }
+  ultimosResultadosFiltrados = empleos.filter(item => {
+    const coincidePalabra = valPalabra === '' || 
+      item.titulo.toLowerCase().includes(valPalabra) || 
+      item.empresa.toLowerCase().includes(valPalabra);
 
-  function mostrarGeoPortal() {
-    if (vistaInicio && vistaGeoPortal) {
-      vistaInicio.style.display = 'none';
-      vistaGeoPortal.style.display = 'block';
+    const coincideZona = valZona === '' || item.zona.toLowerCase() === valZona;
+    const coincideCategoria = valCategoria === '' || item.categoria.toLowerCase() === valCategoria;
 
-      if (!mapa) inicializarMapa();
-      else setTimeout(() => mapa.invalidateSize(), 200);
-    }
-  }
+    return coincidePalabra && coincideZona && coincideCategoria;
+  });
 
-  if (btnEmpleos) btnEmpleos.addEventListener('click', mostrarGeoPortal);
-  if (btnIrGeoPortal) btnIrGeoPortal.addEventListener('click', (e) => { e.preventDefault(); mostrarGeoPortal(); });
-  if (btnVolverInicio) btnVolverInicio.addEventListener('click', (e) => { e.preventDefault(); mostrarInicio(); });
+  abrirPanelResultados();
+  renderizarPanelFlotante(ultimosResultadosFiltrados);
+  actualizarMarcadoresMapa(ultimosResultadosFiltrados);
+}
 
-  function inicializarMapa() {
-    mapa = L.map('mapa').setView([20.9670, -89.6237], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap'
-    }).addTo(mapa);
-    renderizarMarcadores(empleos);
-  }
+function actualizarMarcadoresMapa(lista) {
+  if (!marcadoresGroup) return;
+  marcadoresGroup.clearLayers();
+  marcadoresPorId = {};
+  const puntosCoordenadas = [];
 
-  function renderizarMarcadores(lista) {
-    marcadores.forEach(m => mapa.removeLayer(m));
-    marcadores = [];
+  lista.forEach(item => {
+    if (item.lat && item.lng) {
+      const marcador = L.marker([item.lat, item.lng]);
 
-    lista.forEach(e => {
-      const marker = L.marker([e.lat, e.lng]).addTo(mapa);
-      marker.bindPopup(`
-        <div style="text-align: center;">
-          <h4 style="margin-bottom: 5px; color: #0d3c75;">${e.titulo}</h4>
-          <p style="margin: 0; font-size: 0.85rem;"><strong>Empresa:</strong> ${e.empresa}</p>
-          <p style="margin: 0; font-size: 0.85rem;"><strong>Zona:</strong> ${e.zona}</p>
-          <button style="margin-top: 8px; background: #7bc143; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Postularme</button>
+      marcador.bindPopup(`
+        <div style="font-family: sans-serif; line-height: 1.3;">
+          <strong style="color: #0b3b60; font-size: 0.95rem;">${item.titulo}</strong><br>
+          <span style="font-size: 0.85rem; color: #444;">${item.empresa}</span><br>
+          <small style="color: #666; font-size: 0.75rem;">📍 ${item.zona} | 🏢 ${item.categoria}</small>
         </div>
       `);
-      marcadores.push(marker);
-    });
+
+      marcadoresGroup.addLayer(marcador);
+      marcadoresPorId[item.id] = marcador;
+      puntosCoordenadas.push([item.lat, item.lng]);
+    }
+  });
+
+  if (puntosCoordenadas.length > 0 && mapa) {
+    mapa.fitBounds(puntosCoordenadas, { padding: [40, 40] });
+  }
+}
+
+function enfocarEnMapa(id) {
+  const marcador = marcadoresPorId[id];
+  if (marcador && mapa) {
+    mapa.flyTo(marcador.getLatLng(), 15, { duration: 1 });
+    marcador.openPopup();
+  }
+}
+
+function renderizarPanelFlotante(lista) {
+  const contenedor = document.getElementById('contenedorListaVacantes');
+  const contador = document.getElementById('textoContadorResultados');
+
+  if (!contenedor || !contador) return;
+
+  contador.textContent = `Se encontraron ${lista.length} empleos.`;
+  contenedor.innerHTML = '';
+
+  if (lista.length === 0) {
+    contenedor.innerHTML = '<p style="font-size: 0.85rem; color: #666; text-align: center; margin-top: 20px;">No hay resultados para esta búsqueda.</p>';
+    return;
   }
 
-  const btnToggleFiltros = document.getElementById('btnToggleFiltros');
-  const filtroBox = document.getElementById('filtroBox');
-  const btnBuscarMapa = document.getElementById('btnBuscarMapa');
+  lista.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'item-vacante';
+    div.onclick = () => enfocarEnMapa(item.id);
 
-  if (btnToggleFiltros && filtroBox) {
-    btnToggleFiltros.addEventListener('click', () => filtroBox.classList.toggle('colapsado'));
-  }
+    div.innerHTML = `
+      <div class="item-vacante-titulo">
+        <span>ℹ️</span> ${item.titulo}
+      </div>
+      <div class="item-vacante-zona">
+        COL. ${item.zona.toUpperCase()}, MERIDA
+      </div>
+    `;
 
-  if (btnBuscarMapa) {
-    btnBuscarMapa.addEventListener('click', () => {
-      const texto = document.getElementById('filtroPalabra').value.toLowerCase();
-      const zona = document.getElementById('filtroZona').value;
-      const cat = document.getElementById('filtroCategoria').value;
+    contenedor.appendChild(div);
+  });
+}
 
-      const filtrados = empleos.filter(e => {
-        const matchTexto = e.titulo.toLowerCase().includes(texto) || e.empresa.toLowerCase().includes(texto);
-        const matchZona = zona === '' || e.zona === zona;
-        const matchCat = cat === '' || e.categoria === cat;
-        return matchTexto && matchZona && matchCat;
-      });
+function filtrarListaInterna() {
+  const texto = document.getElementById('inputFiltroLista')?.value.toLowerCase().trim() || '';
+  
+  const filtradosInterno = ultimosResultadosFiltrados.filter(item => 
+    item.titulo.toLowerCase().includes(texto) || 
+    item.zona.toLowerCase().includes(texto)
+  );
 
-      renderizarMarcadores(filtrados);
-    });
-  }
+  renderizarPanelFlotante(filtradosInterno);
+}
 
-/* --- Tarjetas de Sector / Calendario con Carga Dinámica desde Neon --- */
-let mesActualIndex = 0; // 0 = Agosto 2026, 1 = Septiembre 2026
+function cerrarPanelResultados() {
+  const panel = document.getElementById('panelResultados');
+  if (panel) panel.style.display = 'none';
+}
 
+function abrirPanelResultados() {
+  const panel = document.getElementById('panelResultados');
+  if (panel) panel.style.display = 'flex';
+}
+
+/* ==========================================================================
+   3. CALENDARIO DE EVENTOS (CONECTADO A BASE DE DATOS NEON)
+   ========================================================================== */
+
+let mesActualIndex = 0;
 const configuracionMeses = [
   { nombre: 'Agosto 2026', mesIndex: 7, totalDias: 31, offsetDias: 5 },
   { nombre: 'Septiembre 2026', mesIndex: 8, totalDias: 30, offsetDias: 1 }
@@ -371,7 +304,6 @@ async function inicializarCalendarioEventos() {
     if (!data.exito) return;
     const eventosGlobales = data.eventos || [];
 
-    // 1. Rellenar contadores y próxima fecha en tarjetas
     sectorCards.forEach(card => {
       const sectorTipo = card.getAttribute('data-sector');
       const evsTipo = eventosGlobales.filter(e => e.tipo_evento === sectorTipo);
@@ -398,7 +330,6 @@ async function inicializarCalendarioEventos() {
       }
     });
 
-    // 2. Renderizar grid del mes activo
     function renderizarMes() {
       const grid = document.getElementById('calendarioGrid');
       const tituloMes = document.getElementById('tituloMes');
@@ -449,24 +380,19 @@ async function inicializarCalendarioEventos() {
 
     renderizarMes();
 
-    // 3. Controles de navegación de meses
     const btnAnt = document.getElementById('btnMesAnterior');
     const btnSig = document.getElementById('btnMesSiguiente');
 
     if (btnAnt) btnAnt.onclick = () => { if (mesActualIndex > 0) { mesActualIndex--; renderizarMes(); } };
     if (btnSig) btnSig.onclick = () => { if (mesActualIndex < configuracionMeses.length - 1) { mesActualIndex++; renderizarMes(); } };
 
-    // 4. MODAL AL HACER CLIC EN LAS TARJETAS
     sectorCards.forEach(card => {
       card.addEventListener('click', (e) => {
         e.stopPropagation();
         const sectorTipo = card.getAttribute('data-sector');
         const evsTipo = eventosGlobales.filter(e => e.tipo_evento === sectorTipo);
-        
-        // Obtener el título legible de la tarjeta
         const tituloTarjeta = card.querySelector('h3, .font-bold')?.innerText || 'Eventos';
 
-        // Crear contenedor del Modal
         const modalOverlay = document.createElement('div');
         modalOverlay.className = 'fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4';
         
@@ -506,7 +432,6 @@ async function inicializarCalendarioEventos() {
 
         document.body.appendChild(modalOverlay);
 
-        // Eventos para cerrar el modal
         const cerrarBtn = modalOverlay.querySelector('#cerrarModalBtn');
         cerrarBtn.onclick = () => modalOverlay.remove();
         modalOverlay.onclick = (event) => {
@@ -516,40 +441,177 @@ async function inicializarCalendarioEventos() {
     });
 
   } catch (error) {
-    console.error('Error al sincronizar los eventos con Neon:', error);
+    console.error('Error al sincronizar eventos:', error);
   }
 }
 
-// Ejecutar al cargar
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', inicializarCalendarioEventos);
-} else {
+/* ==========================================================================
+   4. INICIALIZACIÓN PRINCIPAL (DOM CONTENT LOADED)
+   ========================================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
   inicializarCalendarioEventos();
-}
 
-/* --- Estado de Autenticación y Menú Flotante --- */
-function actualizarUIAutenticacion() {
-  const userMenuContainer = document.getElementById('userMenuContainer');
-  const dropdownNombre = document.getElementById('dropdownNombre');
-  const dropdownCorreo = document.getElementById('dropdownCorreo');
-  const btnVistaAdminMenu = document.getElementById('btnVistaAdminMenu');
+  // Modales
+  const modalLogin = document.getElementById('modalLogin');
+  const modalRegistro = document.getElementById('modalRegistro');
+  const modalPerfil = document.getElementById('modalPerfil');
+  
+  const formLogin = document.getElementById('formLogin');
+  const formPerfil = document.getElementById('formPerfil');
+  const formReg = document.getElementById('formRegistro');
 
-  if (typeof usuarioActivo !== 'undefined' && usuarioActivo) {
-    if (typeof btnUserAuth !== 'undefined' && btnUserAuth) btnUserAuth.style.display = 'none';
-    if (userMenuContainer) userMenuContainer.style.display = 'inline-flex';
+  const btnUserAuth = document.getElementById('btnUserAuth');
+  const btnCerrarLogin = document.getElementById('btnCerrarLogin');
+  const btnCerrarRegistro = document.getElementById('btnCerrarRegistro');
+  const btnCerrarPerfil = document.getElementById('btnCerrarPerfil');
+  const btnIrARegistro = document.getElementById('btnIrARegistro');
+  const btnMiPerfil = document.getElementById('btnMiPerfil');
+  const btnMiPerfilMenu = document.getElementById('btnMiPerfilMenu');
+  const btnCerrarSesion = document.getElementById('btnCerrarSesion');
+  const btnAdmin = document.getElementById('btnVistaAdminMenu');
 
-    if (dropdownNombre) dropdownNombre.textContent = `${usuarioActivo.nombre || ''} ${usuarioActivo.primer_apellido || ''}`.trim();
-    if (dropdownCorreo) dropdownCorreo.textContent = usuarioActivo.correo || '';
+  // Navegación de Vistas
+  const vistaInicio = document.getElementById('vistaInicio');
+  const vistaGeoPortal = document.getElementById('vistaGeoPortal');
+  const btnEmpleos = document.getElementById('btnEmpleos');
+  const btnVolverInicio = document.getElementById('btnVolverInicio');
+  const btnIrGeoPortal = document.getElementById('btnIrGeoPortal');
 
-    const esAdmin = usuarioActivo.rol === 'admin' || usuarioActivo.rol === 'superadmin' || usuarioActivo.correo?.toLowerCase().includes('admin');
-    if (btnVistaAdminMenu) btnVistaAdminMenu.style.display = esAdmin ? 'flex' : 'none';
-  } else {
-    if (typeof btnUserAuth !== 'undefined' && btnUserAuth) btnUserAuth.style.display = 'inline-flex';
-    if (userMenuContainer) userMenuContainer.style.display = 'none';
+  function mostrarInicio() {
+    if (vistaInicio && vistaGeoPortal) {
+      vistaInicio.style.display = 'block';
+      vistaGeoPortal.style.display = 'none';
+      window.scrollTo(0, 0);
+    }
   }
-}
 
-actualizarUIAutenticacion();
+  function mostrarGeoPortal() {
+    if (vistaInicio && vistaGeoPortal) {
+      vistaInicio.style.display = 'none';
+      vistaGeoPortal.style.display = 'block';
+
+      if (!mapa) {
+        inicializarMapa();
+      } else {
+        setTimeout(() => mapa.invalidateSize(), 200);
+      }
+    }
+  }
+
+  if (btnEmpleos) btnEmpleos.addEventListener('click', mostrarGeoPortal);
+  if (btnIrGeoPortal) btnIrGeoPortal.addEventListener('click', (e) => { e.preventDefault(); mostrarGeoPortal(); });
+  if (btnVolverInicio) btnVolverInicio.addEventListener('click', (e) => { e.preventDefault(); mostrarInicio(); });
+
+  const btnBuscar = document.getElementById('btnBuscarMapa');
+  if (btnBuscar) btnBuscar.addEventListener('click', aplicarFiltros);
+
+  const btnToggle = document.getElementById('btnToggleFiltros');
+  const filtroBox = document.getElementById('filtroBox');
+  if (btnToggle && filtroBox) {
+    btnToggle.addEventListener('click', () => filtroBox.classList.toggle('colapsado'));
+  }
+
+  /* --- Recordar correo guardado --- */
+  const correoGuardado = localStorage.getItem('correoRecordado');
+  const inputCorreo = document.getElementById('loginCorreo');
+  const checkRecordar = document.getElementById('checkRecordar');
+
+  if (correoGuardado && inputCorreo) {
+    inputCorreo.value = correoGuardado;
+    if (checkRecordar) checkRecordar.checked = true;
+  }
+
+  /* --- Pestañas del Perfil --- */
+  const navTabs = document.querySelectorAll('.nav-tab');
+  const tabContent = document.querySelectorAll('.tab-content');
+
+  navTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      navTabs.forEach(t => t.classList.remove('active'));
+      tabContent.forEach(c => c.classList.remove('active'));
+
+      tab.classList.add('active');
+      const targetTab = tab.getAttribute('data-tab');
+      const targetContent = document.getElementById(targetTab);
+      if (targetContent) targetContent.classList.add('active');
+    });
+  });
+
+  /* --- Registro Async --- */
+  if (formReg) {
+    formReg.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const paterno = document.getElementById('apellidoPaterno')?.value.trim();
+      const materno = document.getElementById('apellidoMaterno')?.value.trim();
+
+      if (!paterno && !materno) {
+        alert('Por favor, ingrese al menos un apellido.');
+        return;
+      }
+
+      const datosRegistro = {
+        curp: document.getElementById('curp')?.value.trim().toUpperCase(),
+        nombre: document.getElementById('nombre')?.value.trim(),
+        primer_apellido: paterno,
+        segundo_apellido: materno,
+        correo: document.getElementById('correo')?.value.trim(),
+        password: document.getElementById('password')?.value,
+        fecha_nacimiento: document.getElementById('fechaNacimiento')?.value,
+        sexo: document.getElementById('sexo')?.value,
+        pertenece_grupo_vulnerable: document.getElementById('vulnerable')?.value !== 'NINGUNO',
+        grupos_vulnerables: [document.getElementById('vulnerable')?.value].filter(Boolean),
+        tiene_discapacidad: false,
+        tipos_discapacidad: []
+      };
+
+      try {
+        const respuesta = await fetch('http://localhost:3000/api/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datosRegistro)
+        });
+
+        let resultado = {};
+        try { resultado = await respuesta.json(); } catch (errJson) {}
+
+        if (respuesta.ok && resultado.exito) {
+          alert('¡Registro completado con éxito!');
+          formReg.reset();
+          if (modalRegistro) modalRegistro.style.display = 'none';
+          if (modalLogin) modalLogin.style.display = 'flex';
+        } else {
+          alert(`Atención: ${resultado.mensaje || 'El CURP o correo ingresado ya existe.'}`);
+        }
+      } catch (error) {
+        alert('No se pudo conectar con el servidor backend.');
+      }
+    });
+  }
+
+  /* --- Autenticación UI --- */
+  function actualizarUIAutenticacion() {
+    const userMenuContainer = document.getElementById('userMenuContainer');
+    const dropdownNombre = document.getElementById('dropdownNombre');
+    const dropdownCorreo = document.getElementById('dropdownCorreo');
+    const btnVistaAdminMenu = document.getElementById('btnVistaAdminMenu');
+
+    if (usuarioActivo) {
+      if (btnUserAuth) btnUserAuth.style.display = 'none';
+      if (userMenuContainer) userMenuContainer.style.display = 'inline-flex';
+
+      if (dropdownNombre) dropdownNombre.textContent = `${usuarioActivo.nombre || ''} ${usuarioActivo.primer_apellido || ''}`.trim();
+      if (dropdownCorreo) dropdownCorreo.textContent = usuarioActivo.correo || '';
+
+      const esAdmin = usuarioActivo.rol === 'admin' || usuarioActivo.rol === 'superadmin' || usuarioActivo.correo?.toLowerCase().includes('admin');
+      if (btnVistaAdminMenu) btnVistaAdminMenu.style.display = esAdmin ? 'flex' : 'none';
+    } else {
+      if (btnUserAuth) btnUserAuth.style.display = 'inline-flex';
+      if (userMenuContainer) userMenuContainer.style.display = 'none';
+    }
+  }
+
+  actualizarUIAutenticacion();
 
   const btnToggleUserMenu = document.getElementById('btnToggleUserMenu');
   const userDropdownMenu = document.getElementById('userDropdownMenu');
@@ -563,17 +625,6 @@ actualizarUIAutenticacion();
     document.addEventListener('click', () => userDropdownMenu.classList.remove('show'));
   }
 
-  const btnCerrarSesionMenu = document.getElementById('btnCerrarSesionMenu');
-  if (btnCerrarSesionMenu) {
-    btnCerrarSesionMenu.addEventListener('click', () => {
-      localStorage.removeItem('usuarioActivo');
-      usuarioActivo = null;
-      actualizarUIAutenticacion();
-      if (userDropdownMenu) userDropdownMenu.classList.remove('show');
-    });
-  }
-
-  // Eventos de Apertura/Cierre de Modales
   if (btnUserAuth && modalLogin) btnUserAuth.addEventListener('click', () => modalLogin.style.display = 'flex');
 
   const abrirPerfil = async () => {
@@ -627,7 +678,6 @@ actualizarUIAutenticacion();
     formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
       const inputPassword = document.getElementById('loginPassword');
-
       const correo = inputCorreo?.value;
       const password = inputPassword?.value;
       const recordar = checkRecordar?.checked;
@@ -647,19 +697,6 @@ actualizarUIAutenticacion();
           if (recordar && correo) localStorage.setItem('correoRecordado', correo);
           else localStorage.removeItem('correoRecordado');
 
-          if (window.PasswordCredential && inputCorreo && inputPassword) {
-            try {
-              const credencial = new PasswordCredential({
-                id: correo,
-                password: password,
-                name: usuarioObtenido.nombre || correo
-              });
-              navigator.credentials.store(credencial);
-            } catch (err) {
-              console.log('Autocompletado de navegador gestionado por formulario.');
-            }
-          }
-
           localStorage.setItem('usuarioActivo', JSON.stringify(usuarioObtenido));
           usuarioActivo = usuarioObtenido;
 
@@ -676,7 +713,6 @@ actualizarUIAutenticacion();
           alert(datos.mensaje || 'Error al iniciar sesión.');
         }
       } catch (error) {
-        console.error('Error de conexión:', error);
         alert('No se pudo conectar con el servidor.');
       }
     });
@@ -745,11 +781,10 @@ actualizarUIAutenticacion();
           alert('¡Perfil actualizado con éxito!');
           if (modalPerfil) modalPerfil.style.display = 'none';
         } else {
-          alert(`Error al actualizar perfil: ${resultado.mensaje || 'Respuesta no válida del servidor'}`);
+          alert(`Error al actualizar perfil: ${resultado.mensaje || 'Respuesta no válida'}`);
         }
       } catch (error) {
-        console.error('Error al guardar los datos del perfil:', error);
-        alert('Error de conexión con el servidor backend al intentar guardar el perfil.');
+        alert('Error de conexión al guardar el perfil.');
       }
     });
   }
@@ -763,6 +798,16 @@ actualizarUIAutenticacion();
       } else {
         alert('Acceso no autorizado: Se requieren permisos administrativos.');
       }
+    });
+  }
+
+  const btnCerrarSesionMenu = document.getElementById('btnCerrarSesionMenu');
+  if (btnCerrarSesionMenu) {
+    btnCerrarSesionMenu.addEventListener('click', () => {
+      localStorage.removeItem('usuarioActivo');
+      usuarioActivo = null;
+      actualizarUIAutenticacion();
+      if (userDropdownMenu) userDropdownMenu.classList.remove('show');
     });
   }
 
@@ -928,7 +973,7 @@ actualizarUIAutenticacion();
     });
   });
 
-  // Funciones de Accesibilidad (Conectadas al objeto Global `window`)
+  // Funciones de Accesibilidad vinculadas al objeto `window`
   function cambiarFuente(accion) {
     let current = parseInt(localStorage.getItem('textSize') || '100', 10);
     let nuevo = accion === 'aumentar' ? Math.min(current + 10, 160) : Math.max(current - 10, 100);
@@ -990,7 +1035,7 @@ actualizarUIAutenticacion();
   };
 
   window.pausarVoz = () => {
-    if (synth.speaking) {
+    if (synth && synth.speaking) {
       if (isPaused) {
         synth.resume();
         isPaused = false;
@@ -1002,8 +1047,10 @@ actualizarUIAutenticacion();
   };
 
   window.detenerVoz = () => {
-    synth.cancel();
-    isPaused = false;
+    if (synth) {
+      synth.cancel();
+      isPaused = false;
+    }
   };
 
   const velocidadInput = document.getElementById('velocidadVoz');
@@ -1014,7 +1061,6 @@ actualizarUIAutenticacion();
     });
   }
 
-  // Listeners de Accesibilidad
   document.querySelectorAll('.btn-fuente').forEach(btn => {
     btn.addEventListener('click', () => {
       const accion = btn.dataset.accion;
@@ -1051,7 +1097,7 @@ actualizarUIAutenticacion();
     });
   });
 
-  // Restaurar Preferencias Guardadas
+  // Restaurar preferencias al cargar la página
   function restaurarAccesibilidad() {
     const preferencias = {
       'altoContraste': 'alto-contraste',
