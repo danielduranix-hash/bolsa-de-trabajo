@@ -55,16 +55,16 @@
   <!-- ==========================================
         ENCABEZADO PRINCIPAL (NAVBAR)
         ========================================== -->
-  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between gap-4 w-full">
-      <!-- Logo Institucional con Mayor Tamaño -->
-      <a href="#" class="flex items-center py-2">
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between gap-4 w-full">
+      <!-- Logo Institucional -->
+      <a href="index.html" class="flex items-center py-2">
         <img 
           src="logo-Merida-contigo-es-mejor.png" 
           alt="Mérida Contigo es Mejor - Ayuntamiento 2024-2027" 
-        class="h-32 sm:h-36 w-auto object-contain transition-all"/>
+          class="h-32 sm:h-36 w-auto object-contain transition-all"/>
       </a>
-      </div>
+  </div>
 
       <!-- Botones de Acción -->
       <div class="header-buttons flex items-center gap-2.5 sm:gap-4">
@@ -557,47 +557,88 @@
     </section>
   </main>
 
-  <!-- ==========================================
-        VISTA 2: GEOPORTAL DE EMPLEOS (MAPA)
-        ========================================== -->
-  <div id="vistaGeoPortal" class="geoportal-container" style="display: none;">
-    <div id="mapa" class="mapa-placeholder"></div>
+<!-- ==========================================
+     VISTA 2: GEOPORTAL DE EMPLEOS (MAPA)
+     ========================================== -->
+<div id="vistaGeoPortal" class="geoportal-container" style="display: none;">
+  
+  <!-- Contenedor del Mapa -->
+  <div id="mapa" class="mapa-placeholder"></div>
 
-    <div class="filtro-box" id="filtroBox">
-      <div class="filtro-header" id="btnToggleFiltros">
-        <span>🔍 Filtros de Búsqueda</span>
-        <span class="arrow-down">▼</span>
+  <!-- Box de Filtros Superior -->
+  <div class="filtro-box" id="filtroBox">
+    <div class="filtro-header" id="btnToggleFiltros">
+      <span>🔍 Filtros de Búsqueda</span>
+      <span class="arrow-down">▼</span>
+    </div>
+    <div class="filtro-body">
+      <div class="field-group">
+        <label>💼</label>
+        <input type="text" id="filtroPalabra" placeholder="Puesto, empresa o palabra clave...">
       </div>
-      <div class="filtro-body">
-        <div class="field-group">
-          <label>💼</label>
-          <input type="text" id="filtroPalabra" placeholder="Puesto, empresa o palabra clave...">
-        </div>
-        <div class="field-group">
-          <label>📍</label>
-          <select id="filtroZona">
-            <option value="">Todas las zonas</option>
-            <option value="Centro">Centro</option>
-            <option value="Norte">Norte</option>
-            <option value="Sur">Sur</option>
-            <option value="Poniente">Poniente</option>
-            <option value="Oriente">Oriente</option>
-          </select>
-        </div>
-        <div class="field-group">
-          <label>🏢</label>
-          <select id="filtroCategoria">
-            <option value="">Todas las categorías</option>
-            <option value="Tecnología">Tecnología / Sistemas</option>
-            <option value="Administración">Administración</option>
-            <option value="Ventas">Ventas y Atención a Clientes</option>
-            <option value="Servicios">Servicios Operativos</option>
-          </select>
-        </div>
-        <button id="btnBuscarMapa" class="btn-buscar-mapa">Aplicar Filtros</button>
+      <div class="field-group">
+        <label>📍</label>
+        <select id="filtroZona">
+          <option value="">Todas las zonas</option>
+          <option value="Centro">Centro</option>
+          <option value="Norte">Norte</option>
+          <option value="Sur">Sur</option>
+          <option value="Poniente">Poniente</option>
+          <option value="Oriente">Oriente</option>
+        </select>
       </div>
+      <div class="field-group">
+        <label>🏢</label>
+        <select id="filtroCategoria">
+          <option value="">Todas las categorías</option>
+          <option value="Tecnología">Tecnología</option>
+          <option value="Administración">Administración</option>
+          <option value="Ventas">Ventas y Atención a Clientes</option>
+          <option value="Servicios">Servicios Operativos</option>
+        </select>
+      </div>
+      <button id="btnBuscarMapa" class="btn-buscar-mapa">Aplicar Filtros</button>
     </div>
   </div>
+
+  <!-- PANEL FLOTANTE DE RESULTADOS (Inspirado en la imagen) -->
+<div id="panelResultados" class="panel-resultados" style="display: none;">
+  <!-- Botón de minimizar/cerrar -->
+  <button type="button" class="btn-cerrar-panel" onclick="cerrarPanelResultados()">✕ Ocultar</button>
+
+  <!-- Contador General -->
+  <div class="panel-header-count" style="margin-top: 25px;">
+    <p id="textoContadorResultados">Se encontraron 0 empleos.</p>
+  </div>
+
+  <!-- Filtro rápido interno -->
+  <div class="panel-search-box">
+    <input type="text" id="inputFiltroLista" placeholder="Filtra los resultados..." oninput="filtrarListaInterna()">
+  </div>
+
+  <!-- Lista de Vacantes con Scroll -->
+  <div class="panel-lista-vacantes" id="contenedorListaVacantes"></div>
+</div>
+    <!-- Botón para cerrar/ocultar el panel -->
+    <button class="btn-cerrar-panel" onclick="cerrarPanelResultados()">‹</button>
+
+    <!-- Contador General -->
+    <div class="panel-header-count">
+      <p id="textoContadorResultados">Se encontraron 0 empleos.</p>
+    </div>
+
+    <!-- Filtro rápido en vivo sobre la lista desplegada -->
+    <div class="panel-search-box">
+      <input type="text" id="inputFiltroLista" placeholder="Filtra los resultados..." oninput="filtrarListaInterna()">
+    </div>
+
+    <!-- Lista de Vacantes (Scroll) -->
+    <div class="panel-lista-vacantes" id="contenedorListaVacantes">
+      <!-- Se llena dinámicamente desde JavaScript -->
+    </div>
+  </div>
+
+</div>
 
   <!-- ==========================================
         MODAL 1: INICIAR SESIÓN (LOGIN)
