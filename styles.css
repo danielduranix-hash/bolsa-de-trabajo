@@ -2098,3 +2098,45 @@ body:not(.panel-accesibilidad) .panel-accesibilidad .section-title {
 
   .contenedor-radios { flex-wrap: wrap; }
 }
+
+/* ==========================================
+   NUEVO: Solución para eliminar el ojo duplicado
+   ========================================== */
+
+/* 1. Oculta el ojo nativo del navegador (Edge / Chrome) */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none !important;
+}
+
+/* 2. Alinea tu botón e impide que el texto se encime */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* Espacio para que la contraseña no choque con el ojo */
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  color: #666;
+  z-index: 2; /* Pone tu icono por encima */
+}
+
+/* Color del icono en modo oscuro para que siga siendo visible */
+body.modo-oscuro .btn-toggle-password,
+body.dark-mode .btn-toggle-password {
+  color: #cccccc;
+}

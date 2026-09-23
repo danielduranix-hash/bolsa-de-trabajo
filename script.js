@@ -49,71 +49,55 @@ function calcularEdadPerfil(fechaNacimiento) {
 function cargarDatosPerfilEnModal(usuario) {
   if (!usuario) return;
 
-  const asignarValor = (id, valor) => {
-    const el = document.getElementById(id);
-    if (el) el.value = valor || '';
-  };
-
-  asignarValor('perfilCurp', usuario.curp);
-  asignarValor('perfilNombreSidebar', usuario.nombre);
-  asignarValor('perfilPrimerApellidoSidebar', usuario.primer_apellido);
-  asignarValor('perfilSegundoApellidoSidebar', usuario.segundo_apellido);
+  if (document.getElementById('perfilCurp')) document.getElementById('perfilCurp').value = usuario.curp || '';
+  if (document.getElementById('perfilNombreSidebar')) document.getElementById('perfilNombreSidebar').value = usuario.nombre || '';
+  if (document.getElementById('perfilPrimerApellidoSidebar')) document.getElementById('perfilPrimerApellidoSidebar').value = usuario.primer_apellido || '';
+  if (document.getElementById('perfilSegundoApellidoSidebar')) document.getElementById('perfilSegundoApellidoSidebar').value = usuario.segundo_apellido || '';
   
-  asignarValor('perfilNombre', usuario.nombre);
-  asignarValor('perfilPrimerApellido', usuario.primer_apellido);
-  asignarValor('perfilSegundoApellido', usuario.segundo_apellido);
+  if (document.getElementById('perfilNombre')) document.getElementById('perfilNombre').value = usuario.nombre || '';
+  if (document.getElementById('perfilPrimerApellido')) document.getElementById('perfilPrimerApellido').value = usuario.primer_apellido || '';
+  if (document.getElementById('perfilSegundoApellido')) document.getElementById('perfilSegundoApellido').value = usuario.segundo_apellido || '';
 
-  asignarValor('perfilCorreo', usuario.correo);
-  asignarValor('perfilTelFijo', usuario.telefono_fijo);
-  asignarValor('perfilCelular', usuario.celular || usuario.telefono);
+  if (document.getElementById('perfilCorreo')) document.getElementById('perfilCorreo').value = usuario.correo || '';
+  if (document.getElementById('perfilTelFijo')) document.getElementById('perfilTelFijo').value = usuario.telefono_fijo || '';
+  if (document.getElementById('perfilCelular')) document.getElementById('perfilCelular').value = usuario.celular || '';
 
   if (usuario.fecha_nacimiento) {
-    try {
-      const fecha = new Date(usuario.fecha_nacimiento).toISOString().split('T')[0];
-      const elFecha = document.getElementById('perfilFechaNac');
-      if (elFecha) {
-        elFecha.value = fecha;
-        calcularEdadPerfil(fecha);
-      }
-    } catch (e) {
-      console.warn("Formato de fecha de nacimiento no válido", e);
+    const fecha = new Date(usuario.fecha_nacimiento).toISOString().split('T')[0];
+    if (document.getElementById('perfilFechaNac')) {
+      document.getElementById('perfilFechaNac').value = fecha;
+      calcularEdadPerfil(fecha);
     }
   }
 
   if (usuario.sexo) {
-    asignarValor('perfilSexo', usuario.sexo);
+    if (document.getElementById('perfilSexo')) {
+      document.getElementById('perfilSexo').value = usuario.sexo;
+    }
     const radioSexo = document.querySelector(`input[name="perfilSexo"][value="${usuario.sexo}"]`);
     if (radioSexo) radioSexo.checked = true;
   }
 
-  asignarValor('perfilCalle', usuario.calle);
-  asignarValor('perfilLetraCalle', usuario.letra_calle);
-  asignarValor('perfilNumero', usuario.numero || usuario.numero_calle);
-  asignarValor('perfilLetraNumero', usuario.letra_numero);
-  asignarValor('perfilPoblacion', usuario.poblacion || 'MÉRIDA');
-  asignarValor('perfilColonia', usuario.colonia);
-  asignarValor('perfilCP', usuario.codigo_postal || usuario.cp);
+  if (document.getElementById('perfilCalle')) document.getElementById('perfilCalle').value = usuario.calle || '';
+  if (document.getElementById('perfilLetraCalle')) document.getElementById('perfilLetraCalle').value = usuario.letra_calle || '';
+  if (document.getElementById('perfilNumero')) document.getElementById('perfilNumero').value = usuario.numero || usuario.numero_calle || '';
+  if (document.getElementById('perfilLetraNumero')) document.getElementById('perfilLetraNumero').value = usuario.letra_numero || '';
+  if (document.getElementById('perfilPoblacion')) document.getElementById('perfilPoblacion').value = usuario.poblacion || 'MÉRIDA';
+  if (document.getElementById('perfilColonia')) document.getElementById('perfilColonia').value = usuario.colonia || '';
+  if (document.getElementById('perfilCP')) document.getElementById('perfilCP').value = usuario.codigo_postal || usuario.cp || '';
 
   if (document.getElementById('perfilDiscapacidad')) {
     document.getElementById('perfilDiscapacidad').value = usuario.discapacidad || 'NINGUNA';
     evaluarNuevoComienzoPerfil();
   }
-  
-  asignarValor('perfilTipoApoyo', usuario.tipo_apoyo);
-  asignarValor('perfilContactoNombre', usuario.contacto_nombre);
-  asignarValor('perfilContactoParentesco', usuario.contacto_parentesco);
-  asignarValor('perfilCredencialFolio', usuario.credencial_folio);
-  
-  if (usuario.credencial_vencimiento) {
-    try {
-      const fechaVenc = new Date(usuario.credencial_vencimiento).toISOString().split('T')[0];
-      asignarValor('perfilCredencialVencimiento', fechaVenc);
-    } catch (e) {
-      console.warn("Formato de fecha de vencimiento no válido", e);
-    }
+  if (document.getElementById('perfilTipoApoyo')) document.getElementById('perfilTipoApoyo').value = usuario.tipo_apoyo || '';
+  if (document.getElementById('perfilContactoNombre')) document.getElementById('perfilContactoNombre').value = usuario.contacto_nombre || '';
+  if (document.getElementById('perfilContactoParentesco')) document.getElementById('perfilContactoParentesco').value = usuario.contacto_parentesco || '';
+  if (document.getElementById('perfilCredencialFolio')) document.getElementById('perfilCredencialFolio').value = usuario.credencial_folio || '';
+  if (document.getElementById('perfilCredencialVencimiento') && usuario.credencial_vencimiento) {
+    const fechaVenc = new Date(usuario.credencial_vencimiento).toISOString().split('T')[0];
+    document.getElementById('perfilCredencialVencimiento').value = fechaVenc;
   }
-
-  cargarSeccionEstudios(usuario);
 }
 
 function cargarSeccionEstudios(usuario) {
@@ -167,16 +151,11 @@ const empleos = [
 ];
 
 function inicializarMapa() {
-  const elMapa = document.getElementById('mapa');
-  if (!elMapa || mapa) return;
-
-  if (typeof L === 'undefined') {
-    console.error('La librería Leaflet (L) no está cargada.');
-    return;
-  }
+  if (mapa) return;
 
   mapa = L.map('mapa').setView([20.9670, -89.6237], 12);
 
+  // Mueve botones de aumento/disminución a la derecha para no obstruir el panel
   if (mapa.zoomControl) {
     mapa.zoomControl.setPosition('topright');
   }
@@ -276,7 +255,7 @@ function renderizarPanelFlotante(lista) {
         <span>ℹ️</span> ${item.titulo}
       </div>
       <div class="item-vacante-zona">
-        COL. ${item.zona.toUpperCase()}, MÉRIDA
+        COL. ${item.zona.toUpperCase()}, MERIDA
       </div>
     `;
 
@@ -306,7 +285,7 @@ function abrirPanelResultados() {
 }
 
 /* ==========================================================================
-   3. CALENDARIO DE EVENTOS (CONECTADO A BASE DE DATOS)
+   3. CALENDARIO DE EVENTOS (CONECTADO A BASE DE DATOS NEON)
    ========================================================================== */
 
 let mesActualIndex = 0;
@@ -427,7 +406,7 @@ async function inicializarCalendarioEventos() {
               timeZone: 'UTC'
             });
             return `
-              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center mb-2">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
                 <div>
                   <p class="font-bold text-slate-700 text-sm">📅 ${fechaStr}</p>
                   <p class="text-xs text-slate-500">📍 ${ev.lugar || 'Sede por confirmar'}</p>
@@ -454,7 +433,7 @@ async function inicializarCalendarioEventos() {
         document.body.appendChild(modalOverlay);
 
         const cerrarBtn = modalOverlay.querySelector('#cerrarModalBtn');
-        if (cerrarBtn) cerrarBtn.onclick = () => modalOverlay.remove();
+        cerrarBtn.onclick = () => modalOverlay.remove();
         modalOverlay.onclick = (event) => {
           if (event.target === modalOverlay) modalOverlay.remove();
         };
@@ -473,7 +452,7 @@ async function inicializarCalendarioEventos() {
 document.addEventListener('DOMContentLoaded', () => {
   inicializarCalendarioEventos();
 
-  // Elementos de Modales
+  // Modales
   const modalLogin = document.getElementById('modalLogin');
   const modalRegistro = document.getElementById('modalRegistro');
   const modalPerfil = document.getElementById('modalPerfil');
@@ -533,11 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnToggle.addEventListener('click', () => filtroBox.classList.toggle('colapsado'));
   }
 
-  const inputFiltroLista = document.getElementById('inputFiltroLista');
-  if (inputFiltroLista) {
-    inputFiltroLista.addEventListener('input', filtrarListaInterna);
-  }
-
   /* --- Recordar correo guardado --- */
   const correoGuardado = localStorage.getItem('correoRecordado');
   const inputCorreo = document.getElementById('loginCorreo');
@@ -568,29 +542,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (formReg) {
     formReg.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const paterno = document.getElementById('apellidoPaterno')?.value.trim();
       const materno = document.getElementById('apellidoMaterno')?.value.trim();
-      const pass = document.getElementById('password')?.value;
-      const confirmPass = document.getElementById('confirmarPassword')?.value;
 
       if (!paterno && !materno) {
         alert('Por favor, ingrese al menos un apellido.');
         return;
       }
-
-      const regexPassword = /^(?=.*[A-Z])[a-zA-Z0-9]{8,}$/;
-      if (!regexPassword.test(pass)) {
-        alert('La contraseña no cumple con los requisitos:\n• Mínimo 8 caracteres.\n• Al menos una letra mayúscula.\n• Solo letras (sin acentos/ñ) y números (sin símbolos).');
-        return;
-      }
-
-      if (confirmPass !== undefined && pass !== confirmPass) {
-        alert('Las contraseñas no coinciden.');
-        return;
-      }
-
-      const vulnerableVal = document.getElementById('vulnerable')?.value || 'NINGUNO';
 
       const datosRegistro = {
         curp: document.getElementById('curp')?.value.trim().toUpperCase(),
@@ -598,11 +556,11 @@ document.addEventListener('DOMContentLoaded', () => {
         primer_apellido: paterno,
         segundo_apellido: materno,
         correo: document.getElementById('correo')?.value.trim(),
-        password: pass,
+        password: document.getElementById('password')?.value,
         fecha_nacimiento: document.getElementById('fechaNacimiento')?.value,
         sexo: document.getElementById('sexo')?.value,
-        pertenece_grupo_vulnerable: vulnerableVal !== 'NINGUNO',
-        grupos_vulnerables: vulnerableVal !== 'NINGUNO' ? [vulnerableVal] : [],
+        pertenece_grupo_vulnerable: document.getElementById('vulnerable')?.value !== 'NINGUNO',
+        grupos_vulnerables: [document.getElementById('vulnerable')?.value].filter(Boolean),
         tiene_discapacidad: false,
         tipos_discapacidad: []
       };
@@ -645,7 +603,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (dropdownNombre) dropdownNombre.textContent = `${usuarioActivo.nombre || ''} ${usuarioActivo.primer_apellido || ''}`.trim();
       if (dropdownCorreo) dropdownCorreo.textContent = usuarioActivo.correo || '';
 
-      const esAdmin = usuarioActivo.rol === 'admin' || usuarioActivo.rol === 'superadmin' || (usuarioActivo.correo && usuarioActivo.correo.toLowerCase().includes('admin'));
+      const esAdmin = usuarioActivo.rol === 'admin' || usuarioActivo.rol === 'superadmin' || usuarioActivo.correo?.toLowerCase().includes('admin');
       if (btnVistaAdminMenu) btnVistaAdminMenu.style.display = esAdmin ? 'flex' : 'none';
     } else {
       if (btnUserAuth) btnUserAuth.style.display = 'inline-flex';
@@ -779,8 +737,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return val1 || val2 || null;
       };
 
-      const selectDiscapacidad = document.getElementById('perfilDiscapacidad')?.value || 'NINGUNA';
-
       const datosActualizados = {
         curp: curp,
         nombre: obtenerValor('perfilNombreSidebar', 'perfilNombre'),
@@ -800,8 +756,8 @@ document.addEventListener('DOMContentLoaded', () => {
         codigo_postal: document.getElementById('perfilCP')?.value?.trim() || null,
         telefono_fijo: document.getElementById('perfilTelFijo')?.value?.trim() || null,
         celular: document.getElementById('perfilTelefono')?.value?.trim() || document.getElementById('perfilCelular')?.value?.trim() || null,
-        discapacidad: selectDiscapacidad,
-        es_nuevo_comienzo: selectDiscapacidad !== 'NINGUNA',
+        discapacidad: document.getElementById('perfilDiscapacidad')?.value || 'NINGUNA',
+        es_nuevo_comienzo: (document.getElementById('perfilDiscapacidad')?.value || 'NINGUNA') !== 'NINGUNA',
         tipo_apoyo: document.getElementById('perfilTipoApoyo')?.value?.trim() || null,
         contacto_nombre: document.getElementById('perfilContactoNombre')?.value?.trim() || null,
         contacto_parentesco: document.getElementById('perfilContactoParentesco')?.value?.trim() || null,
@@ -836,7 +792,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnAdmin) {
     btnAdmin.addEventListener('click', (e) => {
       e.preventDefault();
-      if (usuarioActivo && (usuarioActivo.rol === 'admin' || usuarioActivo.rol === 'superadmin')) {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+      if (usuario && (usuario.rol === 'admin' || usuario.rol === 'superadmin')) {
         window.location.href = 'admin.html';
       } else {
         alert('Acceso no autorizado: Se requieren permisos administrativos.');
@@ -936,7 +893,7 @@ document.addEventListener('DOMContentLoaded', () => {
     quitarResaltados();
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 
-    const esGeoPortal = vistaGeoPortal && vistaGeoPortal.style.display !== 'none';
+    const esGeoPortal = typeof vistaGeoPortal !== 'undefined' && vistaGeoPortal && vistaGeoPortal.style.display !== 'none';
     const pasarela = esGeoPortal ? tutorialesPorSeccion.geoportal : tutorialesPorSeccion.inicio;
 
     if (pasoActual >= pasarela.length) {
@@ -1016,7 +973,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Funciones de Accesibilidad globales
+  // Funciones de Accesibilidad vinculadas al objeto `window`
   function cambiarFuente(accion) {
     let current = parseInt(localStorage.getItem('textSize') || '100', 10);
     let nuevo = accion === 'aumentar' ? Math.min(current + 10, 160) : Math.max(current - 10, 100);
@@ -1111,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.querySelectorAll('.btn-toggle').forEach(btn => {
+ document.querySelectorAll('.btn-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
       const accion = btn.dataset.accion;
       const funciones = {
@@ -1140,7 +1097,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Restaurar preferencias guardadas
+  // Restaurar preferencias al cargar la página
   function restaurarAccesibilidad() {
     const preferencias = {
       'altoContraste': 'alto-contraste',
@@ -1175,4 +1132,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   restaurarAccesibilidad();
+
+  // ==========================================
+  // REGISTRO DE EVENTO: MOSTRAR / OCULTAR CONTRASEÑA
+  // ==========================================
+  document.querySelectorAll('.btn-toggle-password').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const wrapper = button.closest('.password-wrapper');
+      const input = wrapper ? wrapper.querySelector('input') : null;
+
+      if (!input) return;
+
+      const isPassword = input.type === 'password';
+
+      // Alterna visibilidad
+      input.type = isPassword ? 'text' : 'password';
+
+      // Actualiza atributos de accesibilidad
+      button.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+      button.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
+  });
+
 });
