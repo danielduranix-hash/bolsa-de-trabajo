@@ -1068,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.querySelectorAll('.btn-toggle').forEach(btn => {
+ document.querySelectorAll('.btn-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
       const accion = btn.dataset.accion;
       const funciones = {
@@ -1132,4 +1132,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   restaurarAccesibilidad();
+
+  // ==========================================
+  // REGISTRO DE EVENTO: MOSTRAR / OCULTAR CONTRASEÑA
+  // ==========================================
+  document.querySelectorAll('.btn-toggle-password').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const wrapper = button.closest('.password-wrapper');
+      const input = wrapper ? wrapper.querySelector('input') : null;
+
+      if (!input) return;
+
+      const isPassword = input.type === 'password';
+
+      // Alterna visibilidad
+      input.type = isPassword ? 'text' : 'password';
+
+      // Actualiza atributos de accesibilidad
+      button.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+      button.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
+  });
+
 });
