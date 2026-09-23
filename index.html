@@ -1496,8 +1496,19 @@
       }
     });
 
+    // Nombre: solo letras, espacios y acentos
+    inputNombre.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
+    });
+
+    // Teléfono: solo dígitos, máximo 10
+    inputTelefono.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    });
+
     // Limpiar errores al escribir
-    [inputNombre, inputCorreo, inputConfirmCorreo, inputTelefono, inputComentarios].forEach(campo => {
+    [inputNombre, inputCorreo, inputConfirmCorreo, inputTelefono, inputComentarios].forEach(campo => 
+    {
       campo.addEventListener('input', () => {
         campo.closest('div').classList.remove('border-rose-400', 'bg-rose-50/50');
       });
