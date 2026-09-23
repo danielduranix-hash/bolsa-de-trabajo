@@ -492,6 +492,15 @@ app.post('/api/consultas', async (req, res) => {
     });
   }
 
+  // Validar nombre: solo letras, espacios y acentos
+  const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+  if (!soloLetras.test(nombre_completo.trim())) {
+    return res.status(400).json({
+      exito: false,
+      mensaje: 'El nombre solo puede contener letras y espacios.'
+    });
+  }
+
   if (!/^\d{10}$/.test(telefono)) {
     return res.status(400).json({
       exito: false,

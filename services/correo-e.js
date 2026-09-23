@@ -91,7 +91,7 @@ async function enviarCorreoConsulta(datos) {
     subject: `📩 Nueva consulta ciudadana #${idConsulta}`,
     html: htmlRenderizado,
     text: `
-Nueva consulta ciudadana #${idConsulta}
+consulta ciudadana #${idConsulta}
 
 Nombre: ${nombre_completo}
 Correo: ${correo}
