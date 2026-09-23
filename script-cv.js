@@ -649,13 +649,300 @@ if (inputColorTema) {
       agregarFilaIdioma("Español", "Nativo");
     }
   }
+  // 1. Función para obtener la clave única del usuario activo
+function obtenerClaveCVUsuario() {
+  if (!usuarioActivo) return null;
+  const idUnico = usuarioActivo.curp || usuarioActivo.correo || usuarioActivo.id;
+  return idUnico ? `progresoCV_${idUnico.toString().toLowerCase().trim()}` : null;
+}
 
+// 2. Cargar datos del borrador del CV asociados al usuario activo
+function cargarProgresoGuardado() {
+  const formCV = document.getElementById('cvForm');
+  
+  // 1. Limpiamos la lista previa de idiomas
+  if (typeof idiomasLista !== 'undefined' && idiomasLista) {
+    idiomasLista.innerHTML = '';
+  }
+
+  // 2. Limpiamos el formulario para que no arrastre datos de la sesión anterior
+  if (formCV) {
+    formCV.reset();
+  }
+
+  const claveCV = obtenerClaveCVUsuario();
+
+  // Si no hay un usuario activo en sesión, colocamos valores por defecto
+  if (!claveCV) {
+    if (typeof agregarFilaIdioma === 'function') agregarFilaIdioma("Español", "Nativo");
+    if (typeof cambiarPaso === 'function') cambiarPaso(1);
+    return;
+  }
+
+  const guardado = localStorage.getItem(claveCV);
+
+  // 3. Si el usuario NO tiene un borrador previo, autocompletamos con sus datos personales
+  if (!guardado) {
+    if (typeof agregarFilaIdioma === 'function') agregarFilaIdioma("Español", "Nativo");
+    if (typeof cambiarPaso === 'function') cambiarPaso(1);
+
+    if (usuarioActivo) {
+      const nombreCompleto = `${usuarioActivo.nombre || ''} ${usuarioActivo.primer_apellido || ''} ${usuarioActivo.segundo_apellido || ''}`.trim();
+      
+      const campoNombre = document.getElementById('nombre') || (formCV ? formCV.elements['nombre'] : null);
+      const campoCorreo = document.getElementById('correo') || (formCV ? formCV.elements['correo'] : null);
+      const campoTel = document.getElementById('telefono') || (formCV ? formCV.elements['telefono'] : null);
+
+      if (campoNombre) campoNombre.value = nombreCompleto || usuarioActivo.nombre || '';
+      if (campoCorreo) campoCorreo.value = usuarioActivo.correo || '';
+      if (campoTel) campoTel.value = usuarioActivo.celular || usuarioActivo.telefono_fijo || '';
+    }
+    return;
+  }
+
+  // 4. Restaurar los datos guardados del usuario activo
+  try {
+    const datos = JSON.parse(guardado);
+
+    Object.keys(datos).forEach(key => {
+      if (key === 'pasoActual' || key === 'disenoCv' || key === 'idiomas' || key === 'colorTema') return;
+      
+      // Busca primero por ID global y si no por 'name' dentro del formulario
+      const el = document.getElementById(key) || (formCV ? formCV.elements[key] : null);
+      if (el) {
+        el.value = datos[key];
+        // Disparar eventos habilitando la propagación (bubbles: true) para actualizar la vista previa
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+
+    // Restaurar Color de Tema
+    if (datos.colorTema) {
+      const colorInput = document.getElementById('inputColorTema');
+      if (colorInput) {
+        colorInput.value = datos.colorTema;
+        document.documentElement.style.setProperty('--cv-theme-color', datos.colorTema);
+        const cvPaperEl = document.getElementById('cvPaper');
+        if (cvPaperEl) cvPaperEl.style.setProperty('--cv-theme-color', datos.colorTema);
+      }
+    }
+
+    // Restaurar Idiomas
+    if (datos.idiomas && Array.isArray(datos.idiomas) && datos.idiomas.length > 0) {
+      datos.idiomas.forEach(i => {
+        if (typeof agregarFilaIdioma === 'function') agregarFilaIdioma(i.nombre, i.nivel);
+      });
+    } else {
+      if (typeof agregarFilaIdioma === 'function') agregarFilaIdioma("Español", "Nativo");
+    }
+
+    // Restaurar Diseño de plantilla
+    if (datos.disenoCv) {
+      const radio = document.querySelector(`input[name="disenoCv"][value="${datos.disenoCv}"]`);
+      if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    // Restaurar el Paso del asistente
+    if (datos.pasoActual && typeof cambiarPaso === 'function') {
+      cambiarPaso(datos.pasoActual);
+    }
+  } catch (e) {
+    console.error("Error al restaurar los datos del borrador:", e);
+    if (typeof agregarFilaIdioma === 'function') agregarFilaIdioma("Español", "Nativo");
+  }
+}
+
+// 3. Guardar el borrador en la clave del usuario activo
+// ==========================================================================
+  // 8. PERSISTENCIA DE DATOS Y GESTIÓN DE SESIÓN
+  // ==========================================================================
+
+  // A. Obtener el usuario activo garantizando persistencia al hacer F5
+  function obtenerUsuarioSesion() {
+    if (typeof usuarioActivo !== 'undefined' && usuarioActivo) {
+      return usuarioActivo;
+    }
+    const usuarioGuardado = localStorage.getItem('usuarioActivo') || sessionStorage.getItem('usuarioActivo');
+    if (usuarioGuardado) {
+      try {
+        window.usuarioActivo = JSON.parse(usuarioGuardado);
+        return window.usuarioActivo;
+      } catch (e) {
+        console.error("Error al parsear usuario de sesión:", e);
+      }
+    }
+    return null;
+  }
+
+  // B. Generar la clave única para guardar los datos en LocalStorage
+  function obtenerClaveCVUsuario() {
+    const user = obtenerUsuarioSesion();
+    if (!user) return 'cv_builder_draft'; // Clave genérica por defecto si no hay login
+    const idUnico = user.curp || user.correo || user.id;
+    return idUnico ? `progresoCV_${idUnico.toString().toLowerCase().trim()}` : 'cv_builder_draft';
+  }
+
+  // C. Guardar el progreso del usuario
+  function guardarProgreso() {
+    const claveCV = obtenerClaveCVUsuario();
+    const formCV = document.getElementById('cvForm');
+
+    const datosCV = {};
+
+    // Si existe el formulario, guardamos todos sus controles
+    if (formCV) {
+      const elementosForm = formCV.querySelectorAll('input, textarea, select');
+      elementosForm.forEach(el => {
+        if (el.type === 'radio' || el.type === 'checkbox') {
+          if (el.checked) {
+            if (el.id) datosCV[el.id] = el.value;
+            if (el.name) datosCV[el.name] = el.value;
+          }
+        } else {
+          if (el.id) datosCV[el.id] = el.value;
+          if (el.name) datosCV[el.name] = el.value;
+        }
+      });
+    }
+
+    // Capturar diseño de la plantilla
+    const radioDiseno = document.querySelector('input[name="disenoCv"]:checked');
+    if (radioDiseno) datosCV.disenoCv = radioDiseno.value;
+
+    // Capturar color del tema
+    const colorInput = document.getElementById('inputColorTema');
+    if (colorInput) datosCV.colorTema = colorInput.value;
+
+    // Capturar paso actual del asistente
+    datosCV.pasoActual = typeof pasoActual !== 'undefined' ? pasoActual : 1;
+
+    // Capturar idiomas agregados dinámicamente
+    const arregloIdiomas = [];
+    document.querySelectorAll('.idioma-row').forEach(row => {
+      const nom = row.querySelector('.select-idioma-nombre')?.value;
+      const niv = row.querySelector('.select-idioma-nivel')?.value;
+      if (nom && niv) arregloIdiomas.push({ nombre: nom, nivel: niv });
+    });
+    if (arregloIdiomas.length > 0) datosCV.idiomas = arregloIdiomas;
+
+    localStorage.setItem(claveCV, JSON.stringify(datosCV));
+  }
+
+  // D. Cargar datos del borrador guardados
+  function cargarProgresoGuardado() {
+    const formCV = document.getElementById('cvForm');
+
+    if (typeof idiomasLista !== 'undefined' && idiomasLista) {
+      idiomasLista.innerHTML = '';
+    }
+
+    if (formCV) {
+      formCV.reset();
+    }
+
+    const claveCV = obtenerClaveCVUsuario();
+    const guardado = localStorage.getItem(claveCV);
+
+    // Si NO hay borrador guardado, autocompletamos con datos del perfil del usuario
+    if (!guardado) {
+      if (typeof agregarFilaIdioma === 'function') agregarFilaIdioma("Español", "Nativo");
+      if (typeof cambiarPaso === 'function') cambiarPaso(1);
+
+      const user = obtenerUsuarioSesion();
+      if (user) {
+        const nombreCompleto = `${user.nombre || ''} ${user.primer_apellido || ''} ${user.segundo_apellido || ''}`.trim();
+        const campoNombre = document.getElementById('nombre') || (formCV ? formCV.elements['nombre'] : null);
+        const campoCorreo = document.getElementById('correo') || (formCV ? formCV.elements['correo'] : null);
+        const campoTel = document.getElementById('telefono') || (formCV ? formCV.elements['telefono'] : null);
+
+        if (campoNombre) {
+          campoNombre.value = nombreCompleto || user.nombre || '';
+          campoNombre.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (campoCorreo) {
+          campoCorreo.value = user.correo || '';
+          campoCorreo.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (campoTel) {
+          campoTel.value = user.celular || user.telefono_fijo || '';
+          campoTel.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+      return;
+    }
+
+    // Si SÍ existe borrador previo, lo restauramos
+    try {
+      const datos = JSON.parse(guardado);
+
+      Object.keys(datos).forEach(key => {
+        if (key === 'pasoActual' || key === 'disenoCv' || key === 'idiomas' || key === 'colorTema') return;
+
+        const el = document.getElementById(key) || (formCV ? formCV.elements[key] : null);
+        if (el) {
+          el.value = datos[key];
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+
+      // Restaurar tema de color
+      if (datos.colorTema) {
+        const colorInput = document.getElementById('inputColorTema');
+        if (colorInput) {
+          colorInput.value = datos.colorTema;
+          document.documentElement.style.setProperty('--cv-theme-color', datos.colorTema);
+          const cvPaperEl = document.getElementById('cvPaper');
+          if (cvPaperEl) cvPaperEl.style.setProperty('--cv-theme-color', datos.colorTema);
+        }
+      }
+
+      // Restaurar lista de idiomas
+      if (datos.idiomas && Array.isArray(datos.idiomas) && datos.idiomas.length > 0) {
+        datos.idiomas.forEach(i => {
+          if (typeof agregarFilaIdioma === 'function') agregarFilaIdioma(i.nombre, i.nivel);
+        });
+      } else {
+        if (typeof agregarFilaIdioma === 'function') agregarFilaIdioma("Español", "Nativo");
+      }
+
+      // Restaurar diseño de plantilla
+      if (datos.disenoCv) {
+        const radio = document.querySelector(`input[name="disenoCv"][value="${datos.disenoCv}"]`);
+        if (radio) {
+          radio.checked = true;
+          radio.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+
+      // Restaurar el paso actual
+      if (datos.pasoActual && typeof cambiarPaso === 'function') {
+        cambiarPaso(datos.pasoActual);
+      }
+    } catch (e) {
+      console.error("Error al restaurar los datos del borrador:", e);
+      if (typeof agregarFilaIdioma === 'function') agregarFilaIdioma("Español", "Nativo");
+    }
+  }
+
+  // ==========================================================================
+  // 9. ESCUCHADORES DE EVENTOS E INICIALIZACIÓN
+  // ==========================================================================
   const formCV = document.getElementById('cvForm');
   if (formCV) {
     formCV.addEventListener('input', guardarProgreso);
     formCV.addEventListener('change', guardarProgreso);
   }
 
-  // Inicialización de la app
+  window.addEventListener('beforeunload', () => {
+    guardarProgreso();
+  });
+
+  // CARGAR LOS DATOS AUTOMÁTICAMENTE AL CARGAR EL DOM
   cargarProgresoGuardado();
+
 });
